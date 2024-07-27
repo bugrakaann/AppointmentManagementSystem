@@ -1,0 +1,27 @@
+@model IEnumerable<AppointmentManagementSystem.DTOs.CustomerDto>
+
+@{
+    Layout = "_Layout";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Customer List</title>
+    @foreach(var customer in Model)
+    {
+        <div>
+            <h2>@customer.name @customer.surname</h2>
+            <p>@customer.email</p>
+            <p>@customer.phoneNumber</p>
+            <p>@customer.address</p>
+        </div>
+    }
+</head>
+<body>
+<div>
+      
+</div>
+</body>
+</html>
