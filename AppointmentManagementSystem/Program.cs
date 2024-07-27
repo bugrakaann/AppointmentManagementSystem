@@ -1,5 +1,7 @@
-using AppointmentManagementSystem.Models;
+using Data_Access_Layer.Data;
 using Microsoft.EntityFrameworkCore;
+using Profiles.Profiles;
+using Services.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,13 +9,19 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 // Register AutoMapper
-builder.Services.AddAutoMapper(typeof(Program));
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
     options.UseSqlServer(connectionString);
 });
+
+
+// Register services
+//builder.Services.AddScoped<IAppointmentService, AppointmentService>();
+//builder.Services.AddScoped<ICustomerService, CustomerService>();
+
 
 var app = builder.Build();
 

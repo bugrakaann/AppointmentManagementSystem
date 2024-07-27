@@ -1,6 +1,6 @@
-namespace AppointmentManagementSystem.Models;
+namespace DTOs.DTOs;
 
-public class Customer : IEntity
+public class CustomerDto
 {
     public int id { get; set; }
     public string phoneNumber { get; set; }
@@ -8,6 +8,4 @@ public class Customer : IEntity
     public string surname { get; set; }
     public string email { get; set; }
     public string address { get; set; }
-    
-    public ICollection<Appointment> Appointments { get; set; }
 }

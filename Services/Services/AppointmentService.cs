@@ -1,10 +1,9 @@
-using System.Collections;
-using AppointmentManagementSystem.DTOs;
-using AppointmentManagementSystem.Models;
-using AppointmentManagementSystem.Repositories;
 using AutoMapper;
+using Data_Access_Layer.Repositories;
+using DTOs.DTOs;
+using Models.Models;
 
-namespace AppointmentManagementSystem.Services;
+namespace Services.Services;
 
 public class AppointmentService : IAppointmentService
 {

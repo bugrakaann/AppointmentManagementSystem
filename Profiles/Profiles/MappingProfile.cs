@@ -1,8 +1,8 @@
 using AutoMapper;
-using AppointmentManagementSystem.Models;
-using AppointmentManagementSystem.DTOs;
+using DTOs.DTOs;
+using Models.Models;
 
-namespace AppointmentManagementSystem.Profiles;
+namespace Profiles.Profiles;
 
 public class MappingProfile: Profile
 {

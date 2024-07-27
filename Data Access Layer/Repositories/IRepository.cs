@@ -1,4 +1,4 @@
-namespace AppointmentManagementSystem.Repositories;
+namespace Data_Access_Layer.Repositories;
 
 public interface IRepository<T>
 {

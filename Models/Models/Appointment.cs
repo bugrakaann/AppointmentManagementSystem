@@ -1,4 +1,4 @@
-namespace AppointmentManagementSystem.Models;
+namespace Models.Models;
 
 public class Appointment : IEntity
 {

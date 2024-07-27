@@ -1,7 +1,8 @@
-using AppointmentManagementSystem.Models;
+using Data_Access_Layer.Data;
 using Microsoft.EntityFrameworkCore;
+using Models.Models;
 
-namespace AppointmentManagementSystem.Repositories;
+namespace Data_Access_Layer.Repositories;
 
 public class Repository<T> : IRepository<T> where T : class, IEntity
 {

@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using Models.Models;
 
-namespace AppointmentManagementSystem.Models;
+namespace Data_Access_Layer.Data;
 
 public class ApplicationDbContext : DbContext
 {

@@ -1,6 +1,6 @@
-using AppointmentManagementSystem.Models;
+using Models.Models;
 
-namespace AppointmentManagementSystem.DTOs;
+namespace DTOs.DTOs;
 
 public class AppointmentDto
 {

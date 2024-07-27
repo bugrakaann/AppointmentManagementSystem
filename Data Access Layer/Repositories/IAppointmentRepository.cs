@@ -1,6 +1,6 @@
-using AppointmentManagementSystem.Models;
+using Models.Models;
 
-namespace AppointmentManagementSystem.Repositories;
+namespace Data_Access_Layer.Repositories;
 
 public interface IAppointmentRepository : IRepository<Appointment>
 {

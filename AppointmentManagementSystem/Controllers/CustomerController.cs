@@ -1,8 +1,9 @@
-using AppointmentManagementSystem.Models;
-using AppointmentManagementSystem.Repositories;
-using AppointmentManagementSystem.Services;
 using AutoMapper;
+using Data_Access_Layer.Data;
+using Data_Access_Layer.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using Models.Models;
+using Services.Services;
 
 namespace AppointmentManagementSystem.Controllers;
 

@@ -1,6 +1,6 @@
-using AppointmentManagementSystem.DTOs;
+using DTOs.DTOs;
 
-namespace AppointmentManagementSystem.Services;
+namespace Services.Services;
 
 public interface IAppointmentService
 {
