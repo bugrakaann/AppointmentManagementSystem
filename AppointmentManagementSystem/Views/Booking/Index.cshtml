@@ -1,0 +1,312 @@
+@{
+ViewBag.Title = "title";
+Layout = "_Layout";
+
+int tabNumber = Math.Min(7, Model.Count);
+int pageIndex = ViewBag.PageIndex;
+int totalPages = ViewBag.TotalPages;
+int? activeSlotId = ViewBag.ActiveSlotId;
+}
+@model List<KeyValuePair<DateTime, IEnumerable<DTOs.DTOs.DoctorAvailabilityDto>>>
+
+
+<head>
+<style>
+    /* Default button style */
+    .btn {
+        background-color: #f24400; /* Default blue color */
+        color: white;
+    }
+
+    /* Disabled button style */
+    .btn.disabled {
+        background-color: #cccccc; /* Gray color for disabled state */
+        color: #666666; /* Darker gray for text */
+        pointer-events: none; /* Disable pointer events */
+    }
+</style>
+</head>
+
+<body>
+
+<!-- Main Wrapper -->
+	<div class="main-wrapper">
+				
+		
+			<!-- Breadcrumb -->
+			<div class="breadcrumb-bar">
+				<div class="container-fluid">
+					<div class="row align-items-center">
+						<div class="col-md-12 col-12">
+							<nav aria-label="breadcrumb" class="page-breadcrumb">
+								<ol class="breadcrumb">
+									<li class="breadcrumb-item"><a href="index.html">Home</a></li>
+									<li class="breadcrumb-item active" aria-current="page">Booking</li>
+								</ol>
+							</nav>
+							<h2 class="breadcrumb-title">Booking</h2>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- /Breadcrumb -->
+			
+			<!-- Page Content -->
+			<div class="content">
+				<div class="container">
+				
+					<div class="row">
+						<div class="col-12">
+							<div class="card">
+								<div class="card-body">
+									<div class="booking-pro-info">
+										<a href="instructor-profile.html" class="booking-pro-img">
+											<img src="~/assets/img/instructors/instructor-thumb-01.jpg" alt="User Image">
+										</a>
+										<div class="booking-info">
+											<h4><a href="instructor-profile.html">David Lee</a></h4>
+											<div class="rating">
+												<i class="fas fa-star filled"></i>
+												<i class="fas fa-star filled"></i>
+												<i class="fas fa-star filled"></i>
+												<i class="fas fa-star filled"></i>
+												<i class="fas fa-star"></i>
+												<span class="d-inline-block average-rating">35</span>
+											</div>
+											<p class="text-muted mb-0"><i class="fas fa-map-marker-alt"></i> Newyork, USA</p>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-12 col-sm-4 col-md-6">
+									<h4 class="mb-1">11 November 2019</h4>
+									<p class="text-muted">Monday</p>
+								</div>
+								<div class="col-12 col-sm-8 col-md-6 text-sm-end">
+									<div class="bookingrange btn btn-white btn-sm mb-3">
+										<i class="far fa-calendar-alt me-2"></i>
+										<span></span>
+										<i class="fas fa-chevron-down ms-2"></i>
+									</div>
+								</div>
+                            </div>
+							<!-- Schedule Widget -->
+							<div class="card booking-schedule schedule-widget">
+							
+								<!-- Schedule Header -->
+								<div class="schedule-header">
+									<div class="row">
+										<div class="col-md-12">
+										
+											<!-- Day Slot -->
+											<div class="day-slot">
+												<ul>
+													<li class="left-arrow">
+														@if (pageIndex > 0)
+														{
+															<a class="btn-custom" href="@Url.Action("Index", new { pageIndex = pageIndex - 1 })"><i class="fa fa-chevron-left"></i></a>
+														}
+														else
+														{
+															<button class="btn-custom" disabled><i class="fa fa-chevron-left"></i></button>
+														}
+													</li>
+													@for(int i = 0; i < tabNumber; i++)
+													{
+														<li>
+															<span>@Model.ElementAt(i).Key.ToString("ddd")</span>
+															<span class="slot-date">@Model.ElementAt(i).Key.ToString("dd MMM") <small class="slot-year">@Model.ElementAt(i).Key.ToString("yyyy")</small></span>
+														</li>
+													}
+													
+													<li class="right-arrow">
+														@if (pageIndex < totalPages - 1)
+														{
+															<a class="btn-custom" href="@Url.Action("Index", new { pageIndex = pageIndex + 1 })"><i class="fa fa-chevron-right"></i></a>
+														}
+														else
+														{
+															<button class="btn-custom" disabled><i class="fa fa-chevron-right"></i></button>
+														}
+													</li>
+												</ul>
+											</div>
+											<!-- /Day Slot -->
+											
+										</div>
+									</div>
+								</div>
+								<!-- /Schedule Header -->
+								
+								<!-- Schedule Content -->
+								<div class="schedule-cont">
+									<div class="row">
+										<div class="col-md-12">
+										
+											<!-- Time Slot -->
+											<div class="time-slot">
+												<ul class="clearfix">
+													@for(int i = 0; i < tabNumber; i++)
+													{
+														<li>
+															@foreach(var item in Model.ElementAt(i).Value)
+															{
+																var isActive = false;
+																if (activeSlotId != null && item.id == activeSlotId)
+																	isActive = true;
+                    											var style = isActive ? "background-color: red; color: white;" : "";
+
+
+																<a class="timing" href="javascript:void(0);" style="@style" onclick="setActiveSlot(@item.id)">
+																	<span>@item.WorkStart.ToString("hh:mm")</span> <span>@item.WorkEnd.ToString("tt")</span>
+																</a>
+															}
+														</li>
+													}
+												</ul>
+											</div>
+											<!-- /Time Slot -->
+											
+										</div>
+									</div>
+								</div>
+								<!-- /Schedule Content -->
+								
+							</div>
+							<!-- /Schedule Widget -->
+							
+							<!-- Submit Section -->
+							<div class="submit-section proceed-btn text-end">
+								<a href="javascript:void(0);" id="scheduleAppointmentBtn" class="btn btn-primary submit-btn" data-bs-toggle="modal" data-bs-target="#editCustomerDetailsModal">Schedule Appointment</a>
+							</div>
+							<!-- /Submit Section -->
+							
+						</div>
+					</div>
+				</div>
+
+			</div>		
+			
+		</div>
+		<!-- /Main Wrapper -->
+	  <!-- Edit Customer Details Modal -->
+<div class="modal fade custom-modal" id="editCustomerDetailsModal" tabindex="-1" aria-labelledby="editCustomerDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-secondary text-white">
+                <h5 class="modal-title" id="editCustomerDetailsModalLabel">Update Your Information</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="customerDetailsForm" action="@Url.Action("SaveChanges","Booking")" method="post">
+					<input type="hidden" id="activeSlotId" name="activeSlotId" value="@activeSlotId" />
+                    <div class="form-section">
+                        <div class="form-group row mb-3">
+                            <label for="customerName" class="col-sm-3 col-form-label">First Name</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="customerName" name="Name" required>
+                            </div>
+                        </div>
+                        <div class="form-group row mb-3">
+                            <label for="customerSurname" class="col-sm-3 col-form-label">Surname</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="customerSurname" name="Surname" required>
+                            </div>
+                        </div>
+                        <div class="form-group row mb-3">
+                            <label for="customerPhoneNumber" class="col-sm-3 col-form-label">Phone</label>
+                            <div class="col-sm-9">
+                                <input type="tel" class="form-control" id="customerPhoneNumber" name="PhoneNumber" required>
+                            </div>
+                        </div>
+                        <div class="form-group row mb-3">
+                            <label for="customerEmail" class="col-sm-3 col-form-label">Email</label>
+                            <div class="col-sm-9">
+                                <input type="email" class="form-control" id="customerEmail" name="Email" required>
+                            </div>
+                        </div>
+                        <div class="form-group row mb-3">
+                            <label for="customerAddress" class="col-sm-3 col-form-label">Address</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="customerAddress" name="Address" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-success">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Edit Customer Details Modal -->
+
+
+		<!-- jQuery -->
+		  <script src="~/assets/js/jquery-3.6.1.min.js"></script>
+		
+		<!-- Bootstrap Core JS -->
+		<script src="~/assets/js/bootstrap.bundle.min.js"></script>
+		
+		<!-- Daterangepikcer JS -->
+		<script src="~/assets/js/moment.min.js"></script>
+		<script src="~/assets/plugins/daterangepicker/daterangepicker.js"></script>
+		
+		<!-- Slick JS -->
+		<script src="~/assets/js/slick.js"></script>
+		
+		<!-- Custom JS -->
+		<script src="~/assets/js/script.js"></script>
+		
+		<script>
+    function getQueryParam(name) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(name);
+    }
+
+    // Function to update the state of the Schedule Appointment button
+    function updateButtonState() {
+        const scheduleButton = document.getElementById('scheduleAppointmentBtn');
+        if (!scheduleButton) return; // Ensure the button exists
+
+        const activeSlotId = getQueryParam('activeSlotId');
+        if (activeSlotId) {
+            scheduleButton.classList.remove('disabled');
+            scheduleButton.removeAttribute('disabled');
+        } else {
+            scheduleButton.classList.add('disabled');
+            scheduleButton.setAttribute('disabled', 'disabled');
+        }
+    }
+
+    // Restore the scroll position after the page reloads
+    document.addEventListener("DOMContentLoaded", function() {
+        var scrollPosition = localStorage.getItem('scrollPosition');
+        if (scrollPosition) {
+            window.scrollTo(0, scrollPosition);
+            localStorage.removeItem('scrollPosition');
+        }
+
+        // Initial check to update button state
+        updateButtonState();
+
+        // Add event listener to update button state when activeSlotId changes
+        document.querySelectorAll('input[name="activeSlotId"]').forEach(function(input) {
+            input.addEventListener('change', function() {
+                const slotIndex = input.value;
+                setActiveSlot(slotIndex);
+            });
+        });
+    });
+
+    function setActiveSlot(slotIndex) {
+        var pageIndex = @ViewBag.PageIndex;
+        localStorage.setItem('scrollPosition', window.scrollY);
+        window.location.href = '@Url.Action("Index", "Booking")?pageIndex=' + pageIndex + '&activeSlotId=' + slotIndex;
+    }
+</script>
+	</body>
+</html>

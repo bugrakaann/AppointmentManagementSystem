@@ -1,27 +1,14 @@
-using Data_Access_Layer.Data;
-using Microsoft.EntityFrameworkCore;
-using Profiles.Profiles;
-using Services.Services;
+using Services;
+
 
 var builder = WebApplication.CreateBuilder(args);
+
+string conString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-// Register AutoMapper
-builder.Services.AddAutoMapper(typeof(MappingProfile));
-
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-{
-    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-    options.UseSqlServer(connectionString);
-});
-
-
-// Register services
-//builder.Services.AddScoped<IAppointmentService, AppointmentService>();
-//builder.Services.AddScoped<ICustomerService, CustomerService>();
-
+builder.Services.AddMyLibraryServices(conString);
 
 var app = builder.Build();
 
