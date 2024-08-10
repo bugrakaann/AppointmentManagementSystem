@@ -1,35 +1,85 @@
 @{
 ViewBag.Title = "title";
 Layout = "_Layout";
+
+var serializedModel = Newtonsoft.Json.JsonConvert.SerializeObject(Model);
+
+int tabNumber = Math.Min(7, Model.Count);
+int pageIndex = ViewBag.PageIndex;
+int totalPages = ViewBag.TotalPages;
 }
-<!DOCTYPE html>
-<html lang="en">
+
+@model List<KeyValuePair<DateTime, IEnumerable<DTOs.DTOs.DoctorAvailabilityDto>>>
+
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
 	<title>DreamsCLG</title>
 	
 	<!-- Favicons -->
-	<link rel="shortcut icon" type="image/x-icon" href="assets/img/favicon.png">
-		
+	<link rel="shortcut icon" type="image/x-icon" href="~/assets/img/favicon.png">
+
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+	<style>
+		.btn-custom {
+			background-color: #ff003b;
+			color: white;
+			border: none;
+			padding: 11px 10px; /* Adjust padding for smaller size */
+			font-size: 14px;   /* Adjust font size */
+			cursor: pointer;
+			display: flex;
+			align-items: center;
+			text-decoration: none; /* Remove underline from links */
+			border-radius: 4px; /* Optional: rounded corners */
+			line-height: 0.3;
+		}
+
+		.btn-custom i {
+			margin-left: 5px; /* Adjust spacing between text and icon */
+			font-size: 12px;  /* Adjust size of the icon */
+		}
+
+		.nav-link-custom {
+			display: inline-block;
+			padding: 5px 10px; /* Adjust padding for consistent size */
+			font-size: 14px;   /* Adjust font size */
+			color: #007bff;    /* Link color */
+			text-decoration: none; /* Remove underline from links */
+			border-radius: 4px; /* Optional: rounded corners */
+		}
+
+		.nav-link-custom.active {
+			background-color: #007bff;
+			color: white;
+		}
+
+		.nav-link-custom:hover {
+			background-color: #0056b3; /* Optional: hover effect */
+			color: white;
+		}
+	</style>
+
 	<!-- Bootstrap CSS -->
-	<link rel="stylesheet" href="assets/css/bootstrap.min.css">
+	<link rel="stylesheet" href="~/assets/css/bootstrap.min.css">
 			
 	<!-- Fontawesome CSS -->
-	<link rel="stylesheet" href="assets/plugins/fontawesome/css/fontawesome.min.css">
-	<link rel="stylesheet" href="assets/plugins/fontawesome/css/all.min.css">
+	<link rel="stylesheet" href="~/assets/plugins/fontawesome/css/fontawesome.min.css">
+	<link rel="stylesheet" href="~/assets/plugins/fontawesome/css/all.min.css">
 	
 	<!-- Select2 CSS -->
-		<link rel="stylesheet" href="assets/plugins/select2/css/select2.min.css">
+		<link rel="stylesheet" href="~/assets/plugins/select2/css/select2.min.css">
 	
 	<!-- Main CSS -->
-	<link rel="stylesheet" href="assets/css/style.css">
+	<link rel="stylesheet" href="~/assets/css/style.css">
 	
 	<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
 	<!--[if lt IE 9]>
-			<script src="assets/js/html5shiv.min.js"></script>
-			<script src="assets/js/respond.min.js"></script>
+			<script src="~/assets/js/html5shiv.min.js"></script>
+			<script src="~/assets/js/respond.min.js"></script>
 	<![endif]-->
+
+
 </head>
 	
 <body>
@@ -67,7 +117,7 @@ Layout = "_Layout";
 								<div class="widget-profile pro-widget-content">
 									<div class="profile-info-widget">
 										<a href="#" class="booking-pro-img">
-											<img src="assets/img/instructors/instructor-thumb-01.jpg" alt="User Image">
+											<img src="~/assets/img/instructors/instructor-thumb-01.jpg" alt="User Image">
 										</a>
 										<div class="profile-det-info">
 											<h3>David Lee</h3>
@@ -162,7 +212,7 @@ Layout = "_Layout";
 								<div class="col-sm-12">
 									<div class="card">
 										<div class="card-body">
-											<h4 class="card-title">Schedule Timings</h4>
+											<h4 class="card-title">Edit&Create Sessions</h4>
 											<div class="profile-box">
 												<div class="row">
 
@@ -171,8 +221,8 @@ Layout = "_Layout";
 												</div>     
 												<div class="row">
 													<div class="col-md-12">
-														<div class="card schedule-widget mb-0">
-														
+														<div class="card schedule-widget mb-0">	
+
 															<!-- Schedule Header -->
 															<div class="schedule-header">
 															
@@ -180,25 +230,37 @@ Layout = "_Layout";
 																<div class="schedule-nav">
 																	<ul class="nav nav-tabs nav-justified">
 																		<li class="nav-item">
-																			<a class="nav-link" data-bs-toggle="tab" href="#slot_sunday">Sunday</a>
+																			@if (pageIndex > 0)
+																			{
+																				<a class="btn-custom" href="@Url.Action("Index", new { pageIndex = pageIndex - 1 })"><i class="fas fa-arrow-left"></i></a>
+																			}
+																			else
+																			{
+																				<button class="btn-custom" disabled><i class="fas fa-arrow-left"></i></button>
+																			}
 																		</li>
+																		 
+																		 @for (int i = 0; i < tabNumber; i++) 
+																		 { 
+																		 	var availability = Model.ElementAt(i); 
+
+																		 	var isActive = i == 0 ? "active" : ""; 
+																		 
+																		 	DateTime workStart = availability.Key; 
+																		 	<li class="nav-item"> 
+																		 		<a class="nav-link @isActive" data-bs-toggle="tab" href="#slot_@i">@workStart.ToString("dd/MM/yy")</a> 
+																		 	</li> 
+																		 } 
+
 																		<li class="nav-item">
-																			<a class="nav-link active" data-bs-toggle="tab" href="#slot_monday">Monday</a>
-																		</li>
-																		<li class="nav-item">
-																			<a class="nav-link" data-bs-toggle="tab" href="#slot_tuesday">Tuesday</a>
-																		</li>
-																		<li class="nav-item">
-																			<a class="nav-link" data-bs-toggle="tab" href="#slot_wednesday">Wednesday</a>
-																		</li>
-																		<li class="nav-item">
-																			<a class="nav-link" data-bs-toggle="tab" href="#slot_thursday">Thursday</a>
-																		</li>
-																		<li class="nav-item">
-																			<a class="nav-link" data-bs-toggle="tab" href="#slot_friday">Friday</a>
-																		</li>
-																		<li class="nav-item">
-																			<a class="nav-link" data-bs-toggle="tab" href="#slot_saturday">Saturday</a>
+																			@if (pageIndex < totalPages - 1)
+																			{
+																				<a class="btn-custom" href="@Url.Action("Index", new { pageIndex = pageIndex + 1 })"><i class="fas fa-arrow-right"></i></a>
+																			}
+																			else
+																			{
+																				<button class="btn-custom" disabled><i class="fas fa-arrow-right"></i></button>
+																			}
 																		</li>
 																	</ul>
 																</div>
@@ -206,113 +268,39 @@ Layout = "_Layout";
 																
 															</div>
 															<!-- /Schedule Header -->
+															<div class="tab-content schedule-cont"></div>
+																<h4 class="card-title d-flex justify-content-between">
+																	<a class="edit-link" data-bs-toggle="modal" href="#edit_time_slot"><i class="fa fa-edit me-1"></i>Edit</a>
+																</h4>
 															
-															<!-- Schedule Content -->
 															<div class="tab-content schedule-cont">
-															
-																<!-- Sunday Slot -->
-																<div id="slot_sunday" class="tab-pane fade">
-																	<h4 class="card-title d-flex justify-content-between">
-																		<span>Time Slots</span> 
-																		<a class="edit-link" data-bs-toggle="modal" href="#add_time_slot"><i class="fa fa-plus-circle"></i> Add Slot</a>
-																	</h4>
-																	<p class="text-muted mb-0">Not Available</p>
-																</div>
-																<!-- /Sunday Slot -->
-
-																<!-- Monday Slot -->
-																<div id="slot_monday" class="tab-pane fade show active">
-																	<h4 class="card-title d-flex justify-content-between">
-																		<span>Time Slots</span> 
-																		<a class="edit-link" data-bs-toggle="modal" href="#edit_time_slot"><i class="fa fa-edit me-1"></i>Edit</a>
-																	</h4>
-																	
-																	<!-- Slot List -->
-																	<div class="pro-times">
-																		<div class="pro-slot-list">
-																			8:00 pm - 11:30 pm
-																			<a href="javascript:void(0)" class="delete_schedule">
-																				<i class="fa fa-times"></i>
-																			</a>
-																		</div>
-																		<div class="pro-slot-list">
-																			11:30 pm - 1:30 pm
-																			<a href="javascript:void(0)" class="delete_schedule">
-																				<i class="fa fa-times"></i>
-																			</a>
-																		</div>
-																		<div class="pro-slot-list">
-																			3:00 pm - 5:00 pm
-																			<a href="javascript:void(0)" class="delete_schedule">
-																				<i class="fa fa-times"></i>
-																			</a>
-																		</div>
-																		<div class="pro-slot-list">
-																			6:00 pm - 11:00 pm
-																			<a href="javascript:void(0)" class="delete_schedule">
-																				<i class="fa fa-times"></i>
-																			</a>
+																@for (int i = 0; i < tabNumber; i++) 
+																{ 
+																	var isActive = i == 0 ? "show active" : "";
+																	<div id="slot_@i" class="tab-pane fade @isActive">
+																		<h4 class="card-title d-flex justify-content-between">
+																			<span>Available Sessions</span> 
+																		</h4>    
+																		<div class="pro-times">
+																			@for (int j = 0; j < Model.ElementAt(i).Value.Count(); j++)
+																			{
+																				<div class="pro-slot-list" id="slot_@i@j">
+																					@{
+																						var availability = Model.ElementAt(i).Value.ElementAt(j);
+																					}
+																					@availability.WorkStart.ToString("HH:mm") - @availability.WorkEnd.ToString("HH:mm") 
+																					<a href=@Url.Action("DeleteSession", "DoctorAvailability")?id=@availability.id> 
+																						 <i class="fa fa-trash"></i>
+																					</a> 
+																				</div> 
+																			}
 																		</div>
 																	</div>
-																	<!-- /Slot List -->
-																	
-																</div>
-																<!-- /Monday Slot -->
-
-																<!-- Tuesday Slot -->
-																<div id="slot_tuesday" class="tab-pane fade">
-																	<h4 class="card-title d-flex justify-content-between">
-																		<span>Time Slots</span> 
-																		<a class="edit-link" data-bs-toggle="modal" href="#add_time_slot"><i class="fa fa-plus-circle"></i> Add Slot</a>
-																	</h4>
-																	<p class="text-muted mb-0">Not Available</p>
-																</div>
-																<!-- /Tuesday Slot -->
-
-																<!-- Wednesday Slot -->
-																<div id="slot_wednesday" class="tab-pane fade">
-																	<h4 class="card-title d-flex justify-content-between">
-																		<span>Time Slots</span> 
-																		<a class="edit-link" data-bs-toggle="modal" href="#add_time_slot"><i class="fa fa-plus-circle"></i> Add Slot</a>
-																	</h4>
-																	<p class="text-muted mb-0">Not Available</p>
-																</div>
-																<!-- /Wednesday Slot -->
-
-																<!-- Thursday Slot -->
-																<div id="slot_thursday" class="tab-pane fade">
-																	<h4 class="card-title d-flex justify-content-between">
-																		<span>Time Slots</span> 
-																		<a class="edit-link" data-bs-toggle="modal" href="#add_time_slot"><i class="fa fa-plus-circle"></i> Add Slot</a>
-																	</h4>
-																	<p class="text-muted mb-0">Not Available</p>
-																</div>
-																<!-- /Thursday Slot -->
-
-																<!-- Friday Slot -->
-																<div id="slot_friday" class="tab-pane fade">
-																	<h4 class="card-title d-flex justify-content-between">
-																		<span>Time Slots</span> 
-																		<a class="edit-link" data-bs-toggle="modal" href="#add_time_slot"><i class="fa fa-plus-circle"></i> Add Slot</a>
-																	</h4>
-																	<p class="text-muted mb-0">Not Available</p>
-																</div>
-																<!-- /Friday Slot -->
-
-																<!-- Saturday Slot -->
-																<div id="slot_saturday" class="tab-pane fade">
-																	<h4 class="card-title d-flex justify-content-between">
-																		<span>Time Slots</span> 
-																		<a class="edit-link" data-bs-toggle="modal" href="#add_time_slot"><i class="fa fa-plus-circle"></i> Add Slot</a>
-																	</h4>
-																	<p class="text-muted mb-0">Not Available</p>
-																</div>
-																<!-- /Saturday Slot -->
-
-															</div>
+																} 
 															<!-- /Schedule Content -->
 															
-														</div>
+															</div>
+															</div>
 													</div>
 												</div>
 											</div>
@@ -329,329 +317,79 @@ Layout = "_Layout";
 			</div>		
 			<!-- /Page Content -->
    
-			<!-- Footer -->
-			<footer class="footer">
-				
-				<div class="footer-top">
-					<div class="container">
-						<div class="row">
-							<div class="col-lg-3 col-md-6">
-							
-								<!-- Footer Widget -->
-								<div class="footer-widget footer-about">
-									<h2 class="footer-title">ABOUT DreamsCLG</h2>
-									<div class="footer-about-content">
-										<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut consequat mauris Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut consequat mauris </p>
-										
-									</div>
-								</div>
-								<!-- /Footer Widget -->
-								
-							</div>
-							
-							<div class="col-lg-3 col-md-6">
-							
-								<!-- Footer Widget -->
-								<div class="footer-widget footer-menu">
-									<h2 class="footer-title">POPULAR COURSES</h2>
-									<ul>
-										<li><a href="courses.html">Development</a></li>
-										<li><a href="courses.html">Business</a></li>
-										<li><a href="courses.html">IT & Software</a></li>
-										<li><a href="courses.html">Office Productivity</a></li>
-										<li><a href="courses.html">Personal Development</a></li>
-									</ul>
-								</div>
-								<!-- /Footer Widget -->
-								
-							</div>
-							
-							<div class="col-lg-3 col-md-6">
-							
-								<!-- Footer Widget -->
-								<div class="footer-widget footer-menu">
-									<h2 class="footer-title">SUPPORT</h2>
-									<ul>
-										<li><a href="booking.html">Booking</a></li>
-										<li><a href="chat.html">Chat</a></li>
-										<li><a href="reviews.html">Reviews</a></li>
-										<li><a href="favourites.html">Favourites </a></li>
-										<li><a href="college.html">College</a></li>
-									</ul>
-								</div>
-								<!-- /Footer Widget -->
-								
-							</div>
-							
-							<div class="col-lg-3 col-md-6">
-							
-								<!-- Footer Widget -->
-								<div class="footer-widget footer-contact">
-									<h2 class="footer-title">NEWSLETTER</h2>
-									<p> Sign Up to Our Newsletter to Get Latest Updates & Services</p>
-									<div class="my-3 footer-newsletter">
-										<form class="input-group">
-										<input type="email" placeholder="Enter Your Email">
-										<div>
-											<button class="btn btn-newsletter" type="submit"><i class="fa fa-paper-plane text-white" aria-hidden="true"></i></button>
-										</div>
-										</form>
-									</div>	
-								</div>
-								<!-- /Footer Widget -->
-								
-							</div>
-							
-						</div>
-					</div>
-				</div>
-				<!-- /Footer Top -->
-				
-				<!-- Footer Bottom -->
-                <div class="footer-bottom">
-					<div class="container">
-					
-						<!-- Copyright -->
-						<div class="copyright">
-							<div class="row">
-								<div class="col-md-4 col-lg-4">
-									<div class="copyright-text">
-										<p class="mb-0">© 2021 All Rights Reserved</p>
-									</div>
-								</div>
-								<div class="col-md-6 col-lg-4">
-									<div class="copyright-text">
-										<p class="mb-0"><a href="term-condition.html">Terms and Conditions</a> - <a href="privacy-policy.html">Privacy Policy</a></p>
-									</div>
-								</div>
-								<div class="col-md-2 col-lg-4 right-text">
-									<div class="social-icon">
-											<ul>
-												<li><a href="#" class="icon" target="_blank"><i class="fab fa-facebook-f"></i> </a></li>
-												<li><a href="#" class="icon" target="_blank"><i class="fab fa-twitter"></i> </a></li>
-												<li><a href="#" class="icon" target="_blank"><i class="fab fa-instagram"></i> </a></li>
-												<li><a href="#" class="icon" target="_blank"><i class="fab fa-linkedin-in"></i> </a></li>
-											</ul>
-										</div>
-								</div>
-							</div>
-						</div>
-						<!-- /Copyright -->
-						
-					</div>
-				</div>
-				<!-- /Footer Bottom -->
-				
-			</footer>
-			<!-- /Footer -->
 		   
 		</div>
 		<!-- /Main Wrapper -->
 		
-		<!-- Add Time Slot Modal -->
-		<div class="modal fade custom-modal" id="add_time_slot">
-			<div class="modal-dialog modal-dialog-centered">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title">Add Time Slots</h5>
-						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-						</button>
-					</div>
-					<div class="modal-body">
-						<form>
-							<div class="hours-info">
-								<div class="row form-row hours-cont">
-									<div class="col-12 col-md-10">
-										<div class="row form-row">
-											<div class="col-12 col-md-6">
-												<div class="form-group">
-													<label>Start Time</label>
-													<select class="form-control">
-														<option>-</option>
-														<option>12.00 am</option>
-														<option>12.30 am</option>  
-														<option>1.00 am</option>
-														<option>1.30 am</option>
-													</select>
-												</div> 
-											</div>
-											<div class="col-12 col-md-6">
-												<div class="form-group">
-													<label>End Time</label>
-													<select class="form-control">
-														<option>-</option>
-														<option>12.00 am</option>
-														<option>12.30 am</option>  
-														<option>1.00 am</option>
-														<option>1.30 am</option>
-													</select>
-												</div> 
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-							
-							<div class="add-more mb-3">
-								<a href="javascript:void(0);" class="add-hours"><i class="fa fa-plus-circle"></i> Add More</a>
-							</div>
-							<div class="submit-section text-center">
-								<button type="submit" class="btn btn-primary submit-btn">Save Changes</button>
-							</div>
-						</form>
-					</div>
-				</div>
-			</div>
-		</div>
-		<!-- /Add Time Slot Modal -->
-		
-		<!-- Edit Time Slot Modal -->
-		<div class="modal fade custom-modal" id="edit_time_slot">
-			<div class="modal-dialog modal-dialog-centered">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title">Edit Time Slots</h5>
-						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-						</button>
-					</div>
-					<div class="modal-body">
-						<form>
-							<div class="hours-info">
-								<div class="row form-row hours-cont">
-									<div class="col-12 col-md-10">
-										<div class="row form-row">
-											<div class="col-12 col-md-6">
-												<div class="form-group">
-													<label>Start Time</label>
-													<select class="form-control">
-														<option>-</option>
-														<option selected>12.00 am</option>
-														<option>12.30 am</option>  
-														<option>1.00 am</option>
-														<option>1.30 am</option>
-													</select>
-												</div> 
-											</div>
-											<div class="col-12 col-md-6">
-												<div class="form-group">
-													<label>End Time</label>
-													<select class="form-control">
-														<option>-</option>
-														<option>12.00 am</option>
-														<option selected>12.30 am</option>  
-														<option>1.00 am</option>
-														<option>1.30 am</option>
-													</select>
-												</div> 
-											</div>
-										</div>
-									</div>
-								</div>
-								
-								<div class="row form-row hours-cont">
-									<div class="col-12 col-md-10">
-										<div class="row form-row">
-											<div class="col-12 col-md-6">
-												<div class="form-group">
-													<label>Start Time</label>
-													<select class="form-control">
-														<option>-</option>
-														<option>12.00 am</option>
-														<option selected>12.30 am</option>
-														<option>1.00 am</option>
-														<option>1.30 am</option>
-													</select>
-												</div>
-											</div>
-											<div class="col-12 col-md-6">
-												<div class="form-group">
-													<label>End Time</label>
-													<select class="form-control">
-														<option>-</option>
-														<option>12.00 am</option>
-														<option>12.30 am</option>
-														<option selected>1.00 am</option>
-														<option>1.30 am</option>
-													</select>
-												</div>
-											</div>
-										</div>
-									</div>
-									<div class="col-12 col-md-2"><label class="d-md-block d-sm-none d-none">&nbsp;</label><a href="#" class="btn btn-danger trash"><i class="far fa-trash-alt"></i></a></div>
-								</div>
-								
-								<div class="row form-row hours-cont">
-									<div class="col-12 col-md-10">
-										<div class="row form-row">
-											<div class="col-12 col-md-6">
-												<div class="form-group">
-													<label>Start Time</label>
-													<select class="form-control">
-														<option>-</option>
-														<option>12.00 am</option>
-														<option>12.30 am</option>
-														<option selected>1.00 am</option>
-														<option>1.30 am</option>
-													</select>
-												</div>
-											</div>
-											<div class="col-12 col-md-6">
-												<div class="form-group">
-													<label>End Time</label>
-													<select class="form-control">
-														<option>-</option>
-														<option>12.00 am</option>
-														<option>12.30 am</option>
-														<option>1.00 am</option>
-														<option selected>1.30 am</option>
-													</select>
-												</div>
-											</div>
-										</div>
-									</div>
-									<div class="col-12 col-md-2"><label class="d-md-block d-sm-none d-none">&nbsp;</label><a href="#" class="btn btn-danger trash"><i class="far fa-trash-alt"></i></a></div>
-								</div>
 
-							</div>
-							
-							<div class="add-more mb-3">
-								<a href="javascript:void(0);" class="add-hours"><i class="fa fa-plus-circle"></i> Add More</a>
-							</div>
-							<div class="submit-section text-center">
-								<button type="submit" class="btn btn-primary submit-btn">Save Changes</button>
-							</div>
-						</form>
-					</div>
-				</div>
-			</div>
-		</div>
-		<!-- /Edit Time Slot Modal -->
+
+<!-- Edit Time Slot Modal -->
+<div class="modal fade custom-modal" id="edit_time_slot" >
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Time Slots</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="timeSlotsForm" action="@Url.Action("SaveChanges","DoctorAvailability")" method="post">
+    <div class="hours-info" id="hoursModal">
+        <div class="row form-row hours-cont">
+            <div class="col-12 col-md-10">
+                <div class="row form-row">
+                    <div class="col-12 col-md-6">
+                        <div class="form-group">
+                            <label>Start Time</label>
+                            <input class="form-control" name="WorkStart" type="datetime-local">
+                            <label>End Time</label>
+                            <input class="form-control" name="WorkEnd" type="datetime-local">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="submit-section text-center">
+        <button type="submit" class="btn btn-primary submit-btn">Save Changes</button>
+    </div>
+</form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- /Edit Time Slot Modal -->
 	  
 		<!-- jQuery -->
-		  <script src="assets/js/jquery-3.6.1.min.js"></script>
+		  <script src="~/assets/js/jquery-3.6.1.min.js"></script>
 		
 		<!-- Bootstrap Core JS -->
-		<script src="assets/js/bootstrap.bundle.min.js"></script>
+		<script src="~/assets/js/bootstrap.bundle.min.js"></script>
 		
 		<!-- Sticky Sidebar JS -->
-        <script src="assets/plugins/theia-sticky-sidebar/ResizeSensor.js"></script>
-        <script src="assets/plugins/theia-sticky-sidebar/theia-sticky-sidebar.js"></script>
+        <script src="~/assets/plugins/theia-sticky-sidebar/ResizeSensor.js"></script>
+        <script src="~/assets/plugins/theia-sticky-sidebar/theia-sticky-sidebar.js"></script>
 		
 		<!-- Select2 JS -->
-		<script src="assets/plugins/select2/js/select2.min.js"></script>
+		<script src="~/assets/plugins/select2/js/select2.min.js"></script>
 		
 		<!-- Slick JS -->
-		<script src="assets/js/slick.js"></script>
+		<script src="~/assets/js/slick.js"></script>
 		
 		<!-- Datetimepicker JS -->
-		<script src="assets/js/moment.min.js"></script>
-		<script src="assets/js/bootstrap-datetimepicker.min.js"></script>
+		<script src="~/assets/js/moment.min.js"></script>
+		<script src="~/assets/js/bootstrap-datetimepicker.min.js"></script>
 		
 		<!-- Fancybox JS -->
-		<script src="assets/plugins/fancybox/jquery.fancybox.min.js"></script>
+		<script src="~/assets/plugins/fancybox/jquery.fancybox.min.js"></script>
 		
 		<!-- Custom JS -->
-		<script src="assets/js/script.js"></script>
-		
+		<script src="~/assets/js/script.js"></script>
+
 	</body>
-</html>
+
+
+
+	
+		

@@ -17,8 +17,21 @@ public class HomeController : Controller
     {
         return View();
     }
-
-    public IActionResult Privacy()
+    
+    public IActionResult Booking()
+    {
+        return View();
+    }
+    
+    public IActionResult BookingSuccess()
+    {
+        return View();
+    }
+    public IActionResult Appointments()
+    {
+        return View();
+    }
+    public IActionResult ScheduleTimings()
     {
         return View();
     }

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Rewrite;
 using Services;
 
 
@@ -26,6 +27,7 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthorization();
+
 
 app.MapControllerRoute(
     name: "default",

@@ -19,4 +19,5 @@ public class ApplicationDbContext : DbContext
 
     public DbSet<Customer> Customers { get; set; }
     public DbSet<Appointment> Appointments { get; set; }
+    public DbSet<DoctorAvailability> DoctorAvailabilities { get; set; }
 }

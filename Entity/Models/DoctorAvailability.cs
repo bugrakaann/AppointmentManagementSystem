@@ -1,8 +1,8 @@
 namespace Models.Models;
 
-public class Doctor
+public class DoctorAvailability : IEntity
 {
-    public TimeSpan workStart { get; set; }
-    public TimeSpan workEnd { get; set; }
-    
+    public int id { get; set; }
+    public DateTime workStart { get; set; }
+    public DateTime workEnd { get; set; }
 }

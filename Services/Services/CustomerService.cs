@@ -7,16 +7,13 @@ namespace Services.Services;
 
 public class CustomerService : ICustomerService
 {
-    public readonly IRepository<Customer> _customerRepository;
     public readonly IMapper _mapper;
 
-    public CustomerService(IRepository<Customer> repository, IMapper mapper)
+    ICustomerRepository _customerRepository;
+
+    public CustomerService(ICustomerRepository customerRepository, IMapper mapper)
     {
-        _customerRepository = repository;
-        if(_customerRepository == null)
-        {
-            throw new ArgumentException("Invalid repository type");
-        }
+        _customerRepository = customerRepository;
         _mapper = mapper;
     }
     
@@ -36,6 +33,7 @@ public class CustomerService : ICustomerService
     {
         var _customer = _mapper.Map<Customer>(customer);
         _customerRepository.Add(_customer);
+        customer.id = _customer.id;
     }
 
     public void Update(CustomerDto customer)

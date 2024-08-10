@@ -18,4 +18,6 @@ public class AppointmentController : Controller
         var appointments = _service.GetAll();
         return View(appointments);
     }
+    
+    
 }

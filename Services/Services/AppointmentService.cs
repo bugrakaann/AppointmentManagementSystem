@@ -7,15 +7,14 @@ namespace Services.Services;
 
 public class AppointmentService : IAppointmentService
 {
-    private readonly IRepository<Appointment> _appointmentRepository;
+    private readonly IAppointmentRepository _appointmentRepository;
     private readonly IMapper _mapper;
-
-    public AppointmentService(IRepository<Appointment> repo, IMapper mapper)
+    
+    public AppointmentService(IAppointmentRepository appointmentRepository, IMapper mapper)
     {
-        _appointmentRepository = repo;
+        _appointmentRepository = appointmentRepository;
         _mapper = mapper;
     }
-
     public IEnumerable<AppointmentDto> GetAll()
     {
         var appointments = _appointmentRepository.GetAll();
