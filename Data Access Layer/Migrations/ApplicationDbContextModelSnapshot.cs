@@ -30,7 +30,7 @@ namespace Data_Access_Layer.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
 
-                    b.Property<int>("customerId")
+                    b.Property<int?>("customerId")
                         .HasColumnType("int");
 
                     b.Property<string>("description")
@@ -42,6 +42,9 @@ namespace Data_Access_Layer.Migrations
 
                     b.Property<DateTime>("startTime")
                         .HasColumnType("datetime2");
+
+                    b.Property<int>("status")
+                        .HasColumnType("int");
 
                     b.HasKey("id");
 
@@ -106,9 +109,7 @@ namespace Data_Access_Layer.Migrations
                 {
                     b.HasOne("Models.Models.Customer", "customer")
                         .WithMany("Appointments")
-                        .HasForeignKey("customerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("customerId");
 
                     b.Navigation("customer");
                 });

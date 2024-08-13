@@ -1,0 +1,398 @@
+@{
+    ViewBag.Title = "title";
+    Layout = "_Layout";
+
+    var serializedModel = Newtonsoft.Json.JsonConvert.SerializeObject(Model);
+    
+    int pageIndex = ViewBag.PageIndex;
+    var dates = Model.Select(w => w.startTime.Date).Distinct().ToList();
+    int tabNumber = Math.Min(7, dates.Count);
+}
+
+@model IEnumerable<DTOs.DTOs.AppointmentDto>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
+    <title>DreamsCLG</title>
+
+    <!-- Favicons -->
+    <link rel="shortcut icon" type="image/x-icon" href="~/assets/img/favicon.png">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+		.btn-custom {
+			background-color: #ff003b;
+			color: white;
+			border: none;
+			padding: 11px 10px; /* Adjust padding for smaller size */
+			font-size: 14px;   /* Adjust font size */
+			cursor: pointer;
+			display: flex;
+			align-items: center;
+			text-decoration: none; /* Remove underline from links */
+			border-radius: 4px; /* Optional: rounded corners */
+			line-height: 0.3;
+		}
+
+		.btn-custom i {
+			margin-left: 5px; /* Adjust spacing between text and icon */
+			font-size: 12px;  /* Adjust size of the icon */
+		}
+
+		.nav-link-custom {
+			display: inline-block;
+			padding: 5px 10px; /* Adjust padding for consistent size */
+			font-size: 14px;   /* Adjust font size */
+			color: #007bff;    /* Link color */
+			text-decoration: none; /* Remove underline from links */
+			border-radius: 4px; /* Optional: rounded corners */
+		}
+
+		.nav-link-custom.active {
+			background-color: #007bff;
+			color: white;
+		}
+
+		.nav-link-custom:hover {
+			background-color: #0056b3; /* Optional: hover effect */
+			color: white;
+		}
+	</style>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="~/assets/css/bootstrap.min.css">
+
+    <!-- Fontawesome CSS -->
+    <link rel="stylesheet" href="~/assets/plugins/fontawesome/css/fontawesome.min.css">
+    <link rel="stylesheet" href="~/assets/plugins/fontawesome/css/all.min.css">
+
+    <!-- Select2 CSS -->
+    <link rel="stylesheet" href="~/assets/plugins/select2/css/select2.min.css">
+
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="~/assets/css/style.css">
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="~/assets/js/html5shiv.min.js"></script>
+        <script src="~/assets/js/respond.min.js"></script>
+    <![endif]-->
+
+
+</head>
+
+<body>
+
+<!-- Main Wrapper -->
+<div class="main-wrapper">
+
+<!-- Breadcrumb -->
+<div class="breadcrumb-bar">
+    <div class="container-fluid">
+        <div class="row align-items-center">
+            <div class="col-md-12 col-12">
+                <nav aria-label="breadcrumb" class="page-breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="index.html">Home</a>
+                        </li>
+                        <li class="breadcrumb-item active" aria-current="page">Schedule Timings</li>
+                    </ol>
+                </nav>
+                <h2 class="breadcrumb-title">Schedule Timings</h2>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Breadcrumb -->
+
+<!-- Page Content -->
+<div class="content">
+    <div class="container">
+
+        <div class="row">
+            <div class="col-md-5 col-lg-4 col-xl-3 theiaStickySidebar">
+
+                <!-- Profile Sidebar -->
+                <div class="profile-sidebar">
+                    <div class="widget-profile pro-widget-content">
+                        <div class="profile-info-widget">
+                            <a href="#" class="booking-pro-img">
+                                <img src="~/assets/img/instructors/instructor-thumb-01.jpg" alt="User Image">
+                            </a>
+                            <div class="profile-det-info">
+                                <h3>David Lee</h3>
+
+                                <div class="customer-details">
+                                    <h5 class="mb-0">Aerospace Engineering</h5>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dashboard-widget">
+                        <nav class="dashboard-menu">
+                            <ul>
+                                <li>
+                                    <a href="instructor-dashboard.html">
+                                        <i class="fas fa-columns"></i>
+                                        <span>Dashboard</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="appointments.html">
+                                        <i class="fas fa-calendar-check"></i>
+                                        <span>Appointments</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="my-student.html">
+                                        <i class="fas fa-user-injured"></i>
+                                        <span>My Student</span>
+                                    </a>
+                                </li>
+                                <li class="active">
+                                    <a href="schedule-timings.html">
+                                        <i class="fas fa-hourglass-start"></i>
+                                        <span>Schedule Timings</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="invoices.html">
+                                        <i class="fas fa-file-invoice"></i>
+                                        <span>Invoices</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="reviews.html">
+                                        <i class="fas fa-star"></i>
+                                        <span>Reviews</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="chat-instructor.html">
+                                        <i class="fas fa-comments"></i>
+                                        <span>Message</span>
+                                        <small class="unread-msg">23</small>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="instructor-profile-settings.html">
+                                        <i class="fas fa-user-cog"></i>
+                                        <span>Profile Settings</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="social-media.html">
+                                        <i class="fas fa-share-alt"></i>
+                                        <span>Social Media</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="instructor-change-password.html">
+                                        <i class="fas fa-lock"></i>
+                                        <span>Change Password</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="index.html">
+                                        <i class="fas fa-sign-out-alt"></i>
+                                        <span>Logout</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+                <!-- /Profile Sidebar -->
+
+            </div>
+
+            <div class="col-md-7 col-lg-8 col-xl-9">
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="card-title">Edit&Create Sessions</h4>
+                                <div class="profile-box">
+                                    <div class="row">
+
+
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="card schedule-widget mb-0">
+
+                                                <!-- Schedule Header -->
+                                                <div class="schedule-header ">
+                                                    <!-- Schedule Nav -->
+                                                    <div class="schedule-nav">
+                                                        <ul class="nav nav-tabs justify-content-center">
+                                                            <li class="nav-item">
+                                                                @if (pageIndex > 0)
+                                                                {
+                                                                    <button class="btn-custom" onclick="location.href='@Url.Action("Availability", new { pageIndex = pageIndex - 1 })'">
+                                                                        <i class="fas fa-arrow-left"></i>
+                                                                    </button>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <button class="btn-custom" disabled>
+                                                                        <i class="fas fa-arrow-left"></i>
+                                                                    </button>
+                                                                }
+                                                            </li>
+
+                                                            
+                                                            @for (int i = 0; i < dates.Count(); i++)
+                                                            {
+                                                                var dataOfDate = Model.Where(w => w.startTime.Date == dates[i]);
+                                                                var isActive = i == 0 ? "active" : "";
+
+                                                                DateTime workStart = dates[i];
+                                                                <li class="nav-item">
+                                                                    <a class="nav-link @isActive" data-bs-toggle="tab" href="#slot_@i">@workStart.ToString("dd/MM/yy")</a>
+                                                                </li>
+                                                            }
+
+                                                            <li class="nav-item">
+                                                                @if (pageIndex < 0)
+                                                                {
+                                                                    <button class="btn-custom" onclick="location.href='@Url.Action("Availability", new { pageIndex = pageIndex + 1 })'">
+                                                                        <i class="fas fa-arrow-right"></i>
+                                                                    </button>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <button class="btn-custom" disabled>
+                                                                        <i class="fas fa-arrow-right"></i>
+                                                                    </button>
+                                                                }
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                    <!-- /Schedule Nav -->
+
+                                                </div>
+                                                <!-- /Schedule Header -->
+                                                <div class="tab-content schedule-cont"></div>
+                                                <h4 class="card-title d-flex justify-content-end">
+                                                    <a class="edit-link" data-bs-toggle="modal" href="#edit_time_slot"><i class="fa fa-edit me-1"></i>Edit</a>
+                                                </h4>
+
+                                                <div class="tab-content schedule-cont">
+                                                    @for (int i = 0; i < dates.Count; i++)
+                                                    {
+                                                        var dataOfDate = Model.Where(w => w.startTime.Date == dates[i]);
+                                                        var isActive = i == 0 ? "show active" : "";
+                                                        <div id="slot_@i" class="tab-pane fade @isActive">
+                                                            <h4 class="card-title d-flex justify-content-between">
+                                                                <span>Available Sessions</span>
+                                                            </h4>
+                                                            <div class="pro-times">
+                                                                @for (int j = 0; j < dataOfDate.Count(); j++)
+                                                                {
+                                                                    <div class="pro-slot-list" id="slot_@i@j">
+                                                                        @{
+                                                                            var availability = dataOfDate.ElementAt(j);
+                                                                        }
+                                                                        @availability.startTime.ToString("HH:mm") - @availability.endTime.ToString("HH:mm")
+                                                                        <a href="@Url.Action("DeleteAppointment", "Appointment")?id=@availability.Id">
+                                                                            <i class="fa fa-trash"></i>
+                                                                        </a>
+                                                                    </div>
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                    <!-- /Schedule Content -->
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+<!-- /Page Content -->
+
+
+</div>
+<!-- /Main Wrapper -->
+
+
+<!-- Edit Time Slot Modal -->
+<div class="modal fade custom-modal" id="edit_time_slot">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Time Slots</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="timeSlotsForm" action="@Url.Action("SaveChanges", "Appointment")" method="post">
+                    <div class="hours-info" id="hoursModal">
+                        <div class="row form-row hours-cont">
+                            <div class="col-12 col-md-10">
+                                <div class="row form-row">
+                                    <div class="col-12 col-md-6">
+                                        <div class="form-group">
+                                            <label>Start Time</label>
+                                            <input class="form-control" name="WorkStart" type="datetime-local">
+                                            <label>End Time</label>
+                                            <input class="form-control" name="WorkEnd" type="datetime-local">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="submit-section text-center">
+                        <button type="submit" class="btn btn-primary submit-btn">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- /Edit Time Slot Modal -->
+
+<!-- jQuery -->
+<script src="~/assets/js/jquery-3.6.1.min.js"></script>
+
+<!-- Bootstrap Core JS -->
+<script src="~/assets/js/bootstrap.bundle.min.js"></script>
+
+<!-- Sticky Sidebar JS -->
+<script src="~/assets/plugins/theia-sticky-sidebar/ResizeSensor.js"></script>
+<script src="~/assets/plugins/theia-sticky-sidebar/theia-sticky-sidebar.js"></script>
+
+<!-- Select2 JS -->
+<script src="~/assets/plugins/select2/js/select2.min.js"></script>
+
+<!-- Slick JS -->
+<script src="~/assets/js/slick.js"></script>
+
+<!-- Datetimepicker JS -->
+<script src="~/assets/js/moment.min.js"></script>
+<script src="~/assets/js/bootstrap-datetimepicker.min.js"></script>
+
+<!-- Fancybox JS -->
+<script src="~/assets/plugins/fancybox/jquery.fancybox.min.js"></script>
+
+<!-- Custom JS -->
+<script src="~/assets/js/script.js"></script>
+
+</body>

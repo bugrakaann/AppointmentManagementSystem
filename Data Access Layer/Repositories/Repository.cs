@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Data_Access_Layer.Data;
 using Microsoft.EntityFrameworkCore;
 using Models.Models;
@@ -47,7 +48,13 @@ public class Repository<T> : IRepository<T> where T : class, IEntity
 
     public void Update(T entity)
     {
-        _dbSet.Update(entity);
+        var existingEntity = _dbSet.Local.FirstOrDefault(e => e.id == (entity as IEntity).id);
+        if (existingEntity != null)
+        {
+            _context.Entry(existingEntity).State = EntityState.Detached;
+        }
+        _dbSet.Attach(entity);
+        _context.Entry(entity).State = EntityState.Modified;
         _context.SaveChanges();
     }
 
@@ -63,5 +70,10 @@ public class Repository<T> : IRepository<T> where T : class, IEntity
     {
         _dbSet.Remove(entity);
         _context.SaveChanges();
+    }
+
+    public IEnumerable<T> Find(Expression<Func<T, bool>> predicate)
+    {
+        return _context.Set<T>().Where(predicate).ToList();
     }
 }

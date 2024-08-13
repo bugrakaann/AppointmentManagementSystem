@@ -51,16 +51,16 @@
             </div>
             <ul class="main-nav">
                 <li>
-                    <a href="@Url.Action("Index", "Home")">HOME</i></a>
+                    <a href="@Url.Action("Index", "Home")">HOME</a>
                 </li>
                 <li>
-                    <a href="@Url.Action("Index", "Booking")">BOOK NOW</i></a>
+                    <a href="@Url.Action("Index", "Booking")">BOOK NOW</a>
                 </li>
                 <li class="has-submenu">
-                    <a href="">Admin Menu <i class="fas fa-chevron-down"></i></a>
+                    <a href="@Url.Action("Index", "AdminMenu")">Admin Menu <i class="fas fa-chevron-down"></i></a>
                     <ul class="submenu">
-                        <li><a href="@Url.Action("Index", "DoctorAvailability")">Availability Management</a></li>
-                        <li><a href="@Url.Action("Appointments", "Home")">Appointments</a></li>
+                        <li><a href="@Url.Action("Index", "AdminMenu")">Appointments</a></li>
+                        <li><a href="@Url.Action("Availability", "AdminMenu")">Availability Management</a></li>
                     </ul>
                 </li>
                 <li class="searchbar">
@@ -123,7 +123,7 @@
 							
 								<!-- Footer Widget -->
 								<div class="footer-widget footer-about">
-									<h2 class="footer-title">ABOUT DreamsCLG</h2>
+									<h2 class="footer-title">ABOUT Management System</h2>
 									<div class="footer-about-content">
 										<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut consequat mauris Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut consequat mauris </p>
 										
@@ -137,9 +137,9 @@
 							
 								<!-- Footer Widget -->
 								<div class="footer-widget footer-menu">
-									<h2 class="footer-title">POPULAR COURSES</h2>
+									<h2 class="footer-title">BOOK NOW</h2>
 									<ul>
-										<li><a href="courses.html">Development</a></li>
+										<li><a href="@Url.Action("Index", "Booking")">Book</a></li>
 										<li><a href="courses.html">Business</a></li>
 										<li><a href="courses.html">IT & Software</a></li>
 										<li><a href="courses.html">Office Productivity</a></li>

@@ -1,5 +1,6 @@
 using DTOs.DTOs;
 using Microsoft.AspNetCore.Mvc;
+using Models.Enums;
 using Models.Models;
 using Newtonsoft.Json;
 using Services.Services;
@@ -8,13 +9,11 @@ namespace AppointmentManagementSystem.Controllers
 {
     public class BookingController : Controller
     {
-        private IDoctorAvailabilityService _availabilityService;
         private ICustomerService _customerService;
         private IAppointmentService _appointmentService;
     
-        public BookingController(IDoctorAvailabilityService availabilityService, ICustomerService customerService, IAppointmentService appointmentService)
+        public BookingController(ICustomerService customerService, IAppointmentService appointmentService)
         {
-            _availabilityService = availabilityService;
             _customerService = customerService;
             _appointmentService = appointmentService;
         }
@@ -22,15 +21,12 @@ namespace AppointmentManagementSystem.Controllers
         public IActionResult Index(int pageIndex=0, int? activeSlotId = null)
         {
             int pageSize = 7;
-            Dictionary<DateTime,IEnumerable<DoctorAvailabilityDto>> availabilityDtos = _availabilityService.GetAll();
-
-            int totalPages = (int)Math.Ceiling((double)availabilityDtos.Count() / pageSize);
-            var pagedData = availabilityDtos.Skip(pageIndex * pageSize).Take(pageSize).ToList();
+            IEnumerable<AppointmentDto> availabilityDtos = _appointmentService.GetRange(pageIndex*pageSize, pageSize);
+            
 
             ViewBag.PageIndex = pageIndex;
-            ViewBag.TotalPages = totalPages;
             ViewBag.ActiveSlotId = activeSlotId;
-            return View(pagedData);
+            return View(availabilityDtos);
         }
 
         [HttpPost("SaveChanges")]
@@ -44,21 +40,20 @@ namespace AppointmentManagementSystem.Controllers
                 email = Email,
                 address = Address
             };
-
-            _customerService.Add(customer);
-
-            DoctorAvailabilityDto availability = _availabilityService.GetById(int.Parse(activeSlotId));
-
-            AppointmentDto appointment = new AppointmentDto()
+            AppointmentDto availability = _appointmentService.GetById(int.Parse(activeSlotId));
+            if (_appointmentService.CheckExistingSession(availability))
             {
-                customerId = customer.id, //içindeki customera bak
-                startTime = availability.WorkStart,
-                endTime = availability.WorkEnd,
-                description = "New Appointment"
-            };
+                TempData["Notification"] = "This session is already booked.";
+                return RedirectToAction("Index", "Booking");
+            }
+                
             
-            _appointmentService.Add(appointment);
-            TempData["appointment"] = JsonConvert.SerializeObject(appointment);
+            _customerService.Add(customer);
+            availability.SetCustomerId(customer);
+            availability.SetStatus(AppointmentStatus.WaitingForApproval);
+
+            _appointmentService.Update(availability);
+            TempData["appointment"] = JsonConvert.SerializeObject(availability);
             return RedirectToAction("BookingSuccess", "Booking");
         }
         public IActionResult BookingSuccess()

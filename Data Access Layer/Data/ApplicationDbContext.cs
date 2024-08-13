@@ -8,6 +8,10 @@ public class ApplicationDbContext : DbContext
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
     {
     }
+    
+    public ApplicationDbContext()
+    {
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -19,5 +23,4 @@ public class ApplicationDbContext : DbContext
 
     public DbSet<Customer> Customers { get; set; }
     public DbSet<Appointment> Appointments { get; set; }
-    public DbSet<DoctorAvailability> DoctorAvailabilities { get; set; }
 }

@@ -1,3 +1,5 @@
+using System.Linq.Expressions;
+
 namespace Data_Access_Layer.Repositories;
 
 public interface IRepository<T>
@@ -8,5 +10,5 @@ public interface IRepository<T>
     public void Update(T entity);
     public void Delete(int id);
     public void Delete(T entity);
-
+    public IEnumerable<T> Find(Expression<Func<T, bool>> predicate);
 }

@@ -24,13 +24,9 @@ public static class ServiceRegistrations
         // Register services
         services.AddScoped<IAppointmentService, AppointmentService>();
         services.AddScoped<ICustomerService, CustomerService>();
-        services.AddScoped<IDoctorAvailabilityService, DoctorAvailabilityService>();
 
         services.AddScoped<IAppointmentRepository, AppointmentRepository>();
         services.AddScoped<ICustomerRepository, CustomerRepository>();
-        services.AddScoped<IDoctorAvailabilityRepository, DoctorAvailabilityRepository>();
-
-
 
     }
     

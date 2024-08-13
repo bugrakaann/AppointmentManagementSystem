@@ -10,6 +10,5 @@ public class MappingProfile: Profile
     {
         CreateMap<Customer, CustomerDto>().ReverseMap();
         CreateMap<Appointment, AppointmentDto>().ReverseMap();
-        CreateMap<DoctorAvailability, DoctorAvailabilityDto>().ReverseMap(); 
     }
 }
