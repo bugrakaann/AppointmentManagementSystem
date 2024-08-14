@@ -7,4 +7,6 @@ public interface IAppointmentRepository : IRepository<Appointment>
 {
     IEnumerable<Appointment> GetRangeByStatus(AppointmentStatus status, int startIndex, int count);
     IEnumerable<Appointment> GetRange(int startIndex, int count);
+    int GetAppointmentNumber();
+
 }

@@ -23,9 +23,11 @@ namespace AppointmentManagementSystem.Controllers
             int pageSize = 7;
             IEnumerable<AppointmentDto> availabilityDtos = _appointmentService.GetRange(pageIndex*pageSize, pageSize);
             
-
+            int totalAppointments = _appointmentService.GetAppointmentNumber();
+            
             ViewBag.PageIndex = pageIndex;
             ViewBag.ActiveSlotId = activeSlotId;
+            ViewBag.HasMorePages = (pageIndex + 1) * pageSize < totalAppointments; // Check if there are more pages
             return View(availabilityDtos);
         }
 

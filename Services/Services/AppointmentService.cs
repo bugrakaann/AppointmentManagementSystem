@@ -159,4 +159,8 @@ public class AppointmentService : IAppointmentService
 
         return overlappingAppointments.Any();
     }
+    public int GetAppointmentNumber()
+    {
+        return _appointmentRepository.GetAppointmentNumber();
+    }
 }

@@ -53,4 +53,12 @@ public class AppointmentRepository : Repository<Appointment>,IAppointmentReposit
 
         return appointments;
     }
+
+    public int GetAppointmentNumber()
+    {
+        return _dbSet
+            .Select(a => a.startTime.Date)
+            .Distinct()
+            .Count();
+    }
 }

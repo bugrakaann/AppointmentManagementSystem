@@ -38,9 +38,11 @@ namespace AppointmentManagementSystem.Controllers
         public IActionResult Availability(int pageIndex = 0)
         {
             int pageSize = 7;
+            int totalAppointments = _appointmentService.GetAppointmentNumber();
             IEnumerable<AppointmentDto> availabilityDtos = _appointmentService.GetRange(pageIndex * pageSize,7);
             
             ViewBag.PageIndex = pageIndex;
+            ViewBag.HasMorePages = (pageIndex + 1) * pageSize < totalAppointments; // Check if there are more pages
             return View(availabilityDtos);
         }
 

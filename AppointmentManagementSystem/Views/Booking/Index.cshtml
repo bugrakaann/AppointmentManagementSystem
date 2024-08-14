@@ -138,7 +138,7 @@
                                             }
 
                                             <li class="right-arrow">
-                                                @if (pageIndex < 0)
+                                                @if (ViewBag.HasMorePages)
                                                 {
                                                     <a class="btn-custom" href="@Url.Action("Index", new { pageIndex = pageIndex + 1 })">
                                                         <i class="fa fa-chevron-right"></i>

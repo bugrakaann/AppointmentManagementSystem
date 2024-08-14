@@ -257,7 +257,7 @@
                                                             }
 
                                                             <li class="nav-item">
-                                                                @if (pageIndex < 0)
+                                                                @if (ViewBag.HasMorePages)
                                                                 {
                                                                     <button class="btn-custom" onclick="location.href='@Url.Action("Availability", new { pageIndex = pageIndex + 1 })'">
                                                                         <i class="fas fa-arrow-right"></i>
@@ -277,9 +277,18 @@
                                                 </div>
                                                 <!-- /Schedule Header -->
                                                 <div class="tab-content schedule-cont"></div>
-                                                <h4 class="card-title d-flex justify-content-end">
-                                                    <a class="edit-link" data-bs-toggle="modal" href="#edit_time_slot"><i class="fa fa-edit me-1"></i>Edit</a>
-                                                </h4>
+                                                <div class="row">
+                                                    <div class="col-1 col-sm-3 text-center">
+                                                        <h4 class="card-title">
+                                                            <span>Available Sessions</span>
+                                                        </h4>
+                                                    </div>
+                                                    <div class="col-1 col-sm-8 col-md-8 text-sm-end">
+                                                        <h4 class="card-title d-flex justify-content-end">
+                                                            <a class="edit-link" data-bs-toggle="modal" href="#edit_time_slot"><i class="fa fa-edit me-1"></i>Edit</a>
+                                                        </h4>
+                                                    </div>
+                                                </div>
 
                                                 <div class="tab-content schedule-cont">
                                                     @for (int i = 0; i < dates.Count; i++)
@@ -287,9 +296,6 @@
                                                         var dataOfDate = Model.Where(w => w.startTime.Date == dates[i]);
                                                         var isActive = i == 0 ? "show active" : "";
                                                         <div id="slot_@i" class="tab-pane fade @isActive">
-                                                            <h4 class="card-title d-flex justify-content-between">
-                                                                <span>Available Sessions</span>
-                                                            </h4>
                                                             <div class="pro-times">
                                                                 @for (int j = 0; j < dataOfDate.Count(); j++)
                                                                 {
