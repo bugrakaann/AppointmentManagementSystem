@@ -1,4 +1,5 @@
 using DTOs.DTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models.Enums;
 using Services.Services;
@@ -6,19 +7,13 @@ using Services.Services;
 namespace AppointmentManagementSystem.Controllers
 {
     [Route("AdminMenu")]
+    [Authorize(Roles = "Admin")]
     public class AdminMenuController : Controller
     {
         private readonly IAppointmentService _appointmentService;
-         // private readonly IEnumerable<AppointmentDto> test;
-
+        
         public AdminMenuController(IAppointmentService appointmentService)
         {
-               // var dates = test.Select(w => w.startTime).Distinct().ToList();
-               // foreach (var date in dates)
-               // {
-               //     var dataOfDate = test.Where(w => w.startTime == date);
-               // }
-
             _appointmentService = appointmentService;
         }
 

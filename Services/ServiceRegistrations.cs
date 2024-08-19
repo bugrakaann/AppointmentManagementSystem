@@ -19,8 +19,8 @@ public static class ServiceRegistrations
         {
             options.UseSqlServer(connectionString);
         });
-
-
+        
+        
         // Register services
         services.AddScoped<IAppointmentService, AppointmentService>();
         services.AddScoped<ICustomerService, CustomerService>();

@@ -1,5 +1,9 @@
+using Data_Access_Layer.Data;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Rewrite;
+using Models.Models;
 using Services;
+using Services.Data;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,7 +15,19 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddMyLibraryServices(conString);
 
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
+
+
 var app = builder.Build();
+
+// Seed roles
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    await SeedData.Initialize(services);
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -26,7 +42,10 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
+
+
 
 
 

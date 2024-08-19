@@ -1,9 +1,27 @@
+@using Microsoft.AspNetCore.Identity
+@using Models.Models
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+@inject IUrlHelper UrlHelper
+
+@functions {
+public bool IsActive(string controller, string action)
+{
+var routeData = Context.GetRouteData();
+var routeAction = routeData.Values["action"]?.ToString();
+var routeController = routeData.Values["controller"]?.ToString();
+return string.Equals(routeAction, action, StringComparison.OrdinalIgnoreCase) &&
+string.Equals(routeController, controller, StringComparison.OrdinalIgnoreCase);
+}
+}
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
-    <title>Prof. Dr. Gazi Yaşargil</title>
+    <title>Appointment Management System</title>
 
     <!-- Favicons -->
     <link rel="shortcut icon" type="image/x-icon" href="~/assets/img/favicon.png">
@@ -50,19 +68,25 @@
                 </a>
             </div>
             <ul class="main-nav">
-                <li>
+                <li class="@(IsActive("Home", "Index") ? "active" : "")">
                     <a href="@Url.Action("Index", "Home")">HOME</a>
                 </li>
-                <li>
-                    <a href="@Url.Action("Index", "Booking")">BOOK NOW</a>
-                </li>
-                <li class="has-submenu">
-                    <a href="@Url.Action("Index", "AdminMenu")">Admin Menu <i class="fas fa-chevron-down"></i></a>
-                    <ul class="submenu">
-                        <li><a href="@Url.Action("Index", "AdminMenu")">Appointments</a></li>
-                        <li><a href="@Url.Action("Availability", "AdminMenu")">Availability Management</a></li>
-                    </ul>
-                </li>
+                @if(SignInManager.IsSignedIn(User))
+				{
+		            <li class="@(IsActive("Booking", "Index") ? "active" : "")">
+			            <a href="@Url.Action("Index", "Booking")">BOOK NOW</a>
+		            </li>
+		            @if (User.IsInRole("Admin"))
+		            {
+		            <li class="has-submenu @((IsActive("AdminMenu", "Index") || IsActive("AdminMenu", "Availability")) ? "active" : "")">
+			            <a href="@Url.Action("Index", "AdminMenu")">Admin Menu <i class="fas fa-chevron-down"></i></a>
+			            <ul class="submenu">
+				            <li><a href="@Url.Action("Index", "AdminMenu")">Appointments</a></li>
+				            <li><a href="@Url.Action("Availability", "AdminMenu")">Availability Management</a></li>
+			            </ul>
+		            </li>
+		            }
+				}
                 <li class="searchbar">
                     <i class="fa fa-search" aria-hidden="true"></i>
                     <div class="togglesearch" style="display: none;">
@@ -77,33 +101,54 @@
             </ul>
         </div>
         <ul class="nav header-navbar-rht">
-            <li><a href="login.html">Log in</a></li>
-            <li><a href="register.html" class="login-btn">Signup </a></li>
-            <li class="lang-item dropdown">
-                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#"><img src="~/assets/img/en.png" alt="Lang"> EN</a>
-                <div class="dropdown-menu">
-                    <a href="javascript:void(0);" class="dropdown-item">
-                        <img src="~/assets/img/flags/us.png" alt="" height="16"> ENG
-                    </a>
-                    <a href="javascript:void(0);" class="dropdown-item">
-                        <img src="~/assets/img/flags/fr.png" alt="" height="16"> FRA
-                    </a>
-                    <a href="javascript:void(0);" class="dropdown-item">
-                        <img src="~/assets/img/flags/es.png" alt="" height="16"> SPN
-                    </a>
-                    <a href="javascript:void(0);" class="dropdown-item">
-                        <img src="~/assets/img/flags/de.png" alt="" height="16"> GER
-                    </a>
-                </div>
-            </li>
-            <li class="course-amt">
-                <a href="courses.html" class="user-circle"><img src="~/assets/img/course.png" width="22" alt=""></a>
-                <a href="courses.html" class="course">
-                    <span>Courses</span>
-                    <p>$200</p>
-                </a>
-
-            </li>
+	        <li class="lang-item dropdown">
+		        <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#"><img src="~/assets/img/en.png" alt="Lang"> EN</a>
+		        <div class="dropdown-menu">
+			        <a href="javascript:void(0);" class="dropdown-item">
+				        <img src="~/assets/img/flags/us.png" alt="" height="16"> ENG
+			        </a>
+			        <a href="javascript:void(0);" class="dropdown-item">
+				        <img src="~/assets/img/flags/fr.png" alt="" height="16"> FRA
+			        </a>
+			        <a href="javascript:void(0);" class="dropdown-item">
+				        <img src="~/assets/img/flags/es.png" alt="" height="16"> SPN
+			        </a>
+			        <a href="javascript:void(0);" class="dropdown-item">
+				        <img src="~/assets/img/flags/de.png" alt="" height="16"> GER
+			        </a>
+		        </div>
+	        </li>
+	        @if (!SignInManager.IsSignedIn(User))
+	        {
+		        <li>
+			        <form asp-controller="Account" asp-action="Register" method="get" class="form-inline">
+				        <button type="submit" class="btn btn-primary">Sign up</button>
+			        </form>
+		        </li>
+		        <li>
+			        <form asp-controller="Account" asp-action="Login" method="get" class="form-inline">
+				        <button type="submit" class="btn btn-secondary">Log in</button>
+			        </form>
+		        </li>
+	        }
+	        else
+	        {
+		        <li>
+			        <form asp-controller="Account" asp-action="Logout" method="post" id="logoutForm" class="form-inline">
+				        <button type="submit" class="btn btn-danger">Log out</button>
+			        </form>
+		        </li>
+		        <li class="course-amt">
+			        <a href="courses.html" class="course">
+				        @{
+					        var currentUser = await UserManager.GetUserAsync(User);
+				        }
+				        <span>Welcome, @currentUser?.UserName</span>
+				        <p>@currentUser?.Email</p>
+			        </a>
+			        <a href="courses.html" class="user-circle"><img src="~/assets/img/icon-01.png" width="22" alt=""></a>
+		        </li>
+	        }
         </ul>
     </nav>
 </header>
@@ -227,5 +272,6 @@
 				<!-- /Footer Bottom -->
 				
 			</footer>
+
 </body>
 </html>
