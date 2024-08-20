@@ -18,15 +18,13 @@ public class AccountController : Controller
     }
 
 
-    [HttpGet]
-    [Route("Login")]
+    [HttpGet("Login")]
     public IActionResult Login()
     {
         return View();
     }
 
-    [HttpPost]
-    [Route("Login")]
+    [HttpPost("Login")]
     public async Task<IActionResult> Login(LoginViewModel model)
     {
         if (ModelState.IsValid)
@@ -41,8 +39,7 @@ public class AccountController : Controller
         return View(model);
     }
 
-    [HttpPost]
-    [Route("Logout")]
+    [HttpPost("Logout")]
     public async Task<IActionResult> Logout()
     {
         await _signInManager.SignOutAsync();

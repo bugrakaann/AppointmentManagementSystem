@@ -17,11 +17,11 @@
 
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
-    <title>Appointment Management System</title>
+    <title>@ViewData["Title"]</title>
 
     <!-- Favicons -->
     <link rel="shortcut icon" type="image/x-icon" href="~/assets/img/favicon.png">
@@ -32,6 +32,9 @@
     <!-- Fontawesome CSS -->
     <link rel="stylesheet" href="~/assets/plugins/fontawesome/css/fontawesome.min.css">
     <link rel="stylesheet" href="~/assets/plugins/fontawesome/css/all.min.css">
+
+    <!-- Select2 CSS -->
+    <link rel="stylesheet" href="~/assets/plugins/select2/css/select2.min.css">
 
     <!-- Daterangepikcer CSS -->
     <link rel="stylesheet" href="~/assets/plugins/daterangepicker/daterangepicker.css">
@@ -69,71 +72,43 @@
                 </div>
                 <ul class="main-nav">
                     <li class="@(IsActive("Home", "Index") ? "active" : "")">
-                        <a href="@Url.Action("Index", "Home")">HOME</a>
+                        <a href="@Url.Action("Index", "Home")">Anasayfa</a>
+                    </li>
+                    <li class="@(IsActive("Booking", "Index") ? "active" : "")">
+                        <a href="@Url.Action("Index", "Booking")">Randevu Al</a>
                     </li>
                     @if (SignInManager.IsSignedIn(User))
                     {
-                        <li class="@(IsActive("Booking", "Index") ? "active" : "")">
-                            <a href="@Url.Action("Index", "Booking")">BOOK NOW</a>
-                        </li>
                         @if (User.IsInRole("Admin"))
                         {
-                            <li class="has-submenu @((IsActive("AdminMenu", "Index") || IsActive("AdminMenu", "Availability")) ? "active" : "")">
-                                <a href="@Url.Action("Index", "AdminMenu")">Admin Menu <i class="fas fa-chevron-down"></i></a>
-                                <ul class="submenu">
-                                    <li><a href="@Url.Action("Index", "AdminMenu")">Appointments</a></li>
-                                    <li><a href="@Url.Action("Availability", "AdminMenu")">Availability Management</a></li>
-                                </ul>
+
+                            <li class="@(IsActive("Submissions", "Index") ? "active" : "")">
+                                <a href="@Url.Action("Index", "Submissions")">Randevu Talepleri</a>
+                            </li>
+                            <li class="@(IsActive("Sessions", "Index") ? "active" : "")">
+                                <a href="@Url.Action("Index", "Sessions")">Randevu Oturumları</a>
                             </li>
                         }
                     }
-                    <li class="searchbar">
-                        <i class="fa fa-search" aria-hidden="true"></i>
-                        <div class="togglesearch" style="display: none;">
-                            <form>
-                                <div class="input-group">
-                                    <input type="text" class="form-control">
-                                    <button type="submit" class="btn btn-primary">search</button>
-                                </div>
-                            </form>
-                        </div>
-                    </li>
                 </ul>
             </div>
             <ul class="nav header-navbar-rht">
-                <li class="lang-item dropdown">
-                    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#"><img src="~/assets/img/en.png" alt="Lang"> EN</a>
-                    <div class="dropdown-menu">
-                        <a href="javascript:void(0);" class="dropdown-item">
-                            <img src="~/assets/img/flags/us.png" alt="" height="16"> ENG
-                        </a>
-                        <a href="javascript:void(0);" class="dropdown-item">
-                            <img src="~/assets/img/flags/fr.png" alt="" height="16"> FRA
-                        </a>
-                        <a href="javascript:void(0);" class="dropdown-item">
-                            <img src="~/assets/img/flags/es.png" alt="" height="16"> SPN
-                        </a>
-                        <a href="javascript:void(0);" class="dropdown-item">
-                            <img src="~/assets/img/flags/de.png" alt="" height="16"> GER
-                        </a>
-                    </div>
-                </li>
                 @if (SignInManager.IsSignedIn(User))
                 {
                     <li>
                         <form asp-controller="Account" asp-action="Logout" method="post" id="logoutForm" class="form-inline">
-                            <button type="submit" class="btn btn-danger">Log out</button>
+                            <button type="submit" class="btn btn-danger"><i class="fas fa-sign-out-alt"></i> Çıkış</button>
                         </form>
                     </li>
                     <li class="course-amt">
-                        <a href="courses.html" class="course">
+                        <a href="#" class="course">
                             @{
                                 var currentUser = await UserManager.GetUserAsync(User);
                             }
-                            <span>Welcome, @currentUser?.UserName</span>
+                            <span>@currentUser?.UserName?.ToUpper()</span>
                             <p>@currentUser?.Email</p>
                         </a>
-                        <a href="courses.html" class="user-circle"><img src="~/assets/img/icon-01.png" width="22" alt=""></a>
+                        <a href="#" class="user-circle"><img src="~/assets/img/icon-01.png" width="22" alt=""></a>
                     </li>
                 }
             </ul>
@@ -142,122 +117,46 @@
     <!-- /Header -->
 
     <div class="content">
-        @RenderBody()
+        <div class="container-fluid">
+            @RenderBody()
+        </div>
     </div>
 
     <!-- Footer -->
     <footer class="footer">
-
-        <div class="footer-top">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-3 col-md-6">
-
-                        <!-- Footer Widget -->
-                        <div class="footer-widget footer-about">
-                            <h2 class="footer-title">ABOUT Management System</h2>
-                            <div class="footer-about-content">
-                                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut consequat mauris Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut consequat mauris </p>
-
-                            </div>
-                        </div>
-                        <!-- /Footer Widget -->
-
-                    </div>
-
-                    <div class="col-lg-3 col-md-6">
-
-                        <!-- Footer Widget -->
-                        <div class="footer-widget footer-menu">
-                            <h2 class="footer-title">BOOK NOW</h2>
-                            <ul>
-                                <li><a href="@Url.Action("Index", "Booking")">Book</a></li>
-                                <li><a href="courses.html">Business</a></li>
-                                <li><a href="courses.html">IT & Software</a></li>
-                                <li><a href="courses.html">Office Productivity</a></li>
-                                <li><a href="courses.html">Personal Development</a></li>
-                            </ul>
-                        </div>
-                        <!-- /Footer Widget -->
-
-                    </div>
-
-                    <div class="col-lg-3 col-md-6">
-
-                        <!-- Footer Widget -->
-                        <div class="footer-widget footer-menu">
-                            <h2 class="footer-title">SUPPORT</h2>
-                            <ul>
-                                <li><a href="booking.html">Booking</a></li>
-                                <li><a href="chat.html">Chat</a></li>
-                                <li><a href="reviews.html">Reviews</a></li>
-                                <li><a href="favourites.html">Favourites </a></li>
-                                <li><a href="college.html">College</a></li>
-                            </ul>
-                        </div>
-                        <!-- /Footer Widget -->
-
-                    </div>
-
-                    <div class="col-lg-3 col-md-6">
-
-                        <!-- Footer Widget -->
-                        <div class="footer-widget footer-contact">
-                            <h2 class="footer-title">NEWSLETTER</h2>
-                            <p> Sign Up to Our Newsletter to Get Latest Updates & Services</p>
-                            <div class="my-3 footer-newsletter">
-                                <form class="input-group">
-                                    <input type="email" placeholder="Enter Your Email">
-                                    <div>
-                                        <button class="btn btn-newsletter" type="submit"><i class="fa fa-paper-plane text-white" aria-hidden="true"></i></button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                        <!-- /Footer Widget -->
-
-                    </div>
-
-                </div>
-            </div>
+        <div class="container">
+            <span class="text-white">&copy; 2024 - ESTER</span>
         </div>
-        <!-- /Footer Top -->
-        <!-- Footer Bottom -->
-        <div class="footer-bottom">
-            <div class="container">
-
-                <!-- Copyright -->
-                <div class="copyright">
-                    <div class="row">
-                        <div class="col-md-4 col-lg-4">
-                            <div class="copyright-text">
-                                <p class="mb-0">© 2021 All Rights Reserved</p>
-                            </div>
-                        </div>
-                        <div class="col-md-6 col-lg-4">
-                            <div class="copyright-text">
-                                <p class="mb-0"><a href="term-condition.html">Terms and Conditions</a> - <a href="privacy-policy.html">Privacy Policy</a></p>
-                            </div>
-                        </div>
-                        <div class="col-md-2 col-lg-4 right-text">
-                            <div class="social-icon">
-                                <ul>
-                                    <li><a href="#" class="icon" target="_blank"><i class="fab fa-facebook-f"></i> </a></li>
-                                    <li><a href="#" class="icon" target="_blank"><i class="fab fa-twitter"></i> </a></li>
-                                    <li><a href="#" class="icon" target="_blank"><i class="fab fa-instagram"></i> </a></li>
-                                    <li><a href="#" class="icon" target="_blank"><i class="fab fa-linkedin-in"></i> </a></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- /Copyright -->
-
-            </div>
-        </div>
-        <!-- /Footer Bottom -->
-
     </footer>
+
+
+    <!-- jQuery -->
+    <script src="~/assets/js/jquery-3.6.1.min.js"></script>
+
+    <!-- Bootstrap Core JS -->
+    <script src="~/assets/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Sticky Sidebar JS -->
+    <script src="~/assets/plugins/theia-sticky-sidebar/ResizeSensor.js"></script>
+    <script src="~/assets/plugins/theia-sticky-sidebar/theia-sticky-sidebar.js"></script>
+
+    <!-- Select2 JS -->
+    <script src="~/assets/plugins/select2/js/select2.min.js"></script>
+
+    <!-- Datetimepicker JS -->
+    <script src="~/assets/js/moment.min.js"></script>
+    <script src="~/assets/js/bootstrap-datetimepicker.min.js"></script>
+
+    <!-- Fancybox JS -->
+    <script src="~/assets/plugins/fancybox/jquery.fancybox.min.js"></script>
+
+    <!-- circle progress JS -->
+    <script src="~/assets/js/circle-progress.min.js"></script>
+
+    <!-- Custom JS -->
+    <script src="~/assets/js/script.js"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
 
 </body>
 </html>

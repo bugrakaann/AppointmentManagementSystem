@@ -1,88 +1,12 @@
-@{
-    ViewBag.Title = "title";
-    Layout = "_Layout";
+@model IEnumerable<DTOs.DTOs.AppointmentDto>
 
+@{
+    ViewData["title"] = "Randevu Oturumlarý";
     var serializedModel = Newtonsoft.Json.JsonConvert.SerializeObject(Model);
-    
     int pageIndex = ViewBag.PageIndex;
     var dates = Model.Select(w => w.startTime.Date).Distinct().ToList();
     int tabNumber = Math.Min(7, dates.Count);
 }
-
-@model IEnumerable<DTOs.DTOs.AppointmentDto>
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
-    <title>DreamsCLG</title>
-
-    <!-- Favicons -->
-    <link rel="shortcut icon" type="image/x-icon" href="~/assets/img/favicon.png">
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-		.btn-custom {
-			background-color: #ff003b;
-			color: white;
-			border: none;
-			padding: 11px 10px; /* Adjust padding for smaller size */
-			font-size: 14px;   /* Adjust font size */
-			cursor: pointer;
-			display: flex;
-			align-items: center;
-			text-decoration: none; /* Remove underline from links */
-			border-radius: 4px; /* Optional: rounded corners */
-			line-height: 0.3;
-		}
-
-		.btn-custom i {
-			margin-left: 5px; /* Adjust spacing between text and icon */
-			font-size: 12px;  /* Adjust size of the icon */
-		}
-
-		.nav-link-custom {
-			display: inline-block;
-			padding: 5px 10px; /* Adjust padding for consistent size */
-			font-size: 14px;   /* Adjust font size */
-			color: #007bff;    /* Link color */
-			text-decoration: none; /* Remove underline from links */
-			border-radius: 4px; /* Optional: rounded corners */
-		}
-
-		.nav-link-custom.active {
-			background-color: #007bff;
-			color: white;
-		}
-
-		.nav-link-custom:hover {
-			background-color: #0056b3; /* Optional: hover effect */
-			color: white;
-		}
-	</style>
-
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="~/assets/css/bootstrap.min.css">
-
-    <!-- Fontawesome CSS -->
-    <link rel="stylesheet" href="~/assets/plugins/fontawesome/css/fontawesome.min.css">
-    <link rel="stylesheet" href="~/assets/plugins/fontawesome/css/all.min.css">
-
-    <!-- Select2 CSS -->
-    <link rel="stylesheet" href="~/assets/plugins/select2/css/select2.min.css">
-
-    <!-- Main CSS -->
-    <link rel="stylesheet" href="~/assets/css/style.css">
-
-    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-        <script src="~/assets/js/html5shiv.min.js"></script>
-        <script src="~/assets/js/respond.min.js"></script>
-    <![endif]-->
-
-
-</head>
-
-<body>
 
 <!-- Main Wrapper -->
 <div class="main-wrapper">
@@ -92,15 +16,7 @@
     <div class="container-fluid">
         <div class="row align-items-center">
             <div class="col-md-12 col-12">
-                <nav aria-label="breadcrumb" class="page-breadcrumb">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item">
-                            <a href="index.html">Home</a>
-                        </li>
-                        <li class="breadcrumb-item active" aria-current="page">Schedule Timings</li>
-                    </ol>
-                </nav>
-                <h2 class="breadcrumb-title">Schedule Timings</h2>
+                <h2 class="breadcrumb-title">Randevu Oturumlarý</h2>
             </div>
         </div>
     </div>
@@ -304,7 +220,7 @@
                                                                             var availability = dataOfDate.ElementAt(j);
                                                                         }
                                                                         @availability.startTime.ToString("HH:mm") - @availability.endTime.ToString("HH:mm")
-                                                                        <a href="@Url.Action("DeleteAppointment", "Appointment")?id=@availability.Id">
+                                                                            <a href="@Url.Action("Delete", new {id = availability.Id})">
                                                                             <i class="fa fa-trash"></i>
                                                                         </a>
                                                                     </div>
@@ -346,7 +262,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form id="timeSlotsForm" action="@Url.Action("SaveChanges", "Appointment")" method="post">
+                <form id="timeSlotsForm" action="@Url.Action("Create")" method="post">
                     <div class="hours-info" id="hoursModal">
                         <div class="row form-row hours-cont">
                             <div class="col-12 col-md-10">
@@ -374,31 +290,3 @@
 </div>
 
 <!-- /Edit Time Slot Modal -->
-
-<!-- jQuery -->
-<script src="~/assets/js/jquery-3.6.1.min.js"></script>
-
-<!-- Bootstrap Core JS -->
-<script src="~/assets/js/bootstrap.bundle.min.js"></script>
-
-<!-- Sticky Sidebar JS -->
-<script src="~/assets/plugins/theia-sticky-sidebar/ResizeSensor.js"></script>
-<script src="~/assets/plugins/theia-sticky-sidebar/theia-sticky-sidebar.js"></script>
-
-<!-- Select2 JS -->
-<script src="~/assets/plugins/select2/js/select2.min.js"></script>
-
-<!-- Slick JS -->
-<script src="~/assets/js/slick.js"></script>
-
-<!-- Datetimepicker JS -->
-<script src="~/assets/js/moment.min.js"></script>
-<script src="~/assets/js/bootstrap-datetimepicker.min.js"></script>
-
-<!-- Fancybox JS -->
-<script src="~/assets/plugins/fancybox/jquery.fancybox.min.js"></script>
-
-<!-- Custom JS -->
-<script src="~/assets/js/script.js"></script>
-
-</body>

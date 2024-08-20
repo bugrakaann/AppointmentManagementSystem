@@ -3,6 +3,7 @@ using System.Linq.Expressions;
 using AutoMapper;
 using Data_Access_Layer.Repositories;
 using DTOs.DTOs;
+using Microsoft.JSInterop.Infrastructure;
 using Models.Enums;
 using Models.Models;
 
@@ -138,29 +139,24 @@ public class AppointmentService : IAppointmentService
         SetCustomers(dtos);
         return dtos;
     }
-    public IEnumerable<AppointmentDto> GetRange(AppointmentStatus category,int startIndex, int count)
+
+    public IEnumerable<AppointmentDto> GetRange(AppointmentStatus category, int startIndex, int count)
     {
         var list = _appointmentRepository.GetRangeByStatus(category, startIndex, count);
         var dtos = _mapper.Map<IEnumerable<AppointmentDto>>(list);
         SetCustomers(dtos);
         return dtos;
     }
-    //Checks if there is an existing session in the database that overlaps 
+
     public bool CheckExistingSession(AppointmentDto dto)
     {
-        var overlappingAppointments = _appointmentRepository
-            .Find(a => 
-                    (a.startTime < dto.endTime && a.endTime > dto.startTime) || // General overlap
-                    (a.startTime >= dto.startTime && a.endTime <= dto.endTime) || // Complete overlap
-                    (a.startTime < dto.endTime && a.endTime > dto.endTime) || // Overlap at the end
-                    (a.startTime < dto.startTime && a.endTime > dto.startTime) // Overlap at the beginning
-            )
-            .ToList();
-
-        return overlappingAppointments.Any();
+        var isAvailable = dto.status.Equals(AppointmentStatus.Available);
+        return !isAvailable || (dto.customerId != null);
     }
+
     public int GetAppointmentNumber()
     {
         return _appointmentRepository.GetAppointmentNumber();
     }
+
 }
