@@ -8,7 +8,12 @@ using Services.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-string conString = builder.Configuration.GetConnectionString("DefaultConnection");
+var conString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+if (conString == null)
+{
+    throw new Exception("Connection string is null");
+}
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -29,11 +34,9 @@ using (var scope = app.Services.CreateScope())
     await SeedData.Initialize(services);
 }
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 

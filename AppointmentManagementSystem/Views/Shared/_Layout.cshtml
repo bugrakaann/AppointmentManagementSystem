@@ -5,14 +5,14 @@
 @inject IUrlHelper UrlHelper
 
 @functions {
-public bool IsActive(string controller, string action)
-{
-var routeData = Context.GetRouteData();
-var routeAction = routeData.Values["action"]?.ToString();
-var routeController = routeData.Values["controller"]?.ToString();
-return string.Equals(routeAction, action, StringComparison.OrdinalIgnoreCase) &&
-string.Equals(routeController, controller, StringComparison.OrdinalIgnoreCase);
-}
+    public bool IsActive(string controller, string action)
+    {
+        var routeData = Context.GetRouteData();
+        var routeAction = routeData.Values["action"]?.ToString();
+        var routeController = routeData.Values["controller"]?.ToString();
+        return string.Equals(routeAction, action, StringComparison.OrdinalIgnoreCase) &&
+        string.Equals(routeController, controller, StringComparison.OrdinalIgnoreCase);
+    }
 }
 
 
@@ -42,236 +42,222 @@ string.Equals(routeController, controller, StringComparison.OrdinalIgnoreCase);
 
 </head>
 <body>
-<!-- Start Navigation -->
-<!-- Header -->
-<header class="header">
-    <nav class="navbar navbar-expand-lg header-nav">
-        <div class="navbar-header">
-            <a id="mobile_btn" href="javascript:void(0);">
-                <span class="bar-icon">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </span>
-            </a>
-            <a href="@Url.Action("Index", "Home")" class="navbar-brand logo">
-                <img src="~/assets/img/logo.png" class="img-fluid" alt="Logo">
-            </a>
-        </div>
-        <div class="main-menu-wrapper">
-            <div class="menu-header">
-                <a href="@Url.Action("Index", "Home")" class="menu-logo">
+    <!-- Start Navigation -->
+    <!-- Header -->
+    <header class="header">
+        <nav class="navbar navbar-expand-lg header-nav">
+            <div class="navbar-header">
+                <a id="mobile_btn" href="javascript:void(0);">
+                    <span class="bar-icon">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </span>
+                </a>
+                <a href="@Url.Action("Index", "Home")" class="navbar-brand logo">
                     <img src="~/assets/img/logo.png" class="img-fluid" alt="Logo">
                 </a>
-                <a id="menu_close" class="menu-close" href="javascript:void(0);">
-                    <i class="fas fa-times"></i>
-                </a>
             </div>
-            <ul class="main-nav">
-                <li class="@(IsActive("Home", "Index") ? "active" : "")">
-                    <a href="@Url.Action("Index", "Home")">HOME</a>
-                </li>
-                @if(SignInManager.IsSignedIn(User))
-				{
-		            <li class="@(IsActive("Booking", "Index") ? "active" : "")">
-			            <a href="@Url.Action("Index", "Booking")">BOOK NOW</a>
-		            </li>
-		            @if (User.IsInRole("Admin"))
-		            {
-		            <li class="has-submenu @((IsActive("AdminMenu", "Index") || IsActive("AdminMenu", "Availability")) ? "active" : "")">
-			            <a href="@Url.Action("Index", "AdminMenu")">Admin Menu <i class="fas fa-chevron-down"></i></a>
-			            <ul class="submenu">
-				            <li><a href="@Url.Action("Index", "AdminMenu")">Appointments</a></li>
-				            <li><a href="@Url.Action("Availability", "AdminMenu")">Availability Management</a></li>
-			            </ul>
-		            </li>
-		            }
-				}
-                <li class="searchbar">
-                    <i class="fa fa-search" aria-hidden="true"></i>
-                    <div class="togglesearch" style="display: none;">
-                        <form>
-                            <div class="input-group">
-                                <input type="text" class="form-control">
-                                <button type="submit" class="btn btn-primary">search</button>
-                            </div>
-                        </form>
+            <div class="main-menu-wrapper">
+                <div class="menu-header">
+                    <a href="@Url.Action("Index", "Home")" class="menu-logo">
+                        <img src="~/assets/img/logo.png" class="img-fluid" alt="Logo">
+                    </a>
+                    <a id="menu_close" class="menu-close" href="javascript:void(0);">
+                        <i class="fas fa-times"></i>
+                    </a>
+                </div>
+                <ul class="main-nav">
+                    <li class="@(IsActive("Home", "Index") ? "active" : "")">
+                        <a href="@Url.Action("Index", "Home")">HOME</a>
+                    </li>
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+                        <li class="@(IsActive("Booking", "Index") ? "active" : "")">
+                            <a href="@Url.Action("Index", "Booking")">BOOK NOW</a>
+                        </li>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="has-submenu @((IsActive("AdminMenu", "Index") || IsActive("AdminMenu", "Availability")) ? "active" : "")">
+                                <a href="@Url.Action("Index", "AdminMenu")">Admin Menu <i class="fas fa-chevron-down"></i></a>
+                                <ul class="submenu">
+                                    <li><a href="@Url.Action("Index", "AdminMenu")">Appointments</a></li>
+                                    <li><a href="@Url.Action("Availability", "AdminMenu")">Availability Management</a></li>
+                                </ul>
+                            </li>
+                        }
+                    }
+                    <li class="searchbar">
+                        <i class="fa fa-search" aria-hidden="true"></i>
+                        <div class="togglesearch" style="display: none;">
+                            <form>
+                                <div class="input-group">
+                                    <input type="text" class="form-control">
+                                    <button type="submit" class="btn btn-primary">search</button>
+                                </div>
+                            </form>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <ul class="nav header-navbar-rht">
+                <li class="lang-item dropdown">
+                    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#"><img src="~/assets/img/en.png" alt="Lang"> EN</a>
+                    <div class="dropdown-menu">
+                        <a href="javascript:void(0);" class="dropdown-item">
+                            <img src="~/assets/img/flags/us.png" alt="" height="16"> ENG
+                        </a>
+                        <a href="javascript:void(0);" class="dropdown-item">
+                            <img src="~/assets/img/flags/fr.png" alt="" height="16"> FRA
+                        </a>
+                        <a href="javascript:void(0);" class="dropdown-item">
+                            <img src="~/assets/img/flags/es.png" alt="" height="16"> SPN
+                        </a>
+                        <a href="javascript:void(0);" class="dropdown-item">
+                            <img src="~/assets/img/flags/de.png" alt="" height="16"> GER
+                        </a>
                     </div>
                 </li>
+                @if (SignInManager.IsSignedIn(User))
+                {
+                    <li>
+                        <form asp-controller="Account" asp-action="Logout" method="post" id="logoutForm" class="form-inline">
+                            <button type="submit" class="btn btn-danger">Log out</button>
+                        </form>
+                    </li>
+                    <li class="course-amt">
+                        <a href="courses.html" class="course">
+                            @{
+                                var currentUser = await UserManager.GetUserAsync(User);
+                            }
+                            <span>Welcome, @currentUser?.UserName</span>
+                            <p>@currentUser?.Email</p>
+                        </a>
+                        <a href="courses.html" class="user-circle"><img src="~/assets/img/icon-01.png" width="22" alt=""></a>
+                    </li>
+                }
             </ul>
+        </nav>
+    </header>
+    <!-- /Header -->
+
+    <div class="content">
+        @RenderBody()
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+
+        <div class="footer-top">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-3 col-md-6">
+
+                        <!-- Footer Widget -->
+                        <div class="footer-widget footer-about">
+                            <h2 class="footer-title">ABOUT Management System</h2>
+                            <div class="footer-about-content">
+                                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut consequat mauris Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut consequat mauris </p>
+
+                            </div>
+                        </div>
+                        <!-- /Footer Widget -->
+
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+
+                        <!-- Footer Widget -->
+                        <div class="footer-widget footer-menu">
+                            <h2 class="footer-title">BOOK NOW</h2>
+                            <ul>
+                                <li><a href="@Url.Action("Index", "Booking")">Book</a></li>
+                                <li><a href="courses.html">Business</a></li>
+                                <li><a href="courses.html">IT & Software</a></li>
+                                <li><a href="courses.html">Office Productivity</a></li>
+                                <li><a href="courses.html">Personal Development</a></li>
+                            </ul>
+                        </div>
+                        <!-- /Footer Widget -->
+
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+
+                        <!-- Footer Widget -->
+                        <div class="footer-widget footer-menu">
+                            <h2 class="footer-title">SUPPORT</h2>
+                            <ul>
+                                <li><a href="booking.html">Booking</a></li>
+                                <li><a href="chat.html">Chat</a></li>
+                                <li><a href="reviews.html">Reviews</a></li>
+                                <li><a href="favourites.html">Favourites </a></li>
+                                <li><a href="college.html">College</a></li>
+                            </ul>
+                        </div>
+                        <!-- /Footer Widget -->
+
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+
+                        <!-- Footer Widget -->
+                        <div class="footer-widget footer-contact">
+                            <h2 class="footer-title">NEWSLETTER</h2>
+                            <p> Sign Up to Our Newsletter to Get Latest Updates & Services</p>
+                            <div class="my-3 footer-newsletter">
+                                <form class="input-group">
+                                    <input type="email" placeholder="Enter Your Email">
+                                    <div>
+                                        <button class="btn btn-newsletter" type="submit"><i class="fa fa-paper-plane text-white" aria-hidden="true"></i></button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <!-- /Footer Widget -->
+
+                    </div>
+
+                </div>
+            </div>
         </div>
-        <ul class="nav header-navbar-rht">
-	        <li class="lang-item dropdown">
-		        <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#"><img src="~/assets/img/en.png" alt="Lang"> EN</a>
-		        <div class="dropdown-menu">
-			        <a href="javascript:void(0);" class="dropdown-item">
-				        <img src="~/assets/img/flags/us.png" alt="" height="16"> ENG
-			        </a>
-			        <a href="javascript:void(0);" class="dropdown-item">
-				        <img src="~/assets/img/flags/fr.png" alt="" height="16"> FRA
-			        </a>
-			        <a href="javascript:void(0);" class="dropdown-item">
-				        <img src="~/assets/img/flags/es.png" alt="" height="16"> SPN
-			        </a>
-			        <a href="javascript:void(0);" class="dropdown-item">
-				        <img src="~/assets/img/flags/de.png" alt="" height="16"> GER
-			        </a>
-		        </div>
-	        </li>
-	        @if (!SignInManager.IsSignedIn(User))
-	        {
-		        <li>
-			        <form asp-controller="Account" asp-action="Register" method="get" class="form-inline">
-				        <button type="submit" class="btn btn-primary">Sign up</button>
-			        </form>
-		        </li>
-		        <li>
-			        <form asp-controller="Account" asp-action="Login" method="get" class="form-inline">
-				        <button type="submit" class="btn btn-secondary">Log in</button>
-			        </form>
-		        </li>
-	        }
-	        else
-	        {
-		        <li>
-			        <form asp-controller="Account" asp-action="Logout" method="post" id="logoutForm" class="form-inline">
-				        <button type="submit" class="btn btn-danger">Log out</button>
-			        </form>
-		        </li>
-		        <li class="course-amt">
-			        <a href="courses.html" class="course">
-				        @{
-					        var currentUser = await UserManager.GetUserAsync(User);
-				        }
-				        <span>Welcome, @currentUser?.UserName</span>
-				        <p>@currentUser?.Email</p>
-			        </a>
-			        <a href="courses.html" class="user-circle"><img src="~/assets/img/icon-01.png" width="22" alt=""></a>
-		        </li>
-	        }
-        </ul>
-    </nav>
-</header>
-<!-- /Header -->
+        <!-- /Footer Top -->
+        <!-- Footer Bottom -->
+        <div class="footer-bottom">
+            <div class="container">
 
-<div class="content">
-    @RenderBody()
-</div>
+                <!-- Copyright -->
+                <div class="copyright">
+                    <div class="row">
+                        <div class="col-md-4 col-lg-4">
+                            <div class="copyright-text">
+                                <p class="mb-0">© 2021 All Rights Reserved</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-4">
+                            <div class="copyright-text">
+                                <p class="mb-0"><a href="term-condition.html">Terms and Conditions</a> - <a href="privacy-policy.html">Privacy Policy</a></p>
+                            </div>
+                        </div>
+                        <div class="col-md-2 col-lg-4 right-text">
+                            <div class="social-icon">
+                                <ul>
+                                    <li><a href="#" class="icon" target="_blank"><i class="fab fa-facebook-f"></i> </a></li>
+                                    <li><a href="#" class="icon" target="_blank"><i class="fab fa-twitter"></i> </a></li>
+                                    <li><a href="#" class="icon" target="_blank"><i class="fab fa-instagram"></i> </a></li>
+                                    <li><a href="#" class="icon" target="_blank"><i class="fab fa-linkedin-in"></i> </a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /Copyright -->
 
-<!-- Footer -->
-			<footer class="footer">
-				
-				<div class="footer-top">
-					<div class="container">
-						<div class="row">
-							<div class="col-lg-3 col-md-6">
-							
-								<!-- Footer Widget -->
-								<div class="footer-widget footer-about">
-									<h2 class="footer-title">ABOUT Management System</h2>
-									<div class="footer-about-content">
-										<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut consequat mauris Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut consequat mauris </p>
-										
-									</div>
-								</div>
-								<!-- /Footer Widget -->
-								
-							</div>
-							
-							<div class="col-lg-3 col-md-6">
-							
-								<!-- Footer Widget -->
-								<div class="footer-widget footer-menu">
-									<h2 class="footer-title">BOOK NOW</h2>
-									<ul>
-										<li><a href="@Url.Action("Index", "Booking")">Book</a></li>
-										<li><a href="courses.html">Business</a></li>
-										<li><a href="courses.html">IT & Software</a></li>
-										<li><a href="courses.html">Office Productivity</a></li>
-										<li><a href="courses.html">Personal Development</a></li>
-									</ul>
-								</div>
-								<!-- /Footer Widget -->
-								
-							</div>
-							
-							<div class="col-lg-3 col-md-6">
-							
-								<!-- Footer Widget -->
-								<div class="footer-widget footer-menu">
-									<h2 class="footer-title">SUPPORT</h2>
-									<ul>
-										<li><a href="booking.html">Booking</a></li>
-										<li><a href="chat.html">Chat</a></li>
-										<li><a href="reviews.html">Reviews</a></li>
-										<li><a href="favourites.html">Favourites </a></li>
-										<li><a href="college.html">College</a></li>
-									</ul>
-								</div>
-								<!-- /Footer Widget -->
-								
-							</div>
-							
-							<div class="col-lg-3 col-md-6">
-							
-								<!-- Footer Widget -->
-								<div class="footer-widget footer-contact">
-									<h2 class="footer-title">NEWSLETTER</h2>
-									<p> Sign Up to Our Newsletter to Get Latest Updates & Services</p>
-									<div class="my-3 footer-newsletter">
-										<form class="input-group">
-										<input type="email" placeholder="Enter Your Email">
-										<div>
-											<button class="btn btn-newsletter" type="submit"><i class="fa fa-paper-plane text-white" aria-hidden="true"></i></button>
-										</div>
-										</form>
-									</div>	
-								</div>
-								<!-- /Footer Widget -->
-								
-							</div>
-							
-						</div>
-					</div>
-				</div>
-				<!-- /Footer Top -->
-				
-				<!-- Footer Bottom -->
-                <div class="footer-bottom">
-					<div class="container">
-					
-						<!-- Copyright -->
-						<div class="copyright">
-							<div class="row">
-								<div class="col-md-4 col-lg-4">
-									<div class="copyright-text">
-										<p class="mb-0">© 2021 All Rights Reserved</p>
-									</div>
-								</div>
-								<div class="col-md-6 col-lg-4">
-									<div class="copyright-text">
-										<p class="mb-0"><a href="term-condition.html">Terms and Conditions</a> - <a href="privacy-policy.html">Privacy Policy</a></p>
-									</div>
-								</div>
-								<div class="col-md-2 col-lg-4 right-text">
-									<div class="social-icon">
-											<ul>
-												<li><a href="#" class="icon" target="_blank"><i class="fab fa-facebook-f"></i> </a></li>
-												<li><a href="#" class="icon" target="_blank"><i class="fab fa-twitter"></i> </a></li>
-												<li><a href="#" class="icon" target="_blank"><i class="fab fa-instagram"></i> </a></li>
-												<li><a href="#" class="icon" target="_blank"><i class="fab fa-linkedin-in"></i> </a></li>
-											</ul>
-										</div>
-								</div>
-							</div>
-						</div>
-						<!-- /Copyright -->
-						
-					</div>
-				</div>
-				<!-- /Footer Bottom -->
-				
-			</footer>
+            </div>
+        </div>
+        <!-- /Footer Bottom -->
+
+    </footer>
 
 </body>
 </html>
