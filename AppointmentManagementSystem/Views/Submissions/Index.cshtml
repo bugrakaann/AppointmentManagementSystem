@@ -47,13 +47,13 @@
                                     <li class="@(Model.CategoryId == (int)AppointmentStatus.WaitingForApproval ? "active" : "")">
                                         <a href="@Url.Action("Index", new { categoryId = (int)AppointmentStatus.WaitingForApproval, page=1 })">
                                             <i class="fas fa-hourglass-start"></i>
-                                            <span>Bekleyen Randevular</span>
+                                            <span>Bekleyen</span>
                                         </a>
                                     </li>
                                     <li class="@(Model.CategoryId == (int)AppointmentStatus.Approved ? "active" : "")">
                                         <a href="@Url.Action("Index", new { categoryId = (int)AppointmentStatus.Approved, page=1 })">
                                             <i class="fas fa-calendar-check"></i>
-                                            <span>Onaylý Randevular</span>
+                                            <span>Onaylý</span>
                                         </a>
                                     </li>
                                 </ul>
@@ -90,30 +90,28 @@
                                             </div>
                                         </div>
                                     </div>
-                                    @if (Model.CategoryId == (int)AppointmentStatus.WaitingForApproval)
-                                    {
-                                        <div class="appointment-action">
-                                            <a href="#"
-                                               class="btn btn-sm bg-info-light"
-                                               data-bs-toggle="modal"
-                                               data-bs-target="#appt_details"
-                                               data-id="@appointment.Id"
-                                               data-status="@appointment.status"
-                                               data-description="@appointment.description"
-                                               data-name="@appointment.Customer?.name"
-                                               data-surname="@appointment.Customer?.surname"
-                                               data-email="@appointment.Customer?.email"
-                                               data-phone="@appointment.Customer?.phoneNumber"
-                                               data-address="@appointment.Customer?.address"
-                                               data-starttime="@appointment.startTime.ToString("dd MMM yyyy hh:mm tt")"
-                                               data-endtime="@appointment.endTime.ToString("dd MMM yyyy hh:mm tt")">
-                                                <i class="far fa-eye"></i> Detaylar
-                                            </a>
+                                    <div class="appointment-action">
+                                        <a href="#"
+                                           class="btn btn-sm bg-info-light"
+                                           data-bs-toggle="modal"
+                                           data-bs-target="#appt_details"
+                                           data-id="@appointment.Id"
+                                           data-status="@appointment.status"
+                                           data-description="@appointment.description"
+                                           data-name="@appointment.Customer?.name"
+                                           data-surname="@appointment.Customer?.surname"
+                                           data-email="@appointment.Customer?.email"
+                                           data-phone="@appointment.Customer?.phoneNumber"
+                                           data-address="@appointment.Customer?.address"
+                                           data-starttime="@appointment.startTime.ToString("dd MMM yyyy hh:mm tt")"
+                                           data-endtime="@appointment.endTime.ToString("dd MMM yyyy hh:mm tt")">
+                                            <i class="far fa-eye"></i> Detaylar
+                                        </a>
+                                        @if (Model.CategoryId == (int)AppointmentStatus.WaitingForApproval)
+                                        {
                                             @if (appointment.endTime < DateTime.Now)
                                             {
-                                                <button class="btn btn-sm bg-secondary" disabled>
-                                                    <i class="fas fa-check"></i> Onayla
-                                                </button>
+                                                <button class="btn btn-sm bg-secondary" onclick="alert('Geçersiz Tarih')" style="cursor: not-allowed">Onayla</button>
                                             }
                                             else
                                             {
@@ -125,8 +123,8 @@
                                             <a href="@Url.Action("Reject")?id=@appointment.Id" class="btn btn-sm bg-danger-light">
                                                 <i class="fas fa-times"></i> Reddet
                                             </a>
-                                        </div>
-                                    }
+                                        }
+                                    </div>
                                 </div>
                             }
                         }

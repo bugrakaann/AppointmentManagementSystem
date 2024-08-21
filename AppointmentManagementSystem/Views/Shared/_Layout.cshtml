@@ -33,9 +33,6 @@
     <link rel="stylesheet" href="~/assets/plugins/fontawesome/css/fontawesome.min.css">
     <link rel="stylesheet" href="~/assets/plugins/fontawesome/css/all.min.css">
 
-    <!-- Select2 CSS -->
-    <link rel="stylesheet" href="~/assets/plugins/select2/css/select2.min.css">
-
     <!-- Daterangepikcer CSS -->
     <link rel="stylesheet" href="~/assets/plugins/daterangepicker/daterangepicker.css">
 
@@ -75,7 +72,7 @@
                         <a href="@Url.Action("Index", "Home")">Anasayfa</a>
                     </li>
                     <li class="@(IsActive("Booking", "Index") ? "active" : "")">
-                        <a href="@Url.Action("Index", "Booking")">Randevu Al</a>
+                        <a href="@Url.Action("Index", "Booking")">Randevu Oluştur</a>
                     </li>
                     @if (SignInManager.IsSignedIn(User))
                     {
@@ -123,7 +120,7 @@
     </div>
 
     <!-- Footer -->
-    <footer class="footer">
+    <footer class="footer mt-5">
         <div class="container">
             <span class="text-white">&copy; 2024 - ESTER</span>
         </div>
@@ -140,18 +137,12 @@
     <script src="~/assets/plugins/theia-sticky-sidebar/ResizeSensor.js"></script>
     <script src="~/assets/plugins/theia-sticky-sidebar/theia-sticky-sidebar.js"></script>
 
-    <!-- Select2 JS -->
-    <script src="~/assets/plugins/select2/js/select2.min.js"></script>
+    <!-- circle progress JS -->
+    <script src="~/assets/js/circle-progress.min.js"></script>
 
     <!-- Datetimepicker JS -->
     <script src="~/assets/js/moment.min.js"></script>
     <script src="~/assets/js/bootstrap-datetimepicker.min.js"></script>
-
-    <!-- Fancybox JS -->
-    <script src="~/assets/plugins/fancybox/jquery.fancybox.min.js"></script>
-
-    <!-- circle progress JS -->
-    <script src="~/assets/js/circle-progress.min.js"></script>
 
     <!-- Custom JS -->
     <script src="~/assets/js/script.js"></script>

@@ -7,6 +7,7 @@ using Services.Services;
 
 namespace AppointmentManagementSystem.Controllers
 {
+    [Route("Booking")]
     public class BookingController : Controller
     {
         private ICustomerService _customerService;
@@ -18,17 +19,10 @@ namespace AppointmentManagementSystem.Controllers
             _appointmentService = appointmentService;
         }
     
-        public IActionResult Index(int pageIndex=0, int? activeSlotId = null)
+        [HttpGet("")]
+        public IActionResult Index()
         {
-            int pageSize = 7;
-            IEnumerable<AppointmentDto> availabilityDtos = _appointmentService.GetRange(pageIndex*pageSize, pageSize);
-            
-            int totalAppointments = _appointmentService.GetAppointmentNumber();
-            
-            ViewBag.PageIndex = pageIndex;
-            ViewBag.ActiveSlotId = activeSlotId;
-            ViewBag.HasMorePages = (pageIndex + 1) * pageSize < totalAppointments; // Check if there are more pages
-            return View(availabilityDtos);
+            return View();
         }
 
         [HttpPost("SaveChanges")]
@@ -58,6 +52,7 @@ namespace AppointmentManagementSystem.Controllers
             TempData["appointment"] = JsonConvert.SerializeObject(availability);
             return RedirectToAction("BookingSuccess", "Booking");
         }
+
         public IActionResult BookingSuccess()
         {
             if (TempData["Appointment"] != null)
@@ -67,5 +62,6 @@ namespace AppointmentManagementSystem.Controllers
             }
             return View();
         }
+
     }
 }

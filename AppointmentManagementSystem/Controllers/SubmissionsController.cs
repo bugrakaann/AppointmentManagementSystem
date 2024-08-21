@@ -22,7 +22,7 @@ namespace AppointmentManagementSystem.Controllers
         [HttpGet("Index/{page:int}")]
         public ActionResult Index(int page = 1, [FromQuery] int categoryId = 1)
         {
-            int pageSize = 1;
+            int pageSize = 5;
             int startIndex = (page - 1) * pageSize;
             AppointmentStatus category = (AppointmentStatus)(categoryId);
 
@@ -35,7 +35,7 @@ namespace AppointmentManagementSystem.Controllers
                 Appointments = appointments,
                 CurrentPage = page,
                 TotalPages = (int)Math.Ceiling((double)totalAppointments / pageSize),
-                CategoryId = (int)category
+                CategoryId = categoryId
             };
 
             return View(viewModel);
@@ -67,5 +67,7 @@ namespace AppointmentManagementSystem.Controllers
             _appointmentService.Update(appointment);
             return RedirectToAction(nameof(Index));
         }
+
     }
+
 }

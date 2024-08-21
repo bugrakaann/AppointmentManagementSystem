@@ -21,10 +21,10 @@ namespace AppointmentManagementSystem.Controllers
         {
             int pageSize = 7;
             int totalAppointments = _appointmentService.GetAppointmentNumber();
-            IEnumerable<AppointmentDto> availabilityDtos = _appointmentService.GetRange(pageIndex * pageSize, 7);
+            IEnumerable<AppointmentDto> availabilityDtos = _appointmentService.GetRange(pageIndex * pageSize, pageSize);
 
             ViewBag.PageIndex = pageIndex;
-            ViewBag.HasMorePages = (pageIndex + 1) * pageSize < totalAppointments; // Check if there are more pages
+            ViewBag.HasMorePages = (pageIndex + 1) * pageSize < totalAppointments; 
             return View(availabilityDtos);
         }
 
@@ -35,7 +35,7 @@ namespace AppointmentManagementSystem.Controllers
             {
                 startTime = workStart,
                 endTime = workEnd,
-                description = "Yeni Randevu",
+                description = "",
                 status = AppointmentStatus.Available
             };
             _appointmentService.Add(dto);

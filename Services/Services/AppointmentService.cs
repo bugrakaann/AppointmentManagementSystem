@@ -164,4 +164,13 @@ public class AppointmentService : IAppointmentService
         return _appointmentRepository.GetCountByStatus(status);
     }
 
+    public IEnumerable<AppointmentDto> GetByDateRange(DateOnly startDate, DateOnly endDate)
+    {
+        var startTime = startDate.ToDateTime(TimeOnly.MinValue);
+        var endTime = endDate.ToDateTime(TimeOnly.MaxValue);
+        var list = _appointmentRepository.GetByDateRange(startTime, endTime);
+        var dtos = _mapper.Map<IEnumerable<AppointmentDto>>(list);
+        return dtos;
+    }
+
 }

@@ -69,4 +69,12 @@ public class AppointmentRepository : Repository<Appointment>,IAppointmentReposit
         return _dbSet
             .Count(a => a.status == status);
     }
+
+    public IEnumerable<Appointment> GetByDateRange(DateTime startTime, DateTime endTime)
+    {
+        return _dbSet
+            .Where(a => a.startTime >= startTime && a.endTime <= endTime)
+            .ToList();
+    }
+
 }

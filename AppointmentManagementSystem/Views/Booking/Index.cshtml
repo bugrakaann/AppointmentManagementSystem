@@ -1,233 +1,37 @@
 @using Models.Enums
 @{
-    ViewBag.Title = "title";
-    Layout = "_Layout";
-    
-    int pageIndex = ViewBag.PageIndex;
-    int? activeSlotId = ViewBag.ActiveSlotId;
-    var dates = Model.Select(w => w.startTime.Date).Distinct().ToList();
-    int tabNumber = Math.Min(7, dates.Count);
+    ViewData["title"] = "Randevu Oluþtur";
 }
 @model IEnumerable<DTOs.DTOs.AppointmentDto>
 
 
-<head>
-    <style>
-    /* Default button style */
-    .btn {
-        background-color: #f24400; /* Default blue color */
-        color: white;
-    }
-
-    /* Disabled button style */
-    .btn.disabled {
-        background-color: #cccccc; /* Gray color for disabled state */
-        color: #666666; /* Darker gray for text */
-        pointer-events: none; /* Disable pointer events */
-    }
-	.not-clickable {
-    pointer-events: none;
-    cursor: default;
-    opacity: 0.6; /* Optional: makes it look visually disabled */
-}
-</style>
-</head>
-
-<body>
 
 <!-- Main Wrapper -->
 <div class="main-wrapper">
-
-
     <!-- Breadcrumb -->
     <div class="breadcrumb-bar">
         <div class="container-fluid">
             <div class="row align-items-center">
                 <div class="col-md-12 col-12">
-                    <nav aria-label="breadcrumb" class="page-breadcrumb">
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item">
-                                <a href="index.html">Home</a>
-                            </li>
-                            <li class="breadcrumb-item active" aria-current="page">Booking</li>
-                        </ol>
-                    </nav>
-                    <h2 class="breadcrumb-title">Booking</h2>
+                    <h2 class="breadcrumb-title">Randevu Oluþtur</h2>
                 </div>
             </div>
         </div>
     </div>
     <!-- /Breadcrumb -->
-
     <!-- Page Content -->
     <div class="content">
         <div class="container">
-
-            <div class="row">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="booking-pro-info">
-                                <a href="instructor-profile.html" class="booking-pro-img">
-                                    <img src="~/assets/img/instructors/instructor-thumb-01.jpg" alt="User Image">
-                                </a>
-                                <div class="booking-info">
-                                    <h4>
-                                        <a href="instructor-profile.html">David Lee</a>
-                                    </h4>
-                                    <div class="rating">
-                                        <i class="fas fa-star filled"></i>
-                                        <i class="fas fa-star filled"></i>
-                                        <i class="fas fa-star filled"></i>
-                                        <i class="fas fa-star filled"></i>
-                                        <i class="fas fa-star"></i>
-                                        <span class="d-inline-block average-rating">35</span>
-                                    </div>
-                                    <p class="text-muted mb-0"><i class="fas fa-map-marker-alt"></i> Newyork, USA</p>
-                                </div>
-                            </div>
-                        </div>
+            <!-- FullCalendar container -->
+            <div class="row mb-2">
+                <div class="d-flex justify-content-center">
+                    <div class="col-mb-6">
+                        <input class="form-control" type="date" id="calendarDate" value="@DateTime.Now.ToString("yyyy-MM-dd")">
                     </div>
-                    <div class="row">
-                        <div class="col-12 col-sm-4 col-md-6">
-                            <h4 class="mb-1">11 November 2019</h4>
-                            <p class="text-muted">Monday</p>
-                        </div>
-                        <div class="col-12 col-sm-8 col-md-6 text-sm-end">
-                            <div class="bookingrange btn btn-white btn-sm mb-3">
-                                <i class="far fa-calendar-alt me-2"></i>
-                                <span></span>
-                                <i class="fas fa-chevron-down ms-2"></i>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Schedule Widget -->
-                    <div class="card booking-schedule schedule-widget">
-
-                        <!-- Schedule Header -->
-                        <div class="schedule-header">
-                            <div class="row">
-                                <div class="col-md-12">
-
-                                    <!-- Day Slot -->
-                                    <div class="day-slot">
-                                        <ul>
-                                            <li class="left-arrow">
-                                                @if (pageIndex > 0)
-                                                {
-                                                    <a class="btn-custom" href="@Url.Action("Index", new { pageIndex = pageIndex - 1 })">
-                                                        <i class="fa fa-chevron-left"></i>
-                                                    </a>
-                                                }
-                                                else
-                                                {
-                                                    <button class="btn-custom" disabled>
-                                                        <i class="fa fa-chevron-left"></i>
-                                                    </button>
-                                                }
-                                            </li>
-                                            @for (int i = 0; i < tabNumber; i++)
-                                            {
-                                                
-                                                <li>
-                                                    <span>@dates[i].ToString("ddd")</span>
-                                                    <span class="slot-date">
-                                                        @dates[i].ToString("dd MMM") <small class="slot-year">@dates[i].ToString("yyyy")</small>
-                                                    </span>
-                                                </li>
-                                            }
-
-                                            <li class="right-arrow">
-                                                @if (ViewBag.HasMorePages)
-                                                {
-                                                    <a class="btn-custom" href="@Url.Action("Index", new { pageIndex = pageIndex + 1 })">
-                                                        <i class="fa fa-chevron-right"></i>
-                                                    </a>
-                                                }
-                                                else
-                                                {
-                                                    <button class="btn-custom" disabled>
-                                                        <i class="fa fa-chevron-right"></i>
-                                                    </button>
-                                                }
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <!-- /Day Slot -->
-
-                                </div>
-                            </div>
-                        </div>
-                        <!-- /Schedule Header -->
-
-                        <!-- Schedule Content -->
-                        <div class="schedule-cont">
-                            <div class="row">
-                                <div class="col-md-12">
-
-                                    <!-- Time Slot -->
-                                    <div class="time-slot">
-                                        <ul class="clearfix">
-                                            @for (int i = 0; i < tabNumber; i++)
-                                            {
-                                                var items = Model.Where(w => w.startTime.Date == dates[i]);
-                                                <li>
-                                                    @foreach (var item in items)
-                                                    {
-                                                        var isActive = activeSlotId != null && item.Id == activeSlotId;
-                                                        string style = "";
-                                                        string onClick = "";
-
-                                                        switch (item.status)
-                                                        {
-                                                            case AppointmentStatus.Available:
-                                                                style = "background-color: #6c9666; color: white;";
-                                                                onClick = $"setActiveSlot({item.Id})";
-                                                                break;
-                                                            case AppointmentStatus.WaitingForApproval:
-                                                                style = "background-color: #d47e57; color: white; cursor: not-allowed;";
-                                                                onClick = ""; // Disable click
-                                                                break;
-                                                            case AppointmentStatus.Approved:
-                                                                style = "background-color: #636363; color: white; cursor: not-allowed;";
-                                                                onClick = ""; // Disable click
-                                                                break;
-                                                        }
-
-                                                        // If the slot is active, override the color with red
-                                                        if (isActive)
-                                                        {
-                                                            style = "background-color: #e35656; color: white;";
-                                                        }
-
-                                                        <a class="timing" href="javascript:void(0);" style="@style" onclick="@onClick">
-                                                            <span>@item.startTime.ToString("HH.mm")</span> - <span>@item.endTime.ToString("HH.mm")</span>
-                                                        </a>
-                                                    }
-                                                </li>
-                                            }
-                                        </ul>
-                                    </div>
-                                    <!-- /Time Slot -->
-
-                                </div>
-                            </div>
-                        </div>
-                        <!-- /Schedule Content -->
-
-                    </div>
-                    <!-- /Schedule Widget -->
-
-                    <!-- Submit Section -->
-                    <div class="submit-section proceed-btn text-end">
-                        <a href="javascript:void(0);" id="scheduleAppointmentBtn" class="btn btn-primary submit-btn" data-bs-toggle="modal" data-bs-target="#editCustomerDetailsModal">Schedule Appointment</a>
-                    </div>
-                    <!-- /Submit Section -->
-
                 </div>
             </div>
+            <div id="calendar"></div>
         </div>
-
     </div>
 
 </div>
@@ -242,7 +46,7 @@
             </div>
             <div class="modal-body">
                 <form id="customerDetailsForm" action="@Url.Action("SaveChanges", "Booking")" method="post">
-                    <input type="hidden" id="activeSlotId" name="activeSlotId" value="@activeSlotId"/>
+
                     <div class="form-section">
                         <div class="form-group row mb-3">
                             <label for="customerName" class="col-sm-3 col-form-label">First Name</label>
@@ -285,66 +89,108 @@
     </div>
 </div>
 <!-- /Edit Customer Details Modal -->
+@section Scripts {
+    <!-- Bootstrap Datepicker JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.tr.min.js"></script>
 
+    <!-- FullCalendar JS -->
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.5/locales/tr.js"></script>
 
+    <script>
 
-<script>
-    function getQueryParam(name) {
-        const urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get(name);
-    }
+        document.addEventListener('DOMContentLoaded', function () {
+            var calendarEl = document.getElementById('calendar');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'timeGridWeek',
+                firstDay: 1,
+                timeZone: 'local',
+                locale: 'tr',
+                slotLabelFormat: {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false
+                },
+                eventTimeFormat: {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false
+                },
+                headerToolbar: {
+                    left: '',
+                    right: '',
+                    center: 'prev,next'
+                },
+                selectable: true,
+                selectAllow: function (selectInfo) {
+                    // Allow selection only between 10:00 AM and 12:00 PM
+                    var startHour = selectInfo.start.getHours();
+                    var endHour = selectInfo.end.getHours();
 
-    // Function to update the state of the Schedule Appointment button
-    function updateButtonState() {
-        const scheduleButton = document.getElementById('scheduleAppointmentBtn');
-        if (!scheduleButton) return; // Ensure the button exists
-
-        const activeSlotId = getQueryParam('activeSlotId');
-        if (activeSlotId) {
-            scheduleButton.classList.remove('disabled');
-            scheduleButton.removeAttribute('disabled');
-        } else {
-            scheduleButton.classList.add('disabled');
-            scheduleButton.setAttribute('disabled', 'disabled');
-        }
-    }
-
-    // Restore the scroll position after the page reloads
-    document.addEventListener("DOMContentLoaded", function() {
-        var scrollPosition = localStorage.getItem('scrollPosition');
-        if (scrollPosition) {
-            window.scrollTo(0, scrollPosition);
-            localStorage.removeItem('scrollPosition');
-        }
-
-        // Initial check to update button state
-        updateButtonState();
-
-        // Add event listener to update button state when activeSlotId changes
-        document.querySelectorAll('input[name="activeSlotId"]').forEach(function(input) {
-            input.addEventListener('change', function() {
-                const slotIndex = input.value;
-                setActiveSlot(slotIndex);
+                    return (startHour >= 10 && endHour <= 12);
+                },
+                select: function (info) {
+                    alert('Selected: ' + info.startStr + ' to ' + info.endStr);
+                },
+                datesSet: function (info) {
+                    loadCalendarEvents(info.start, info.end);
+                    $("#calendarDate").val(formattedDate(info.start));
+                }
             });
-        });
-    });
+            calendar.render();
 
-    function setActiveSlot(slotIndex) {
-        var pageIndex = @ViewBag.PageIndex;
-        localStorage.setItem('scrollPosition', window.scrollY);
-        window.location.href = '@Url.Action("Index", "Booking")?pageIndex=' + pageIndex + '&activeSlotId=' + slotIndex;
-    }
-</script>
-@if (TempData["Notification"] != null)
-{
-<div id="notification" style="display:none;">@TempData["Notification"]</div>
-<script type="text/javascript">
-    document.addEventListener("DOMContentLoaded", function() {
-        var notification = document.getElementById("notification").innerText;
-        if (notification) {
-            alert(notification);
+            $("#calendarDate").on('change', function () {
+                const selectedDate = $(this).val();
+                selectedDate && calendar.gotoDate(selectedDate);
+            });
+
+            function loadCalendarEvents(startDate, endDate) {
+                startDate = formattedDate(startDate);
+                endDate = formattedDate(endDate);
+                $.ajax({
+                    url: '@Url.Action("GetSlots", "Appointments")',
+                    type: 'GET',
+                    dataType: 'JSON',
+                    data: {
+                        startDate: startDate,
+                        endDate: endDate
+                    },
+                    success: function (slots) {
+                        slots.forEach(slot => {
+                            const event = {
+                                id: slot.id,
+                                start: slot.startTime,
+                                end: slot.endTime,
+                                editable: false
+                            }
+                            if (slot.status === 1) {
+                                event.title = "UYGUN DEÐÝL";
+                                event.color = "gray";
+                            }
+                            else if (slot.status === 2) {
+                                event.title = "DOLU";
+                                event.color = "red";
+                            } else {
+                                return;
+                            }
+
+                            if (!calendar.getEventById(event.id)) {
+                                calendar.addEvent(event);
+                            }
+                        });
+                    },
+                    error: function (error) {
+                        alert("Bir hata oluþtu!")
+                    }
+                });
+            }
+
+        });
+
+        function formattedDate(dateTime) {
+            return moment(dateTime).format("YYYY-MM-DD")
         }
-    });
-</script>
+
+    </script>
 }
-</body>

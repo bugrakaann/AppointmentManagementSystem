@@ -29,6 +29,6 @@ public class AppointmentDto
     {
         Customer = null;
         customerId = null;
-        description = "Empty";
+        description = "";
     }
 }
