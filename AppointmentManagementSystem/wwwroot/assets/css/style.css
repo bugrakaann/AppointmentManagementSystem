@@ -8542,12 +8542,10 @@ html.menu-opened body {
 	padding: 0;
 }
 .student {
-    background:  url(../img/student-bg.jpg) no-repeat ;
-	background-size: cover;
-    padding: 50px 0;
-    position: relative;
-    color: #fff;
-	text-align: center;
+	background-color: #3aaaff;
+	color: #fff;
+	padding: 50px 0;
+	position: relative;
 }
 .student:before {
     content: "";
@@ -8571,7 +8569,7 @@ html.menu-opened body {
 	padding-bottom: 10px;
 	position: relative;
 }
-.student p{
+.student li{
 	font-size: 16px;
 	color: #fff;
 	padding-bottom: 15px;

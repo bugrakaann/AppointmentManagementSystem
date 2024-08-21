@@ -2,6 +2,7 @@ using DTOs.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models.Enums;
+using Models.ViewModel;
 using Services.Services;
 
 namespace AppointmentManagementSystem.Controllers
@@ -18,16 +19,26 @@ namespace AppointmentManagementSystem.Controllers
         }
 
         [HttpGet("")]
-        [HttpGet("Index/{index:int}")]
-        public ActionResult Index(int index = 1)
+        [HttpGet("Index/{page:int}")]
+        public ActionResult Index(int page = 1, [FromQuery] int categoryId = 1)
         {
-            //pagination eklenirse buranın düzenlenmesi lazım
-            int pageSize = 7;
-            AppointmentStatus category = (AppointmentStatus)index;
-            var pendingappointments = _appointmentService.GetRange(category, 0 * pageSize, 7);
+            int pageSize = 1;
+            int startIndex = (page - 1) * pageSize;
+            AppointmentStatus category = (AppointmentStatus)(categoryId);
 
-            ViewBag.Category = (int)category;
-            return View(pendingappointments);
+            var appointments = _appointmentService.GetRange(category, startIndex, pageSize);
+
+            var totalAppointments = _appointmentService.GetCountByStatus(category);
+
+            var viewModel = new AppointmentViewModel
+            {
+                Appointments = appointments,
+                CurrentPage = page,
+                TotalPages = (int)Math.Ceiling((double)totalAppointments / pageSize),
+                CategoryId = (int)category
+            };
+
+            return View(viewModel);
         }
 
         [HttpGet("Reject")]

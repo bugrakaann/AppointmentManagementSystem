@@ -9,4 +9,6 @@ public interface IAppointmentRepository : IRepository<Appointment>
     IEnumerable<Appointment> GetRange(int startIndex, int count);
     int GetAppointmentNumber();
 
+    int GetCountByStatus(AppointmentStatus status);
+
 }

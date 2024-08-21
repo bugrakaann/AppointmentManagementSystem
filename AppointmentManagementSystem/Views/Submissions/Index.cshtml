@@ -1,8 +1,21 @@
 @using Models.Enums
-@model IEnumerable<DTOs.DTOs.AppointmentDto>
+@model Models.ViewModel.AppointmentViewModel
 @{
     ViewData["Title"] = "Randevu Talepleri";
-    int index = ViewBag.Category;
+
+    string categoryImg;
+    switch (Model.CategoryId)
+    {
+        case (int)AppointmentStatus.WaitingForApproval:
+            categoryImg = "https://cdn-icons-png.flaticon.com/512/1827/1827336.png";
+            break;
+        case (int)AppointmentStatus.Approved:
+            categoryImg = "https://cdn-icons-png.flaticon.com/256/9826/9826449.png";
+            break;
+        default:
+            categoryImg = "https://cdn0.iconfinder.com/data/icons/expenses-vs-income/30/__pending_transaction_clock_wait-512.png";
+            break;
+    }
 }
 
 <!-- Main Wrapper -->
@@ -19,7 +32,6 @@
         </div>
     </div>
     <!-- /Breadcrumb -->
-
     <!-- Page Content -->
     <div class="content">
         <div class="container">
@@ -27,19 +39,19 @@
             <div class="row">
                 <div class="col-md-5 col-lg-4 col-xl-3 theiaStickySidebar">
 
-                    <!-- Profile Sidebar -->
+                    <!-- Sidebar -->
                     <div class="profile-sidebar">
                         <div class="dashboard-widget">
                             <nav class="dashboard-menu">
                                 <ul>
-                                    <li class="@(index == (int)AppointmentStatus.WaitingForApproval ? "active" : "")">
-                                        <a href="@Url.Action("Index", new { index = (int)AppointmentStatus.WaitingForApproval })">
+                                    <li class="@(Model.CategoryId == (int)AppointmentStatus.WaitingForApproval ? "active" : "")">
+                                        <a href="@Url.Action("Index", new { categoryId = (int)AppointmentStatus.WaitingForApproval, page=1 })">
                                             <i class="fas fa-hourglass-start"></i>
                                             <span>Bekleyen Randevular</span>
                                         </a>
                                     </li>
-                                    <li class="@(index == (int)AppointmentStatus.Approved ? "active" : "")">
-                                        <a href="@Url.Action("Index", new { index = (int)AppointmentStatus.Approved })">
+                                    <li class="@(Model.CategoryId == (int)AppointmentStatus.Approved ? "active" : "")">
+                                        <a href="@Url.Action("Index", new { categoryId = (int)AppointmentStatus.Approved, page=1 })">
                                             <i class="fas fa-calendar-check"></i>
                                             <span>Onaylý Randevular</span>
                                         </a>
@@ -48,13 +60,13 @@
                             </nav>
                         </div>
                     </div>
-                    <!-- /Profile Sidebar -->
+                    <!--  Sidebar -->
 
                 </div>
 
                 <div class="col-md-7 col-lg-8 col-xl-9">
                     <div class="appointments">
-                        @if (!Model.Any())
+                        @if (!Model.Appointments.Any())
                         {
                             <div>
                                 <p>Herhangi bir randevu talebi bulunmuyor!</p>
@@ -62,62 +74,91 @@
                         }
                         else
                         {
-                            var dates = Model.Select(w => w.startTime).Distinct().ToList();
-                            @foreach (var date in dates)
+                            foreach (var appointment in Model.Appointments)
                             {
-                                var dataOfDate = Model.Where(w => w.startTime == date);
-                                foreach (var appointment in dataOfDate)
-                                {
-                                    <!-- Appointment List -->
-                                    <div class="appointment-list">
-                                        <div class="profile-info-widget">
-                                            <a href="student-profile.html" class="booking-pro-img">
-                                                <img src="~/assets/img/student/student.jpg" alt="User Image">
-                                            </a>
-                                            <div class="profile-det-info">
-                                                <h3><a href="student-profile.html">@appointment.Customer?.name @appointment.Customer?.surname</a></h3>
-                                                <div class="customer-details">
-                                                    <h5><i class="far fa-clock"></i>@appointment.startTime - @appointment.endTime.TimeOfDay</h5>
-                                                    <h5><i class="fa fa-map-marker"></i>@appointment.Customer?.address</h5>
-                                                    <h5><i class="fas fa-envelope"></i>@appointment.Customer?.email</h5>
-                                                    <h5><i class="fa fa-comments"></i>@appointment.description</h5>
-                                                    <h5 class="mb-0"><i class="fas fa-phone"></i>@appointment.Customer?.phoneNumber</h5>
-                                                </div>
+                                <div class="appointment-list">
+                                    <div class="profile-info-widget">
+                                        <a href="#" class="booking-pro-img">
+                                            <img src="@categoryImg" alt="User Image">
+                                        </a>
+                                        <div class="profile-det-info">
+                                            <h3><a href="#">@appointment.Customer?.name @appointment.Customer?.surname</a></h3>
+                                            <div class="customer-details">
+                                                <h5><i class="far fa-clock"></i>@appointment.startTime - @appointment.endTime.TimeOfDay</h5>
+                                                <h5><i class="fas fa-envelope"></i>@appointment.Customer?.email</h5>
+                                                <h5 class="mb-0"><i class="fas fa-phone"></i>@appointment.Customer?.phoneNumber</h5>
                                             </div>
                                         </div>
-                                        @if (index == (int)AppointmentStatus.WaitingForApproval)
-                                        {
-                                            <div class="appointment-action">
-                                                <a href="#"
-                                                   class="btn btn-sm bg-info-light"
-                                                   data-bs-toggle="modal"
-                                                   data-bs-target="#appt_details"
-                                                   data-id="@appointment.Id"
-                                                   data-status="@appointment.status"
-                                                   data-description="@appointment.description"
-                                                   data-name="@appointment.Customer?.name"
-                                                   data-surname="@appointment.Customer?.surname"
-                                                   data-email="@appointment.Customer?.email"
-                                                   data-phone="@appointment.Customer?.phoneNumber"
-                                                   data-address="@appointment.Customer?.address"
-                                                   data-starttime="@appointment.startTime.ToString("dd MMM yyyy hh:mm tt")"
-                                                   data-endtime="@appointment.endTime.ToString("dd MMM yyyy hh:mm tt")">
-                                                    <i class="far fa-eye"></i> Detaylar
-                                                </a>
-                                                <a href="@Url.Action("Accept")?id=@appointment.Id" class="btn btn-sm bg-success-light">
+                                    </div>
+                                    @if (Model.CategoryId == (int)AppointmentStatus.WaitingForApproval)
+                                    {
+                                        <div class="appointment-action">
+                                            <a href="#"
+                                               class="btn btn-sm bg-info-light"
+                                               data-bs-toggle="modal"
+                                               data-bs-target="#appt_details"
+                                               data-id="@appointment.Id"
+                                               data-status="@appointment.status"
+                                               data-description="@appointment.description"
+                                               data-name="@appointment.Customer?.name"
+                                               data-surname="@appointment.Customer?.surname"
+                                               data-email="@appointment.Customer?.email"
+                                               data-phone="@appointment.Customer?.phoneNumber"
+                                               data-address="@appointment.Customer?.address"
+                                               data-starttime="@appointment.startTime.ToString("dd MMM yyyy hh:mm tt")"
+                                               data-endtime="@appointment.endTime.ToString("dd MMM yyyy hh:mm tt")">
+                                                <i class="far fa-eye"></i> Detaylar
+                                            </a>
+                                            @if (appointment.endTime < DateTime.Now)
+                                            {
+                                                <button class="btn btn-sm bg-secondary" disabled>
+                                                    <i class="fas fa-check"></i> Onayla
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <a href="@Url.Action("Accept")?id=@appointment.Id"
+                                                   class="btn btn-sm bg-success-light">
                                                     <i class="fas fa-check"></i> Onayla
                                                 </a>
-                                                <a href="@Url.Action("Reject")?id=@appointment.Id" class="btn btn-sm bg-danger-light">
-                                                    <i class="fas fa-times"></i> Reddet
-                                                </a>
-                                            </div>
-                                        }
-                                    </div>
-                                    <!-- /Appointment List -->
-                                }
+                                            }
+                                            <a href="@Url.Action("Reject")?id=@appointment.Id" class="btn btn-sm bg-danger-light">
+                                                <i class="fas fa-times"></i> Reddet
+                                            </a>
+                                        </div>
+                                    }
+                                </div>
                             }
                         }
                     </div>
+                    <!-- Pagination Controls -->
+                    @if (Model.TotalPages > 1)
+                    {
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                                    <a class="page-link" href="@Url.Action("Index", new { categoryId = Model.CategoryId, page = Model.CurrentPage - 1 })" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+
+                                @for (int i = 1; i <= Model.TotalPages; i++)
+                                {
+                                    <li class="page-item @(Model.CurrentPage == i ? "active" : "")">
+                                        <a class="page-link" href="@Url.Action("Index", new { categoryId = Model.CategoryId, page = i })">@i</a>
+                                    </li>
+                                }
+
+                                <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+                                    <a class="page-link" href="@Url.Action("Index", new { categoryId = Model.CategoryId, page = Model.CurrentPage + 1 })" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    }
+
+                    <!-- /Pagination Controls -->
                 </div>
             </div>
 
@@ -128,7 +169,6 @@
 
 </div>
 <!-- /Main Wrapper -->
-
 <!-- Appointment Details Modal -->
 <div class="modal fade custom-modal" id="appt_details">
     <div class="modal-dialog modal-dialog-centered">
@@ -138,45 +178,24 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <ul class="info-details">
-                    <li>
-                        <div class="details-header">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <span class="title">#<span id="appt_id">APT0001</span></span>
-                                    <span class="text" id="appt_date">21 Oct 2019 10:00 AM</span>
-                                </div>
-                                <div class="col-md-6 text-end">
-                                    <button type="button" class="btn bg-success-light btn-sm" id="topup_status">Completed</button>
-                                </div>
-                            </div>
-                        </div>
-                    </li>
-                    <li>
-                        <span class="title">Customer:</span>
-                        <span class="text" id="customer_name">John Doe</span>
-                    </li>
-                    <li>
-                        <span class="title">Email:</span>
-                        <span class="text" id="customer_email">johndoe@example.com</span>
-                    </li>
-                    <li>
-                        <span class="title">Phone:</span>
-                        <span class="text" id="customer_phone">+123456789</span>
-                    </li>
-                    <li>
-                        <span class="title">Address:</span>
-                        <span class="text" id="customer_address">123 Main St</span>
-                    </li>
-                    <li>
-                        <span class="title">Appointment Time:</span>
-                        <span class="text" id="appt_time">21 Oct 2019 10:00 AM - 21 Oct 2019 11:00 AM</span>
-                    </li>
-                    <li>
-                        <span class="title">Description:</span>
-                        <span class="text" id="appt_description">Consultation regarding...</span>
-                    </li>
-                </ul>
+                <div class="mb-3">
+                    <strong>Randevu Zamaný:</strong> <span id="appt_time"></span>
+                </div>
+                <div class="mb-3">
+                    <strong>Müþteri:</strong> <span id="customer_name"></span>
+                </div>
+                <div class="mb-3">
+                    <strong>Email:</strong> <span id="customer_email"></span>
+                </div>
+                <div class="mb-3">
+                    <strong>Telefon:</strong> <span id="customer_phone"></span>
+                </div>
+                <div class="mb-3">
+                    <strong>Adres:</strong> <span id="customer_address"></span>
+                </div>
+                <div class="mb-3">
+                    <strong>Açýklama:</strong> <span id="appt_description"></span>
+                </div>
             </div>
         </div>
     </div>
@@ -192,8 +211,6 @@
 
                 // Extract info from data attributes
                 var appointmentDetails = {
-                    id: button.getAttribute('data-id'),
-                    status: button.getAttribute('data-status'),
                     description: button.getAttribute('data-description'),
                     name: button.getAttribute('data-name'),
                     surname: button.getAttribute('data-surname'),
@@ -204,20 +221,14 @@
                     endTime: button.getAttribute('data-endtime')
                 };
 
-
                 // Update the modal's content
-                apptDetailsModal.querySelector('#appt_id').textContent = appointmentDetails.id;
-                apptDetailsModal.querySelector('#appt_date').textContent = appointmentDetails.startTime;
-                apptDetailsModal.querySelector('#topup_status').textContent = appointmentDetails.status;
-                apptDetailsModal.querySelector('#customer_name').textContent = appointmentDetails.name + ' ' + appointmentDetails.surname;
+                apptDetailsModal.querySelector('#customer_name').textContent = `${appointmentDetails.name} ${appointmentDetails.surname}`;
                 apptDetailsModal.querySelector('#customer_email').textContent = appointmentDetails.email;
                 apptDetailsModal.querySelector('#customer_phone').textContent = appointmentDetails.phone;
                 apptDetailsModal.querySelector('#customer_address').textContent = appointmentDetails.address;
-                apptDetailsModal.querySelector('#appt_time').textContent = appointmentDetails.startTime + ' - ' + appointmentDetails.endTime;
+                apptDetailsModal.querySelector('#appt_time').textContent = `${appointmentDetails.startTime} - ${appointmentDetails.endTime}`;
                 apptDetailsModal.querySelector('#appt_description').textContent = appointmentDetails.description;
-
             });
         });
-
     </script>
 }

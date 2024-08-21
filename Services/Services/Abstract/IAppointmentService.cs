@@ -17,4 +17,6 @@ public interface IAppointmentService
     void Delete(AppointmentDto appointment);
     bool CheckExistingSession(AppointmentDto dto);
     int GetAppointmentNumber();
+
+    int GetCountByStatus(AppointmentStatus status);
 }

@@ -15,7 +15,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Data Access Layer\Data Access Layer.csproj" />
-      <ProjectReference Include="..\Entity\Entity.csproj" />
     </ItemGroup>
 
 </Project>

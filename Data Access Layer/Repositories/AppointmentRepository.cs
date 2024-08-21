@@ -21,19 +21,21 @@ public class AppointmentRepository : Repository<Appointment>,IAppointmentReposit
             .Where(a => a.status == status)
             .Select(a => a.startTime.Date)
             .Distinct()
-            .OrderBy(date => date)
+            .OrderByDescending(date => date) // Descending order by date to get latest first
             .Skip(startIndex)
             .Take(count)
             .ToList();
 
-        // Step 2: Retrieve the appointments for these dates with the given status
+        // Step 2: Retrieve the appointments for these dates with the given status, sorted by ID descending
         var appointments = _dbSet
             .Where(a => a.status == status && dates.Contains(a.startTime.Date))
-            .OrderBy(a => a.startTime)
+            .OrderByDescending(a => a.id) // Order by ID descending
+            .ThenBy(a => a.startTime)     // Then by startTime if needed (optional)
             .ToList();
 
         return appointments;
     }
+
     public IEnumerable<Appointment> GetRange(int startIndex, int count)
     {
         // Step 1: Retrieve the distinct dates for the specified range
@@ -60,5 +62,11 @@ public class AppointmentRepository : Repository<Appointment>,IAppointmentReposit
             .Select(a => a.startTime.Date)
             .Distinct()
             .Count();
+    }
+
+    public int GetCountByStatus(AppointmentStatus status)
+    {
+        return _dbSet
+            .Count(a => a.status == status);
     }
 }

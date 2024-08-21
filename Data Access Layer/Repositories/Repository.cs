@@ -24,7 +24,7 @@ public class Repository<T> : IRepository<T> where T : class, IEntity
         }
         else if (typeof(T) == typeof(Appointment))
         {
-            (_dbSet as DbSet<Appointment>)?.Include(a => a.customer);
+            (_dbSet as DbSet<Appointment>)?.Include(c => c.customer);
         }
     }
     
@@ -37,7 +37,7 @@ public class Repository<T> : IRepository<T> where T : class, IEntity
     public T GetById(int id)
     {
         IncludeRelationships();
-        return _dbSet.FirstOrDefault(a => a.id == id);
+        return _dbSet.First(a => a.id == id);
     }
 
     public void Add(T entity)
@@ -60,7 +60,7 @@ public class Repository<T> : IRepository<T> where T : class, IEntity
 
     public void Delete(int id)
     {
-        T entity = _dbSet.FirstOrDefault(a=>a.id == id);
+        var entity = _dbSet.FirstOrDefault(a=>a.id == id);
         if(entity == null) return;
         _dbSet.Remove(entity);
         _context.SaveChanges();

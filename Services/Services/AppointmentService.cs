@@ -159,4 +159,9 @@ public class AppointmentService : IAppointmentService
         return _appointmentRepository.GetAppointmentNumber();
     }
 
+    public int GetCountByStatus(AppointmentStatus status)
+    {
+        return _appointmentRepository.GetCountByStatus(status);
+    }
+
 }
