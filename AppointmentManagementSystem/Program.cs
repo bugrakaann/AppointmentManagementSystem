@@ -1,6 +1,5 @@
 using Data_Access_Layer.Data;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Rewrite;
 using Models.Models;
 using Services;
 using Services.Data;
@@ -40,6 +39,8 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+app.UseStatusCodePagesWithReExecute("/Home/HttpError/{0}");
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
@@ -49,9 +50,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 
-
-
-
+app.MapGet("/l", () => Results.Redirect("/Account/Login"));
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");

@@ -16,8 +16,8 @@ namespace AppointmentManagementSystem.Controllers
         [HttpGet("GetSlots")]
         public IActionResult GetSlots([FromQuery] DateOnly startDate, [FromQuery] DateOnly endDate)
         {
-            var availableSlots = _appointmentService.GetByDateRange(startDate, endDate);
-            return Json(availableSlots);
+            var slots = _appointmentService.GetByDateRange(startDate, endDate);
+            return Json(slots);
         }
 
     }

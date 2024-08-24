@@ -25,8 +25,8 @@ namespace AppointmentManagementSystem.Controllers
             return View();
         }
 
-        [HttpPost("SaveChanges")]
-        public IActionResult SaveChanges(string Name, string Surname, string PhoneNumber, string Email, string Address, string activeSlotId)
+        [HttpPost("NewAppointment")]
+        public IActionResult NewAppointment(string Name, string Surname, string PhoneNumber, string Email, string Address, string activeSlotId)
         {
             CustomerDto customer = new CustomerDto()
             {
