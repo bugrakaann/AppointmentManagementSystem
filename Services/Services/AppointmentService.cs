@@ -72,47 +72,7 @@ public class AppointmentService : IAppointmentService
     public void Add(AppointmentDto appointment)
     {
         var _appointment = _mapper.Map<Appointment>(appointment);
-        var timeSlots = GenerateTimeSlots(_appointment.startTime, _appointment.endTime);
-        foreach (var slot in timeSlots)
-        {
-            // Query the database for overlapping appointments
-            var overlappingAppointments = _appointmentRepository
-                .Find(a => a.startTime < slot.Item2 && a.endTime > slot.Item1)
-                .ToList();
-
-            // If there are overlapping appointments, skip this slot
-            if (overlappingAppointments.Any())
-                continue;
-
-            var newAppointment = new Appointment
-            {
-                startTime = slot.Item1,
-                endTime = slot.Item2,
-                description = _appointment.description,
-                status = _appointment.status
-            };
-
-            _appointmentRepository.Add(newAppointment);
-        }
-    }
-
-    private List<(DateTime, DateTime)> GenerateTimeSlots(DateTime workStart, DateTime workEnd)
-    {
-        var slots = new List<(DateTime, DateTime)>();
-
-        DateTime currentStart = workStart;
-        while (currentStart < workEnd)
-        {
-            DateTime currentEnd = currentStart.AddMinutes(30);
-            if (currentEnd <= workEnd)
-            {
-                slots.Add((currentStart, currentEnd));
-            }
-
-            currentStart = currentEnd;
-        }
-
-        return slots;
+        _appointmentRepository.Add(_appointment);
     }
 
     public void Update(AppointmentDto appointment)
@@ -171,6 +131,11 @@ public class AppointmentService : IAppointmentService
         var list = _appointmentRepository.GetByDateRange(startTime, endTime);
         var dtos = _mapper.Map<IEnumerable<AppointmentDto>>(list);
         return dtos;
+    }
+
+    public bool IsOverlapping(DateTime startTime, DateTime endTime)
+    {
+        return _appointmentRepository.IsOverlapping(startTime, endTime);
     }
 
 }

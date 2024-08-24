@@ -1,8 +1,9 @@
 @using Models.Enums
+@using DTOs.DTOs
 @{
     ViewData["title"] = "Randevu Oluþtur";
 }
-@model IEnumerable<DTOs.DTOs.AppointmentDto>
+@model DTOs.DTOs.NewAppointmentDto
 
 
 <!-- Main Wrapper -->
@@ -46,44 +47,57 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form id="customerDetailsForm" action="@Url.Action("NewAppointment")" method="post">
-                    <div class="form-section">
+                <div class="form-section">
+                    <p id="AppointmentRange"></p>
+                    <form asp-action="NewAppointment" method="post" autocomplete="off">
+                        <input asp-for="StartTime" type="hidden"/>
+                        <input asp-for="EndTime" type="hidden"/>
+                        <div asp-validation-summary="All" class="text-danger"></div>
                         <div class="form-group row mb-3">
-                            <label for="customerName" class="col-sm-3 col-form-label">Ýsim</label>
+                            <label asp-for="Name" class="col-sm-3 col-form-label">Ýsim</label>
                             <div class="col-sm-9">
-                                <input type="text" class="form-control" id="customerName" name="Name" required>
+                                <input asp-for="Name" class="form-control" required/>
                             </div>
+                            <span asp-validation-for="Name" class="text-danger"></span>
                         </div>
                         <div class="form-group row mb-3">
-                            <label for="customerSurname" class="col-sm-3 col-form-label">Soyisim</label>
+                            <label asp-for="Surname" class="col-sm-3 col-form-label">Soyisim</label>
                             <div class="col-sm-9">
-                                <input type="text" class="form-control" id="customerSurname" name="Surname" required>
+                                <input asp-for="Surname" class="form-control" required/>
                             </div>
+                            <span asp-validation-for="Surname" class="text-danger"></span>
                         </div>
                         <div class="form-group row mb-3">
-                            <label for="customerPhoneNumber" class="col-sm-3 col-form-label">Telefon</label>
+                            <label asp-for="PhoneNumber" class="col-sm-3 col-form-label">Telefon</label>
                             <div class="col-sm-9">
-                                <input type="tel" class="form-control" id="customerPhoneNumber" name="PhoneNumber" required>
+                                <input asp-for="PhoneNumber" class="form-control" required/>
                             </div>
+                            <span asp-validation-for="PhoneNumber" type="tel" class="text-danger"></span>
                         </div>
                         <div class="form-group row mb-3">
-                            <label for="customerEmail" class="col-sm-3 col-form-label">Email</label>
+                            <label asp-for="Email" class="col-sm-3 col-form-label">Email</label>
                             <div class="col-sm-9">
-                                <input type="email" class="form-control" id="customerEmail" name="Email" required>
+                                <input asp-for="Email" type="email" class="form-control"required/>
                             </div>
+                            <span asp-validation-for="Email" class="text-danger"></span>
                         </div>
                         <div class="form-group row mb-3">
-                            <label for="customerAddress" class="col-sm-3 col-form-label">Adres</label>
+                            <label asp-for="Address" class="col-sm-3 col-form-label">Adres</label>
                             <div class="col-sm-9">
-                                <input type="text" class="form-control" id="customerAddress" name="Address" required>
+                                <input asp-for="Address" class="form-control" required/>
                             </div>
+                            <span asp-validation-for="Address" class="text-danger"></span>
                         </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                        <div class="form-group row mb-3">
+                            <label asp-for="Description" class="col-sm-3 col-form-label">Açýklama</label>
+                            <div class="col-sm-9">
+                                <input asp-for="Description" class="form-control" required/>
+                            </div>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
                         <button type="submit" class="btn btn-success">Kaydet</button>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
@@ -100,20 +114,24 @@
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.5/locales/tr.js"></script>
 
     <script src="~/assets/js/calendar.js"></script>
-
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+      document.addEventListener('DOMContentLoaded', function () {
             const customerModal = $("#editCustomerDetailsModal");
             const eventsURL = '@Url.Action("GetSlots", "Appointments")';
             renderCalendar(eventsURL, {
-                select: (info) => {
+                select: ({start, end}) => {
+                    $("#AppointmentRange").html(formattedTime(start) + " &nbsp;&nbsp;&nbsp;&nbsp; " + formattedTime(end))
                     customerModal.modal('show');
-                    alert('Selected: ' + info.startStr + ' to ' + info.endStr);
+                    $("#StartTime").val(formattedTime(start));
+                    $("#EndTime").val(formattedTime(end));
                 },
                 selectAllow: (info) => {
                     return true;
                 }
             });
+            if (@(ViewData.ModelState.ErrorCount) > 0) {
+                customerModal.modal('show');
+            }
         });
     </script>
 }

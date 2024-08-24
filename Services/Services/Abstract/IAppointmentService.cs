@@ -19,4 +19,5 @@ public interface IAppointmentService
     int GetAppointmentNumber();
     int GetCountByStatus(AppointmentStatus status);
     IEnumerable<AppointmentDto> GetByDateRange(DateOnly startTime, DateOnly endTime);
+    bool IsOverlapping(DateTime startTime, DateTime endTime);
 }

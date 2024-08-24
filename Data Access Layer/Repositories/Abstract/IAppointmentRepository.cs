@@ -10,4 +10,6 @@ public interface IAppointmentRepository : IRepository<Appointment>
     int GetAppointmentNumber();
     int GetCountByStatus(AppointmentStatus status);
     IEnumerable<Appointment> GetByDateRange(DateTime startTime, DateTime endTime);
+    bool IsOverlapping(DateTime startTime, DateTime endTime);
+
 }

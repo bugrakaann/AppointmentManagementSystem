@@ -5,7 +5,7 @@ using Models.Models;
 
 namespace Data_Access_Layer.Repositories;
 
-public class AppointmentRepository : Repository<Appointment>,IAppointmentRepository
+public class AppointmentRepository : Repository<Appointment>, IAppointmentRepository
 {
     private readonly DbContext _context;
     private readonly DbSet<Appointment> _dbSet;
@@ -75,6 +75,16 @@ public class AppointmentRepository : Repository<Appointment>,IAppointmentReposit
         return _dbSet
             .Where(a => a.startTime >= startTime && a.endTime <= endTime)
             .ToList();
+    }
+
+    public bool IsOverlapping(DateTime startTime, DateTime endTime)
+    {
+        return _dbSet
+            .Any(a =>
+                (startTime >= a.startTime && startTime < a.endTime) || // Yeni baþlangýç zamaný mevcut randevunun içinde mi?
+                (endTime > a.startTime && endTime <= a.endTime) || // Yeni bitiþ zamaný mevcut randevunun içinde mi?
+                (startTime <= a.startTime && endTime >= a.endTime) // Yeni randevu mevcut randevuyu kapsýyor mu?
+            );
     }
 
 }

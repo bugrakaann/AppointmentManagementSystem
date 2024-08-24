@@ -4,6 +4,7 @@
     const calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'timeGridWeek',
         firstDay: 1,
+        allDaySlot: false,
         timeZone: 'local',
         locale: 'tr',
         slotLabelFormat: {
@@ -81,4 +82,8 @@
 
 function formattedDate(dateTime) {
     return moment(dateTime).format("YYYY-MM-DD")
+}
+
+function formattedTime(dateTime) {
+    return moment(dateTime).format("YYYY-MM-DD HH:mm:ss")
 }

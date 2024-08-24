@@ -1,8 +1,6 @@
 using DTOs.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Models.Enums;
-using Models.Models;
-using Newtonsoft.Json;
 using Services.Services;
 
 namespace AppointmentManagementSystem.Controllers
@@ -12,13 +10,13 @@ namespace AppointmentManagementSystem.Controllers
     {
         private ICustomerService _customerService;
         private IAppointmentService _appointmentService;
-    
+
         public BookingController(ICustomerService customerService, IAppointmentService appointmentService)
         {
             _customerService = customerService;
             _appointmentService = appointmentService;
         }
-    
+
         [HttpGet("")]
         public IActionResult Index()
         {
@@ -26,41 +24,43 @@ namespace AppointmentManagementSystem.Controllers
         }
 
         [HttpPost("NewAppointment")]
-        public IActionResult NewAppointment(string Name, string Surname, string PhoneNumber, string Email, string Address, string activeSlotId)
+        public IActionResult NewAppointment(NewAppointmentDto info)
         {
-            CustomerDto customer = new CustomerDto()
+            if (ModelState.IsValid)
             {
-                name = Name,
-                surname = Surname,
-                phoneNumber = PhoneNumber,
-                email = Email,
-                address = Address
-            };
-            AppointmentDto availability = _appointmentService.GetById(int.Parse(activeSlotId));
-            if (_appointmentService.CheckExistingSession(availability))
-            {
-                TempData["Notification"] = "This session is already booked.";
-                return RedirectToAction("Index", "Booking");
+                if (info.StartTime < DateTime.Now || info.EndTime < DateTime.Now)
+                {
+                    ModelState.AddModelError("", "Geçersiz tarih aralýðý!");
+                }
+                else if (_appointmentService.IsOverlapping(info.StartTime, info.EndTime))
+                {
+                    ModelState.AddModelError("", "Bu tarih aralýðý dolu!");
+                }
+                else
+                {
+                    var customer = new CustomerDto
+                    {
+                        name = info.Name,
+                        surname = info.Surname,
+                        phoneNumber = info.PhoneNumber,
+                        email = info.Email,
+                        address = info.Address
+                    };
+                    _customerService.Add(customer);
+                    var appointment = new AppointmentDto
+                    {
+                        customerId = customer.id,
+                        description = info.Description,
+                        status = AppointmentStatus.WaitingForApproval,
+                        startTime = info.StartTime,
+                        endTime = info.EndTime
+                    };
+                    _appointmentService.Add(appointment);
+                    return View("BookingSuccess", appointment);
+                }
             }
-                
-            
-            _customerService.Add(customer);
-            availability.SetCustomerId(customer);
-            availability.SetStatus(AppointmentStatus.WaitingForApproval);
 
-            _appointmentService.Update(availability);
-            TempData["appointment"] = JsonConvert.SerializeObject(availability);
-            return RedirectToAction("BookingSuccess", "Booking");
-        }
-
-        public IActionResult BookingSuccess()
-        {
-            if (TempData["Appointment"] != null)
-            {
-                var appointment = JsonConvert.DeserializeObject<AppointmentDto>(TempData["Appointment"].ToString());
-                return View(appointment);
-            }
-            return View();
+            return View("Index", info);
         }
 
     }
