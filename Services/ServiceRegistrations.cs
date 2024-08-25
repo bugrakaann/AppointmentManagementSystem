@@ -24,6 +24,7 @@ public static class ServiceRegistrations
         // Register services
         services.AddScoped<IAppointmentService, AppointmentService>();
         services.AddScoped<ICustomerService, CustomerService>();
+        services.AddScoped<ICalendarService, GoogleCalendarService>();
 
         services.AddScoped<IAppointmentRepository, AppointmentRepository>();
         services.AddScoped<ICustomerRepository, CustomerRepository>();
