@@ -10,21 +10,24 @@ namespace AppointmentManagementSystem.Controllers
     {
         private ICustomerService _customerService;
         private IAppointmentService _appointmentService;
+        private ICalendarService _googleCalendarService;
 
-        public BookingController(ICustomerService customerService, IAppointmentService appointmentService)
+        public BookingController(ICustomerService customerService, IAppointmentService appointmentService,
+            ICalendarService googleCalendarService)
         {
             _customerService = customerService;
             _appointmentService = appointmentService;
+            _googleCalendarService = googleCalendarService;
         }
 
-        [HttpGet("")]
+        [HttpGet]
         public IActionResult Index()
         {
             return View();
         }
 
         [HttpPost("NewAppointment")]
-        public IActionResult NewAppointment(NewAppointmentDto info)
+        public async Task<IActionResult> NewAppointment(NewAppointmentDto info)
         {
             if (ModelState.IsValid)
             {
@@ -56,11 +59,50 @@ namespace AppointmentManagementSystem.Controllers
                         endTime = info.EndTime
                     };
                     _appointmentService.Add(appointment);
+
+                    try
+                    {
+                        string[] desc = [$"Email: {customer.email}", $"Tel: {customer.phoneNumber}", $"Adres: {customer.address}", $"Açýklama: {appointment.description}"];
+                        var result = await _googleCalendarService.AddEventAsync(
+                            $"Randevu - {customer.name} {customer.surname}",
+                            string.Join("\n", desc),
+                            appointment.startTime,
+                            appointment.endTime
+                        );
+                    }
+                    catch (Exception)
+                    {
+                        ModelState.AddModelError("", "Bir hata oluþtu");
+                        return View("Index", info);
+                    }
+
                     return View("BookingSuccess", appointment);
                 }
             }
 
             return View("Index", info);
+        }
+
+
+        [HttpGet("a")]
+        public async Task<IActionResult> StartWatchingCalendar()
+        {
+            var webhookUrl = "https://p.twitools.me/c.php";
+            var calendarId = "estery.proje@gmail.com"; // Ýzlemek istediðiniz takvim ID'si
+
+            var channel = await _googleCalendarService.WatchCalendarAsync(webhookUrl);
+
+            // Kanal bilgilerini saklayýn (database veya baþka bir saklama çözümü)
+            Console.WriteLine($"Started watching calendar. Channel ID: {channel.Id}");
+
+            return Ok("Started watching calendar.");
+        }
+
+        [HttpGet("b")]
+        public async Task<IActionResult> StopWatchingCalendar(string channelId, string resourceId)
+        {
+            await _googleCalendarService.StopWatchingCalendarAsync(channelId, resourceId);
+            return Ok("Stopped watching calendar.");
         }
 
     }

@@ -26,6 +26,8 @@ public static class ServiceRegistrations
         services.AddScoped<ICustomerService, CustomerService>();
         services.AddScoped<ICalendarService, GoogleCalendarService>();
 
+        // services.AddHostedService<GoogleCalendarRenewalService>();
+
         services.AddScoped<IAppointmentRepository, AppointmentRepository>();
         services.AddScoped<ICustomerRepository, CustomerRepository>();
 

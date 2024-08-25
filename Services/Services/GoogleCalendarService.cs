@@ -30,7 +30,7 @@ namespace Services.Services
             _calendarService = new CalendarService(new BaseClientService.Initializer()
             {
                 HttpClientInitializer = credential,
-                ApplicationName = "AppointmentSystem",
+           
             });
 
 
@@ -58,5 +58,31 @@ namespace Services.Services
             var request = _calendarService.Events.Insert(newEvent, this.calendarId);
             return await request.ExecuteAsync();
         }
+
+
+        public async Task<Channel> WatchCalendarAsync(string webhookUrl)
+        {
+            var channel = new Channel()
+            {
+                Id = Guid.NewGuid().ToString(),
+                Type = "web_hook",
+                Address = webhookUrl
+            };
+
+            var watchRequest = _calendarService.Events.Watch(channel, this.calendarId);
+            return await watchRequest.ExecuteAsync();
+        }
+
+        public async Task StopWatchingCalendarAsync(string channelId, string resourceId)
+        {
+            var channel = new Channel()
+            {
+                Id = channelId,
+                ResourceId = resourceId
+            };
+
+            await _calendarService.Channels.Stop(channel).ExecuteAsync();
+        }
+
     }
 }
