@@ -25,12 +25,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Services\Services.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <_ContentIncludedByDefault Remove="Views\Home\Index.cshtml" />
-      <_ContentIncludedByDefault Remove="Views\Home\Privacy.cshtml" />
+      <ProjectReference Include="..\Business\Business.csproj" />
     </ItemGroup>
 
 </Project>

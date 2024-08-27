@@ -1,4 +1,4 @@
-﻿using DTOs.DTOs;
+﻿using Models.DTOs;
 
 namespace Models.ViewModel;
 public class AppointmentViewModel

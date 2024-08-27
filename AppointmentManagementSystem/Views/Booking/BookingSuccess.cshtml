@@ -1,7 +1,8 @@
+@model Models.DTOs.BookingDto
 @{
     ViewData["Title"] = "Randevu";
 }
-@model DTOs.DTOs.AppointmentDto
+
 <!-- Main Wrapper -->
 <div class="main-wrapper">
 
@@ -28,7 +29,9 @@
                             <div class="success-cont">
                                 <i class="fas fa-check text-white bg-success"></i>
                                 <h3>Randevu kaydý oluþturuldu!</h3>
-                                <p><strong>@Model.startTime - @Model.endTime</strong></p>
+                                <p>
+                                    <strong>@Model.StartTime - @Model.EndTime</strong>
+                                </p>
                                 <p>Asistan onayýndan sonra randevunuz geçerli olacaktýr.</p>
                                 <a href="@Url.Action("Index", "Home")" class="btn btn-success view-inv-btn">Anasayfa</a>
                             </div>

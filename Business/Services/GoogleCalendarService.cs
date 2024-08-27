@@ -1,12 +1,13 @@
+using Business.Services.Abstract;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Calendar.v3;
 using Google.Apis.Calendar.v3.Data;
 using Google.Apis.Services;
 using Microsoft.Extensions.Configuration;
 
-namespace Services.Services
+namespace Business.Services
 {
-    public class GoogleCalendarService : ICalendarService
+    public class GoogleCalendarService : IGoogleCalendarService
     {
         private readonly CalendarService _calendarService;
         private readonly string calendarId;
@@ -30,11 +31,9 @@ namespace Services.Services
             _calendarService = new CalendarService(new BaseClientService.Initializer()
             {
                 HttpClientInitializer = credential,
-           
+
             });
-
-
-            this.calendarId = configuration["GoogleCalendar:CalendarID"] ?? "primary";
+            calendarId = configuration["GoogleCalendar:CalendarID"] ?? "primary";
         }
 
         public async Task<Event> AddEventAsync(string summary, string description, DateTimeOffset start, DateTimeOffset end)
@@ -55,7 +54,7 @@ namespace Services.Services
                     TimeZone = "UTC",
                 },
             };
-            var request = _calendarService.Events.Insert(newEvent, this.calendarId);
+            var request = _calendarService.Events.Insert(newEvent, calendarId);
             return await request.ExecuteAsync();
         }
 
@@ -69,7 +68,7 @@ namespace Services.Services
                 Address = webhookUrl
             };
 
-            var watchRequest = _calendarService.Events.Watch(channel, this.calendarId);
+            var watchRequest = _calendarService.Events.Watch(channel, calendarId);
             return await watchRequest.ExecuteAsync();
         }
 

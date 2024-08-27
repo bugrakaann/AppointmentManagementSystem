@@ -1,14 +1,15 @@
 using System.Linq.Expressions;
 
-namespace Data_Access_Layer.Repositories;
+namespace Data_Access_Layer.Repositories.Abstract;
 
 public interface IRepository<T>
 {
-    public IEnumerable<T> GetAll();
-    public T GetById(int id);
-    public void Add(T entity);
-    public void Update(T entity);
-    public void Delete(int id);
-    public void Delete(T entity);
-    public IEnumerable<T> Find(Expression<Func<T, bool>> predicate);
+    public Task<IEnumerable<T>> GetAll();
+    public Task<T> GetById(int id);
+    public Task<T> Add(T entity);
+    public Task<T> Update(T entity);
+    public Task Delete(int id);
+    public Task Delete(T entity);
+    public Task<IEnumerable<T>> Find(Expression<Func<T, bool>> predicate);
+    public Task<bool> Contains(Expression<Func<T, bool>> predicate);
 }

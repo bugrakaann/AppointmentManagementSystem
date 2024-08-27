@@ -1,15 +1,12 @@
 using Models.Enums;
 using Models.Models;
 
-namespace Data_Access_Layer.Repositories;
+namespace Data_Access_Layer.Repositories.Abstract;
 
 public interface IAppointmentRepository : IRepository<Appointment>
 {
-    IEnumerable<Appointment> GetRangeByStatus(AppointmentStatus status, int startIndex, int count);
-    IEnumerable<Appointment> GetRange(int startIndex, int count);
-    int GetAppointmentNumber();
-    int GetCountByStatus(AppointmentStatus status);
-    IEnumerable<Appointment> GetByDateRange(DateTime startTime, DateTime endTime);
-    bool IsOverlapping(DateTime startTime, DateTime endTime);
-
+    Task<IEnumerable<Appointment>> GetRangeByStatus(AppointmentStatus status, int startIndex, int count);
+    Task<int> GetCountByStatus(AppointmentStatus status);
+    Task<IEnumerable<Appointment>> GetByDateRange(DateTime startTime, DateTime endTime);
+    Task<bool> IsOverlapping(DateTime startTime, DateTime endTime);
 }

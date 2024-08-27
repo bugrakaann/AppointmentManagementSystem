@@ -1,6 +1,6 @@
 namespace Models.Models;
 
-public interface IEntity
+public class IEntity
 {
-    int id { get; set; }
+   public int id { get; set; }
 }

@@ -1,4 +1,4 @@
-namespace DTOs.DTOs;
+namespace Models.DTOs;
 
 public class CustomerDto
 {

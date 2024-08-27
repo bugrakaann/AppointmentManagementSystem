@@ -1,10 +1,10 @@
 using AutoMapper;
-using DTOs.DTOs;
+using Models.DTOs;
 using Models.Models;
 
-namespace Profiles.Profiles;
+namespace Business.Profiles;
 
-public class MappingProfile: Profile
+public class MappingProfile : Profile
 {
     public MappingProfile()
     {

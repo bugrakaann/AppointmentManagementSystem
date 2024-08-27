@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Services.Services;
+using Business.Services.Abstract;
 
 namespace AppointmentManagementSystem.Controllers
 {
@@ -14,9 +14,9 @@ namespace AppointmentManagementSystem.Controllers
         }
 
         [HttpGet("GetSlots")]
-        public IActionResult GetSlots([FromQuery] DateOnly startDate, [FromQuery] DateOnly endDate)
+        public async Task<IActionResult> GetSlots([FromQuery] DateOnly startDate, [FromQuery] DateOnly endDate)
         {
-            var slots = _appointmentService.GetByDateRange(startDate, endDate);
+            var slots = await _appointmentService.GetByDateRange(startDate, endDate);
             return Json(slots);
         }
 

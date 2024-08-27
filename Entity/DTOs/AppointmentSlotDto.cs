@@ -1,7 +1,7 @@
 using Models.Models;
 using Models.Enums;
 
-namespace DTOs.DTOs;
+namespace Models.DTOs;
 
 public class AppointmentSlotDto
 {

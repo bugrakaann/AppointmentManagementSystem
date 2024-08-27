@@ -1,9 +1,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Models.Models;
-using System.Data;
 
-namespace Services.Data;
+namespace Business.Data;
 
 public class SeedData
 {
@@ -18,8 +17,7 @@ public class SeedData
 
     private static async Task InitRoles(RoleManager<IdentityRole> roleManager)
     {
-
-        string[] roleNames = { "Admin", "User" };
+        string[] roleNames = ["Admin", "User"];
         IdentityResult roleResult;
 
         foreach (var roleName in roleNames)

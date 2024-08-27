@@ -1,6 +1,6 @@
-﻿namespace DTOs.DTOs;
+﻿namespace Models.DTOs;
 
-public class NewAppointmentDto
+public class BookingDto
 {
     public string Name { get; set; }
     public string Surname { get; set; }

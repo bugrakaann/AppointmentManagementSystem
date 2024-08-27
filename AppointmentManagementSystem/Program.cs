@@ -1,24 +1,19 @@
 using Data_Access_Layer.Data;
 using Microsoft.AspNetCore.Identity;
 using Models.Models;
-using Services;
-using Services.Data;
+using Business;
+using AppointmentManagementSystem.Middlewares;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
 var conString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-if (conString == null)
-{
-    throw new Exception("Connection string is null");
-}
+
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-
-builder.Services.AddMyLibraryServices(conString);
-
+builder.Services.RegisterServices(conString);
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
@@ -26,11 +21,11 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
 
 var app = builder.Build();
 
-// Seed roles
+// Initializer
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-    await SeedData.Initialize(services);
+    await Business.Data.SeedData.Initialize(services);
 }
 
 if (!app.Environment.IsDevelopment())
@@ -39,11 +34,12 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseStatusCodePagesWithReExecute("/Home/HttpError/{0}");
+app.UseStatusCodePagesWithReExecute("/Home/Error/{0}");
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseRouting();
 
 app.UseAuthentication();

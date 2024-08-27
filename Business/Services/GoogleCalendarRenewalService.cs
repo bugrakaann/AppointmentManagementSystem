@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
-using Services.Services;
+using Business.Services;
 
 public class GoogleCalendarRenewalService : BackgroundService
 {

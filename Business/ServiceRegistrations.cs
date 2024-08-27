@@ -1,17 +1,19 @@
+using Business.Profiles;
+using Business.Services;
+using Business.Services.Abstract;
 using Data_Access_Layer.Data;
 using Data_Access_Layer.Repositories;
+using Data_Access_Layer.Repositories.Abstract;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Profiles.Profiles;
-using Services.Services;
 
-namespace Services;
+namespace Business;
 
-public static class ServiceRegistrations  
+public static class ServiceRegistrations
 {
-    public static void AddMyLibraryServices(this IServiceCollection services , string connectionString)
+    public static void RegisterServices(this IServiceCollection services, string connectionString)
     {
-        
+
         // Register AutoMapper
         services.AddAutoMapper(typeof(MappingProfile));
 
@@ -19,20 +21,18 @@ public static class ServiceRegistrations
         {
             options.UseSqlServer(connectionString);
         });
-        
-        
+
         // Register services
+        services.AddScoped<IHomeService, HomeService>();
         services.AddScoped<IAppointmentService, AppointmentService>();
-        services.AddScoped<ICustomerService, CustomerService>();
-        services.AddScoped<ICalendarService, GoogleCalendarService>();
+        services.AddSingleton<IGoogleCalendarService, GoogleCalendarService>();
 
-        // services.AddHostedService<GoogleCalendarRenewalService>();
-
+        // Register repositories
         services.AddScoped<IAppointmentRepository, AppointmentRepository>();
         services.AddScoped<ICustomerRepository, CustomerRepository>();
 
     }
-    
 
-    
+
+
 }

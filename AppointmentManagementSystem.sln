@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Entity", "Entity\Entity.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Data Access Layer", "Data Access Layer\Data Access Layer.csproj", "{2074462A-450C-463D-A1C5-6F6443FC8820}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Services", "Services\Services.csproj", "{69A27916-7A85-497F-AF85-D542AED42964}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Business", "Business\Business.csproj", "{D9080D4E-4A4D-4C36-AF44-A9A48E81969A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,12 +29,15 @@ Global
 		{2074462A-450C-463D-A1C5-6F6443FC8820}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2074462A-450C-463D-A1C5-6F6443FC8820}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2074462A-450C-463D-A1C5-6F6443FC8820}.Release|Any CPU.Build.0 = Release|Any CPU
-		{69A27916-7A85-497F-AF85-D542AED42964}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{69A27916-7A85-497F-AF85-D542AED42964}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{69A27916-7A85-497F-AF85-D542AED42964}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{69A27916-7A85-497F-AF85-D542AED42964}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D9080D4E-4A4D-4C36-AF44-A9A48E81969A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D9080D4E-4A4D-4C36-AF44-A9A48E81969A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D9080D4E-4A4D-4C36-AF44-A9A48E81969A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D9080D4E-4A4D-4C36-AF44-A9A48E81969A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D8BEBF8D-8190-4006-9D4D-6AEFF3587043}
 	EndGlobalSection
 EndGlobal

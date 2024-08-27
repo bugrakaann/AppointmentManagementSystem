@@ -1,13 +1,11 @@
-@using Models.Enums
-@using DTOs.DTOs
+@model Models.DTOs.BookingDto
 @{
     ViewData["title"] = "Randevu Oluþtur";
 }
-@model DTOs.DTOs.NewAppointmentDto
-
 
 <!-- Main Wrapper -->
 <div class="main-wrapper">
+
     <!-- Breadcrumb -->
     <div class="breadcrumb-bar">
         <div class="container-fluid">
@@ -27,7 +25,7 @@
             <div class="row mb-2">
                 <div class="d-flex justify-content-center">
                     <div class="col-mb-6">
-                        <input class="form-control" type="date" id="calendarDate" value="@DateTime.Now.ToString("yyyy-MM-dd")">
+                        <input class="form-control" type="date" id="calendarDate">
                     </div>
                 </div>
             </div>
@@ -49,7 +47,7 @@
             <div class="modal-body">
                 <div class="form-section">
                     <p id="AppointmentRange"></p>
-                    <form asp-action="NewAppointment" method="post" autocomplete="off">
+                    <form asp-action="Save" method="post" autocomplete="off">
                         <input asp-for="StartTime" type="hidden"/>
                         <input asp-for="EndTime" type="hidden"/>
                         <div asp-validation-summary="All" class="text-danger"></div>
@@ -105,10 +103,6 @@
 <!-- /Edit Customer Details Modal -->
 
 @section Scripts {
-    <!-- Bootstrap Datepicker JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.tr.min.js"></script>
-
     <!-- FullCalendar JS -->
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.5/locales/tr.js"></script>

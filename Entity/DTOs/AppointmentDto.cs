@@ -1,11 +1,10 @@
-using Models.Models;
 using Models.Enums;
 
-namespace DTOs.DTOs;
+namespace Models.DTOs;
 
 public class AppointmentDto
 {
-    public CustomerDto Customer { get; set; }
+    public CustomerDto? Customer { get; set; }
     public int? customerId { get; set; }
     public int Id { get; set; }
     public DateTime startTime { get; set; }
@@ -13,18 +12,9 @@ public class AppointmentDto
     public string description { get; set; }
     public AppointmentStatus status { get; set; }
 
-    public void SetStatus(AppointmentStatus status)
-    {
-        this.status = status;
-    }
-    public void SetCustomerId(CustomerDto customer)
-    {
-        customerId = customer.id;
-    }
-    public void SetCustomer(CustomerDto customer)
-    {
-        Customer = customer;
-    }
+    public CustomerDto CustomerDto { get; set; }
+
+
     public void FlushCustomer()
     {
         Customer = null;
