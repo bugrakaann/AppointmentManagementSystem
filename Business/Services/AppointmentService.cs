@@ -1,6 +1,7 @@
 using AutoMapper;
 using Business.Services.Abstract;
 using Data_Access_Layer.Repositories.Abstract;
+using Microsoft.AspNetCore.Http;
 using Models.DTOs;
 using Models.Enums;
 using Models.Models;
@@ -12,13 +13,35 @@ public class AppointmentService : IAppointmentService
     private readonly IMapper _mapper;
     private readonly IAppointmentRepository _appointmentRepository;
     private readonly IGoogleCalendarService _googleCalendarService;
+    private readonly IUtilService _utilService;
+    private readonly IAuthService _authService;
 
     public AppointmentService(IMapper mapper, IAppointmentRepository appointmentRepository,
-        IGoogleCalendarService googleCalendarService)
+        IGoogleCalendarService googleCalendarService, IUtilService utilService,
+        IAuthService authService)
     {
         _mapper = mapper;
         _appointmentRepository = appointmentRepository;
         _googleCalendarService = googleCalendarService;
+        _utilService = utilService;
+        _authService = authService;
+        Init();
+    }
+
+    private void Init()
+    {
+        _appointmentRepository.ValidStatuses = GetValidAppointmentStatusArray();
+    }
+
+
+    private AppointmentStatus[] GetValidAppointmentStatusArray()
+    {
+        return _utilService
+            .GetAppointmentStatuses()
+            .Values
+            .Where(s => s.IsValid)
+            .Select(s => s.Status)
+            .ToArray();
     }
 
     public async Task<IEnumerable<AppointmentSlotDto>> GetByDateRange(DateOnly startDate, DateOnly endDate)
@@ -27,7 +50,17 @@ public class AppointmentService : IAppointmentService
         var endTime = endDate.ToDateTime(TimeOnly.MaxValue);
         var list = await _appointmentRepository.GetByDateRange(startTime, endTime);
         var listDto = _mapper.Map<IEnumerable<AppointmentSlotDto>>(list);
-        return listDto;
+        return FillSlotsProps(listDto);
+    }
+
+    private IEnumerable<AppointmentSlotDto> FillSlotsProps(IEnumerable<AppointmentSlotDto> list)
+    {
+        foreach (var item in list)
+        {
+            item.Props = _utilService.GetAppointmentStatus(item.Status);
+        }
+
+        return list;
     }
 
     public async Task<PagedResultDto<AppointmentDto>> GetPaged(int pageNumber, AppointmentStatus status)
@@ -47,29 +80,64 @@ public class AppointmentService : IAppointmentService
         };
     }
 
-    public async Task<AppointmentSlotDto> Deny(int id)
+    public async Task<AppointmentDto> Deny(int id)
     {
         var appointment = await _appointmentRepository.GetById(id);
-        appointment.status = AppointmentStatus.Available;
-        appointment.customerId = null;
-        appointment.customer = null;
+        appointment.status = AppointmentStatus.Denied;
         await _appointmentRepository.Update(appointment);
-        return _mapper.Map<AppointmentSlotDto>(appointment);
+        return _mapper.Map<AppointmentDto>(appointment);
     }
 
-    public async Task<AppointmentSlotDto> Approve(int id)
+    public async Task<AppointmentDto> Approve(int id)
     {
         var appointment = await _appointmentRepository.GetById(id);
         appointment.status = AppointmentStatus.Approved;
         await _appointmentRepository.Update(appointment);
-        return _mapper.Map<AppointmentSlotDto>(appointment);
+        return _mapper.Map<AppointmentDto>(appointment);
     }
 
-    public async Task<Appointment> Book(BookingDto bookingDto)
+    public async Task<AppointmentDto> Busy(BusyingDto busyingDto)
     {
-        CheckPastTime(bookingDto);
-        await CheckOverlap(bookingDto);
+        CheckPastTime(busyingDto.StartTime, busyingDto.EndTime);
+        await CheckOverlap(busyingDto.StartTime, busyingDto.EndTime);
 
+        var user = await _authService.GetLoggedUser();
+        var appointmentStatus = _utilService.GetAppointmentStatus(AppointmentStatus.Busy);
+        var customer = new Customer
+        {
+            name = user.UserName ?? "ADMIN",
+            surname = "",
+            phoneNumber = "",
+            email = user.Email ?? "",
+            address = ""
+        };
+        var appointment = new Appointment
+        {
+            description = appointmentStatus.Title,
+            status = appointmentStatus.Status,
+            startTime = busyingDto.StartTime,
+            endTime = busyingDto.EndTime,
+            customer = customer
+        };
+        appointment = await _appointmentRepository.Add(appointment);
+
+        await _googleCalendarService.AddEvent(
+            $"Randevu - {appointmentStatus.Title}",
+            "",
+            appointment.startTime
+            , appointment.endTime,
+            appointmentStatus.ColorId
+        );
+
+        return _mapper.Map<AppointmentDto>(appointment);
+    }
+
+    public async Task<AppointmentDto> Book(BookingDto bookingDto)
+    {
+        CheckPastTime(bookingDto.StartTime, bookingDto.EndTime);
+        await CheckOverlap(bookingDto.StartTime, bookingDto.EndTime);
+
+        var appointmentStatus = _utilService.GetAppointmentStatus(AppointmentStatus.Busy);
         var customer = new Customer
         {
             name = bookingDto.Name,
@@ -80,23 +148,15 @@ public class AppointmentService : IAppointmentService
         };
         var appointment = new Appointment
         {
-            customerId = customer.id,
             description = bookingDto.Description,
-            status = AppointmentStatus.WaitingForApproval,
+            status = appointmentStatus.Status,
             startTime = bookingDto.StartTime,
             endTime = bookingDto.EndTime,
             customer = customer
         };
         appointment = await _appointmentRepository.Add(appointment);
 
-        await AddToGoogleCalendar(customer, appointment);
-
-        return appointment;
-    }
-
-    private async Task AddToGoogleCalendar(Customer customer, Appointment appointment)
-    {
-        string title = $"Randevu - {customer.name} {customer.surname}";
+        var title = $"Randevu - {customer.name} {customer.surname}";
         string[] desc =
         [
             $"Email: {customer.email}",
@@ -104,29 +164,30 @@ public class AppointmentService : IAppointmentService
             $"Adres: {customer.address}",
             $"Açýklama: {appointment.description}"
         ];
-        await _googleCalendarService.AddEventAsync(
+        await _googleCalendarService.AddEvent(
             title,
             string.Join("\n", desc),
             appointment.startTime
-            , appointment.endTime
+            , appointment.endTime,
+            appointmentStatus.ColorId
         );
+
+        return _mapper.Map<AppointmentDto>(appointment);
     }
 
-    private async Task CheckOverlap(BookingDto bookingDto)
+    private async Task CheckOverlap(DateTime starTime, DateTime endTime)
     {
-        if (await _appointmentRepository.IsOverlapping(bookingDto.StartTime, bookingDto.EndTime))
+        if (await _appointmentRepository.IsOverlapping(starTime, endTime))
         {
             throw new ArgumentException("Bu tarih aralýðý dolu!");
         }
     }
 
-    private static void CheckPastTime(BookingDto bookingDto)
+    private static void CheckPastTime(DateTime starTime, DateTime endTime)
     {
-        if (bookingDto.StartTime < DateTime.Now || bookingDto.EndTime < DateTime.Now)
+        if (starTime < DateTime.Now || endTime < DateTime.Now)
         {
             throw new ArgumentException("Geçmiþ tarihli randevu oluþturulamaz!");
         }
     }
-
-
 }

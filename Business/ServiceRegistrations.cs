@@ -6,6 +6,7 @@ using Data_Access_Layer.Repositories;
 using Data_Access_Layer.Repositories.Abstract;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using UtilService = Business.Services.UtilService;
 
 namespace Business;
 
@@ -24,7 +25,7 @@ public static class ServiceRegistrations
 
         // Register services
         services.AddScoped<IAuthService, AuthService>();
-        services.AddScoped<IHomeService, HomeService>();
+        services.AddScoped<IUtilService, UtilService>();
         services.AddScoped<IAppointmentService, AppointmentService>();
         services.AddSingleton<IGoogleCalendarService, GoogleCalendarService>();
 

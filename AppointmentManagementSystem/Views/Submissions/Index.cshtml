@@ -1,7 +1,7 @@
 @using Models.Enums
 @model Models.DTOs.SubmissionsDto
 @{
-    ViewData["Title"] = "Randevu Talepleri";
+    ViewData["Title"] = "Randevu Listesi";
 
     string statusIcon;
     switch (Model.AppointmentStatus)
@@ -26,12 +26,13 @@
         <div class="container-fluid">
             <div class="row align-items-center">
                 <div class="col-md-12 col-12">
-                    <h2 class="breadcrumb-title">Randevu Talepleri</h2>
+                    <h2 class="breadcrumb-title">Randevu Listesi</h2>
                 </div>
             </div>
         </div>
     </div>
     <!-- /Breadcrumb -->
+
     <!-- Page Content -->
     <div class="content">
         <div class="container">

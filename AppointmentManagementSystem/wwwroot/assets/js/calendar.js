@@ -59,23 +59,21 @@
             },
             success: function (slots) {
                 slots.forEach(slot => {
+                    if (!slot?.props?.isValid) return;
                     const event = {
                         id: slot.id,
                         start: slot.startTime,
                         end: slot.endTime,
-                        editable: false
+                        editable: false,
+                        title: slot.props.title,
+                        color: slot.props.colorCode
+                    };
+                    if (slot.url) {
+                        event.url = slot.url;
                     }
-                    if (slot.status === 1) {
-                        event.title = "UYGUN DEĞİL";
-                        event.color = "gray";
+                    if (slot.customer) {
+                        event.title += " - " + slot.customer.name;
                     }
-                    else if (slot.status === 2) {
-                        event.title = "DOLU";
-                        event.color = "red";
-                    } else {
-                        return;
-                    }
-
                     if (!calendar.getEventById(event.id)) {
                         calendar.addEvent(event);
                     }

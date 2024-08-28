@@ -16,10 +16,10 @@ namespace Business.Services
         {
             var serviceAccountKeyFilePath = configuration["GoogleCalendar:ServiceAccountKeyFilePath"];
             _calendarId = configuration["GoogleCalendar:CalendarID"] ?? "";
-            _calendarService = InitializeCalendarService(serviceAccountKeyFilePath);
+            _calendarService = Init(serviceAccountKeyFilePath);
         }
 
-        private CalendarService InitializeCalendarService(string? serviceAccountKeyFilePath)
+        private CalendarService Init(string? serviceAccountKeyFilePath)
         {
             if (string.IsNullOrEmpty(_calendarId))
             {
@@ -45,13 +45,13 @@ namespace Business.Services
             });
         }
 
-        public async Task<Event> AddEventAsync(string summary, string description, DateTimeOffset start, DateTimeOffset end)
+        public async Task<Event> AddEvent(string summary, string description, DateTimeOffset start, DateTimeOffset end, string colorId)
         {
             var newEvent = new Event()
             {
                 Summary = summary,
                 Description = description,
-                ColorId = "8",
+                ColorId = colorId,
                 Start = new EventDateTime()
                 {
                     DateTimeDateTimeOffset = start.UtcDateTime,

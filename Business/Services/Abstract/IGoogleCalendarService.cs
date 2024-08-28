@@ -4,10 +4,9 @@ namespace Business.Services.Abstract;
 
 public interface IGoogleCalendarService
 {
-    public Task<Event> AddEventAsync(string summary, string description, DateTimeOffset start, DateTimeOffset end);
+    Task<Event> AddEvent(string summary, string description, DateTimeOffset start, DateTimeOffset end, string colorId);
 
-    public Task<Channel> WatchCalendarAsync(string webhookUrl);
+    Task<Channel> WatchCalendarAsync(string webhookUrl);
 
-    public Task StopWatchingCalendarAsync(string channelId, string resourceId);
-
+    Task StopWatchingCalendarAsync(string channelId, string resourceId);
 }

@@ -1,197 +1,105 @@
-@using Models.DTOs
-@model IEnumerable<AppointmentDto>
-
+@model Models.DTOs.BusyingDto;
 @{
-    ViewData["title"] = "Randevu Oturumlarý";
-    var serializedModel = Newtonsoft.Json.JsonConvert.SerializeObject(Model);
-    int pageIndex = ViewBag.PageIndex;
-    var dates = Model.Select(w => w.StartTime.Date).Distinct().ToList();
-    int tabNumber = Math.Min(7, dates.Count);
+    ViewData["title"] = "Randevu Takvimi";
 }
 
 <!-- Main Wrapper -->
 <div class="main-wrapper">
 
-<!-- Breadcrumb -->
-<div class="breadcrumb-bar">
-    <div class="container-fluid">
-        <div class="row align-items-center">
-            <div class="col-md-12 col-12">
-                <h2 class="breadcrumb-title">Randevu Oturumlarý</h2>
+    <!-- Breadcrumb -->
+    <div class="breadcrumb-bar">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col-md-12 col-12">
+                    <h2 class="breadcrumb-title">Randevu Takvimi</h2>
+                </div>
             </div>
         </div>
     </div>
-</div>
-<!-- /Breadcrumb -->
+    <!-- /Breadcrumb -->
 
-<!-- Page Content -->
-<div class="content">
-    <div class="container">
+    <!-- Page Content -->
+    <div class="content">
+        <div class="container">
 
-        <div class="row">
-            <div class="col-12">
-
-                <div class="row">
-                    <div class="col-sm-12">
-                        <div class="card">
-                            <div class="card-body">
-                                <h4 class="card-title">Edit&Create Sessions</h4>
-                                <div class="profile-box">
-                                    <div class="row">
-
-
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <div class="card schedule-widget mb-0">
-
-                                                <!-- Schedule Header -->
-                                                <div class="schedule-header ">
-                                                    <!-- Schedule Nav -->
-                                                    <div class="schedule-nav">
-                                                        <ul class="nav nav-tabs justify-content-center">
-                                                            <li class="nav-item">
-                                                                @if (pageIndex > 0)
-                                                                {
-                                                                    <button class="btn-custom" onclick="location.href='@Url.Action("Sessions", new { pageIndex = pageIndex - 1 })'">
-                                                                        <i class="fas fa-arrow-left"></i>
-                                                                    </button>
-                                                                }
-                                                                else
-                                                                {
-                                                                    <button class="btn-custom" disabled>
-                                                                        <i class="fas fa-arrow-left"></i>
-                                                                    </button>
-                                                                }
-                                                            </li>
-
-                                                            
-                                                            @for (int i = 0; i < dates.Count(); i++)
-                                                            {
-                                                                var dataOfDate = Model.Where(w => w.StartTime.Date == dates[i]);
-                                                                var isActive = i == 0 ? "active" : "";
-
-                                                                DateTime workStart = dates[i];
-                                                                <li class="nav-item">
-                                                                    <a class="nav-link @isActive" data-bs-toggle="tab" href="#slot_@i">@workStart.ToString("dd/MM/yy")</a>
-                                                                </li>
-                                                            }
-
-                                                            <li class="nav-item">
-                                                                @if (ViewBag.HasMorePages)
-                                                                {
-                                                                    <button class="btn-custom" onclick="location.href='@Url.Action("Sessions", new { pageIndex = pageIndex + 1 })'">
-                                                                        <i class="fas fa-arrow-right"></i>
-                                                                    </button>
-                                                                }
-                                                                else
-                                                                {
-                                                                    <button class="btn-custom" disabled>
-                                                                        <i class="fas fa-arrow-right"></i>
-                                                                    </button>
-                                                                }
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                    <!-- /Schedule Nav -->
-
-                                                </div>
-                                                <!-- /Schedule Header -->
-                                                <div class="tab-content schedule-cont"></div>
-                                                <div class="row">
-                                                    <div class="col-1 col-sm-3 text-center">
-                                                        <h4 class="card-title">
-                                                            <span>Available Sessions</span>
-                                                        </h4>
-                                                    </div>
-                                                    <div class="col-1 col-sm-8 col-md-8 text-sm-end">
-                                                        <h4 class="card-title d-flex justify-content-end">
-                                                            <a class="edit-link" data-bs-toggle="modal" href="#edit_time_slot"><i class="fa fa-edit me-1"></i>Edit</a>
-                                                        </h4>
-                                                    </div>
-                                                </div>
-
-                                                <div class="tab-content schedule-cont">
-                                                    @for (int i = 0; i < dates.Count; i++)
-                                                    {
-                                                        var dataOfDate = Model.Where(w => w.StartTime.Date == dates[i]);
-                                                        var isActive = i == 0 ? "show active" : "";
-                                                        <div id="slot_@i" class="tab-pane fade @isActive">
-                                                            <div class="pro-times">
-                                                                @for (int j = 0; j < dataOfDate.Count(); j++)
-                                                                {
-                                                                    <div class="pro-slot-list" id="slot_@i@j">
-                                                                        @{
-                                                                            var availability = dataOfDate.ElementAt(j);
-                                                                        }
-                                                                        @availability.StartTime.ToString("HH:mm") - @availability.EndTime.ToString("HH:mm")
-                                                                            <a href="@Url.Action("Delete", new {id = availability.Id})">
-                                                                            <i class="fa fa-trash"></i>
-                                                                        </a>
-                                                                    </div>
-                                                                }
-                                                            </div>
-                                                        </div>
-                                                    }
-                                                    <!-- /Schedule Content -->
-
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+            <!-- FullCalendar container -->
+            <div class="row mb-2">
+                <div class="d-flex justify-content-center">
+                    <div class="col-mb-6">
+                        <input class="form-control" type="date" id="calendarDate">
                     </div>
                 </div>
-
             </div>
+            <div id="calendar"></div>
         </div>
-
     </div>
-
-</div>
-<!-- /Page Content -->
-
 
 </div>
 <!-- /Main Wrapper -->
 
 
-<!-- Edit Time Slot Modal -->
-<div class="modal fade custom-modal" id="edit_time_slot">
+<!-- Busying Modal -->
+<div class="modal fade custom-modal" id="formModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Edit Time Slots</h5>
+            <div class="modal-header bg-secondary text-white">
+                <h5 class="modal-title">Randevu Bilgileri</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form id="timeSlotsForm" action="@Url.Action("Create")" method="post">
-                    <div class="hours-info" id="hoursModal">
-                        <div class="row form-row hours-cont">
-                            <div class="col-12 col-md-10">
-                                <div class="row form-row">
-                                    <div class="col-12 col-md-6">
-                                        <div class="form-group">
-                                            <label>Start Time</label>
-                                            <input class="form-control" name="WorkStart" type="datetime-local">
-                                            <label>End Time</label>
-                                            <input class="form-control" name="WorkEnd" type="datetime-local">
-                                        </div>
-                                    </div>
-                                </div>
+                <div class="form-section">
+                    <p id="AppointmentRange"></p>
+                    <form asp-action="Busying" method="post" autocomplete="off">
+                        <div asp-validation-summary="All" class="text-danger"></div>
+                        <div class="form-group row mb-3">
+                            <label asp-for="StartTime" class="col-sm-3 col-form-label">Baþlangýç</label>
+                            <div class="col-sm-9">
+                                <input asp-for="StartTime" class="form-control" readonly />
                             </div>
+                            <span asp-validation-for="StartTime" class="text-danger"></span>
                         </div>
-                    </div>
-
-                    <div class="submit-section text-center">
-                        <button type="submit" class="btn btn-primary submit-btn">Save Changes</button>
-                    </div>
-                </form>
+                        <div class="form-group row mb-3">
+                            <label asp-for="EndTime" class="col-sm-3 col-form-label">Bitiþ</label>
+                            <div class="col-sm-9">
+                                <input asp-for="EndTime" class="form-control" readonly />
+                            </div>
+                            <span asp-validation-for="EndTime" class="text-danger"></span>
+                        </div>
+                        <button type="submit" class="btn btn-warning">BU ARALIK UYGUN DEÐÝL</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
 </div>
+<!-- Booking Modal -->
 
-<!-- /Edit Time Slot Modal -->
+@section Scripts {
+    <!-- FullCalendar JS -->
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.5/locales/tr.js"></script>
+
+    <script src="~/assets/js/calendar.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const formModal = $("#formModal");
+            const eventsURL = '@Url.Action("GetSlots", "Appointments")';
+            renderCalendar(eventsURL, {
+                select: ({ start, end }) => {
+                    const startTime = formattedTime(start);
+                    const endTime = formattedTime(end);
+                    const range = startTime + "    " + endTime;
+                    $("#StartTime").val(startTime);
+                    $("#EndTime").val(endTime);
+                    formModal.modal('show');
+                },
+                selectAllow: (info) => {
+                    return true;
+                }
+            });
+            if (@(ViewData.ModelState.ErrorCount) > 0) {
+                formModal.modal('show');
+            }
+        });
+    </script>
+}

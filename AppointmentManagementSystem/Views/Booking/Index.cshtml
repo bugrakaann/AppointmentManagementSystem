@@ -36,12 +36,12 @@
 </div>
 <!-- /Main Wrapper -->
 
-<!-- Edit Customer Details Modal -->
-<div class="modal fade custom-modal" id="editCustomerDetailsModal" tabindex="-1" aria-labelledby="editCustomerDetailsModalLabel" aria-hidden="true">
+<!-- Booking Modal -->
+<div class="modal fade custom-modal" id="modal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header bg-secondary text-white">
-                <h5 class="modal-title" id="editCustomerDetailsModalLabel">Randevu Bilgileri</h5>
+                <h5 class="modal-title">Randevu Bilgileri</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -75,7 +75,7 @@
                         <div class="form-group row mb-3">
                             <label asp-for="Email" class="col-sm-3 col-form-label">Email</label>
                             <div class="col-sm-9">
-                                <input asp-for="Email" type="Email" class="form-control"required/>
+                                <input asp-for="Email" type="Email" class="form-control" required/>
                             </div>
                             <span asp-validation-for="Email" class="text-danger"></span>
                         </div>
@@ -100,7 +100,7 @@
         </div>
     </div>
 </div>
-<!-- /Edit Customer Details Modal -->
+<!-- Booking Modal -->
 
 @section Scripts {
     <!-- FullCalendar JS -->
@@ -110,21 +110,23 @@
     <script src="~/assets/js/calendar.js"></script>
     <script>
       document.addEventListener('DOMContentLoaded', function () {
-            const customerModal = $("#editCustomerDetailsModal");
+            const formModal = $("#formModal");
             const eventsURL = '@Url.Action("GetSlots", "Appointments")';
             renderCalendar(eventsURL, {
                 select: ({start, end}) => {
-                    $("#AppointmentRange").html(formattedTime(start) + " &nbsp;&nbsp;&nbsp;&nbsp; " + formattedTime(end))
-                    customerModal.modal('show');
-                    $("#StartTime").val(formattedTime(start));
-                    $("#EndTime").val(formattedTime(end));
+                    const startTime = formattedTime(start);
+                    const endTime = formattedTime(end);
+                    $("#AppointmentRange").html(startTime + " &nbsp;&nbsp;&nbsp;&nbsp; " + endTime)
+                    $("#StartTime").val(startTime);
+                    $("#EndTime").val(endTime);
+                    formModal.modal('show');
                 },
                 selectAllow: (info) => {
                     return true;
                 }
             });
             if (@(ViewData.ModelState.ErrorCount) > 0) {
-                customerModal.modal('show');
+                formModal.modal('show');
             }
         });
     </script>

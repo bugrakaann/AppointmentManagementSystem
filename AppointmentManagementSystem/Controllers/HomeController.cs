@@ -6,11 +6,11 @@ namespace AppointmentManagementSystem.Controllers;
 
 public class HomeController : Controller
 {
-    private readonly IHomeService _homeService;
+    private readonly IUtilService _utilService;
 
-    public HomeController(IHomeService homeService)
+    public HomeController(IUtilService utilService)
     {
-        _homeService = homeService;
+        _utilService = utilService;
     }
 
     public IActionResult Index()
@@ -21,7 +21,7 @@ public class HomeController : Controller
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error(int code = 0)
     {
-        var message = _homeService.GetHttpErrorMessage(code);
+        var message = _utilService.GetHttpErrorMessage(code);
         return View(new ErrorDto { Message = message });
     }
 

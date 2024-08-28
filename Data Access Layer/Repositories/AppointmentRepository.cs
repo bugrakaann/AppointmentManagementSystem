@@ -11,6 +11,8 @@ public class AppointmentRepository : Repository<Appointment>, IAppointmentReposi
     private readonly DbContext _context;
     private readonly DbSet<Appointment> _dbSet;
 
+    public AppointmentStatus[] ValidStatuses { get; set; }
+
     public AppointmentRepository(ApplicationDbContext context) : base(context)
     {
         _context = context;
@@ -19,7 +21,6 @@ public class AppointmentRepository : Repository<Appointment>, IAppointmentReposi
 
     public async Task<IEnumerable<Appointment>> GetRangeByStatus(AppointmentStatus status, int startIndex, int count)
     {
-
         var appointments = await _dbSet
             .Include(a => a.customer)
             .Where(a => a.status == status)
@@ -41,17 +42,33 @@ public class AppointmentRepository : Repository<Appointment>, IAppointmentReposi
     public async Task<IEnumerable<Appointment>> GetByDateRange(DateTime startTime, DateTime endTime)
     {
         return await _dbSet
-            .Where(a => a.startTime >= startTime && a.endTime <= endTime)
+            .Include(a => a.customer)
+            .Where(a =>
+                ValidStatuses.Contains(a.status) &&
+                a.startTime >= startTime &&
+                a.endTime <= endTime
+            )
             .ToListAsync();
+    }
+
+    public async Task<IEnumerable<Appointment>> GetByDateRange(DateTime startTime, DateTime endTime, int customerId)
+    {
+        return await Find(a =>
+            ValidStatuses.Contains(a.status) &&
+            a.startTime >= startTime &&
+            a.endTime <= endTime
+        );
     }
 
     public async Task<bool> IsOverlapping(DateTime startTime, DateTime endTime)
     {
         return await Contains(a =>
-                (startTime >= a.startTime &&
-                 startTime < a.endTime) || // Yeni baþlangýç zamaný mevcut randevunun içinde mi?
-                (endTime > a.startTime && endTime <= a.endTime) || // Yeni bitiþ zamaný mevcut randevunun içinde mi?
-                (startTime <= a.startTime && endTime >= a.endTime) // Yeni randevu mevcut randevuyu kapsýyor mu?
+            ValidStatuses.Contains(a.status) &&
+            (
+                (startTime >= a.startTime && startTime < a.endTime) || // baþlangýç zamaný mevcut randevunun içinde 
+                (endTime > a.startTime && endTime <= a.endTime) || // bitiþ zamaný mevcut randevunun içinde
+                (startTime <= a.startTime && endTime >= a.endTime) // yeni randevu mevcut randevuyu kapsýyor
+            )
         );
     }
 }

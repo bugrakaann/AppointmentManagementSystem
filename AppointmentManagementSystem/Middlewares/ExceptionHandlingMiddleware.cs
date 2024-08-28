@@ -5,10 +5,12 @@ namespace AppointmentManagementSystem.Middlewares;
 public class ExceptionHandlingMiddleware
 {
     private readonly RequestDelegate _next;
+    private readonly IWebHostEnvironment _env;
 
-    public ExceptionHandlingMiddleware(RequestDelegate next)
+    public ExceptionHandlingMiddleware(RequestDelegate next, IWebHostEnvironment env)
     {
         _next = next;
+        _env = env;
     }
 
     public async Task InvokeAsync(HttpContext context)
@@ -19,6 +21,11 @@ public class ExceptionHandlingMiddleware
         }
         catch (Exception ex)
         {
+            if (_env.IsDevelopment())
+            {
+                throw;
+            }
+
             await HandleExceptionAsync(context, ex);
         }
     }

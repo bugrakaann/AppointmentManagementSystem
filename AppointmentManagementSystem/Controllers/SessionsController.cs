@@ -1,19 +1,20 @@
 using Microsoft.AspNetCore.Mvc;
 using Business.Services.Abstract;
 using Models.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AppointmentManagementSystem.Controllers;
 
-[Route("Booking")]
-public class BookingController : Controller
+
+[Authorize(Roles = "Admin")]
+[Route("Sessions")]
+public class SessionsController : Controller
 {
     private readonly IAppointmentService _appointmentService;
-    private readonly IUtilService _utilService;
 
-    public BookingController(IAppointmentService appointmentService, IUtilService utilService)
+    public SessionsController(IAppointmentService appointmentService)
     {
         _appointmentService = appointmentService;
-        _utilService = utilService;
     }
 
     [HttpGet("")]
@@ -22,24 +23,24 @@ public class BookingController : Controller
         return View();
     }
 
-    [HttpPost("Save")]
-    public async Task<IActionResult> Save(BookingDto bookingDto)
+    [HttpPost("Busying")]
+    public async Task<IActionResult> Busying(BusyingDto busyingDto)
     {
         if (!ModelState.IsValid)
         {
-            return View("Index", bookingDto);
+            return View("Index", busyingDto);
         }
 
         try
         {
-            await _appointmentService.Book(bookingDto);
+            await _appointmentService.Busy(busyingDto);
         }
         catch (ArgumentException ex)
         {
             ModelState.AddModelError(string.Empty, ex.Message);
-            return View("Index", bookingDto);
+            return View("Index", busyingDto);
         }
 
-        return View("BookingSuccess", bookingDto);
+        return View("Index");
     }
 }

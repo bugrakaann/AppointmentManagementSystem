@@ -8,5 +8,5 @@ public class AppointmentSlotDto
     public DateTime StartTime { get; set; }
     public DateTime EndTime { get; set; }
     public AppointmentStatus Status { get; set; }
-
+    public AppointmentStatusPropsDto? Props { get; set; }
 }

@@ -16,6 +16,6 @@ public class PagedResultDto<T>
 
     public PagedResultDto()
     {
-        Items = new List<T>();
+        Items = [];
     }
 }
