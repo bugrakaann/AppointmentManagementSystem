@@ -1,6 +1,6 @@
-namespace Models.ViewModel;
+namespace Models.DTOs;
 
-public class ErrorViewModel
+public class ErrorDto
 {
     public string? Message { get; set; }
 

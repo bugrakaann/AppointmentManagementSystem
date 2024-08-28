@@ -7,6 +7,14 @@
         allDaySlot: false,
         timeZone: 'local',
         locale: 'tr',
+        businessHours: {
+            daysOfWeek: [1, 2, 3, 4, 5],
+            startTime: '06:00:00',
+            endTime: "20:00:00",
+        },
+        hiddenDays: [6, 0],
+        slotMinTime: "06:00:00",
+        slotMaxTime: "20:00:00",
         slotLabelFormat: {
             hour: '2-digit',
             minute: '2-digit',

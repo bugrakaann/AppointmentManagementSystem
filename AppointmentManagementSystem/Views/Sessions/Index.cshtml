@@ -5,7 +5,7 @@
     ViewData["title"] = "Randevu Oturumlarý";
     var serializedModel = Newtonsoft.Json.JsonConvert.SerializeObject(Model);
     int pageIndex = ViewBag.PageIndex;
-    var dates = Model.Select(w => w.startTime.Date).Distinct().ToList();
+    var dates = Model.Select(w => w.StartTime.Date).Distinct().ToList();
     int tabNumber = Math.Min(7, dates.Count);
 }
 
@@ -68,7 +68,7 @@
                                                             
                                                             @for (int i = 0; i < dates.Count(); i++)
                                                             {
-                                                                var dataOfDate = Model.Where(w => w.startTime.Date == dates[i]);
+                                                                var dataOfDate = Model.Where(w => w.StartTime.Date == dates[i]);
                                                                 var isActive = i == 0 ? "active" : "";
 
                                                                 DateTime workStart = dates[i];
@@ -114,7 +114,7 @@
                                                 <div class="tab-content schedule-cont">
                                                     @for (int i = 0; i < dates.Count; i++)
                                                     {
-                                                        var dataOfDate = Model.Where(w => w.startTime.Date == dates[i]);
+                                                        var dataOfDate = Model.Where(w => w.StartTime.Date == dates[i]);
                                                         var isActive = i == 0 ? "show active" : "";
                                                         <div id="slot_@i" class="tab-pane fade @isActive">
                                                             <div class="pro-times">
@@ -124,7 +124,7 @@
                                                                         @{
                                                                             var availability = dataOfDate.ElementAt(j);
                                                                         }
-                                                                        @availability.startTime.ToString("HH:mm") - @availability.endTime.ToString("HH:mm")
+                                                                        @availability.StartTime.ToString("HH:mm") - @availability.EndTime.ToString("HH:mm")
                                                                             <a href="@Url.Action("Delete", new {id = availability.Id})">
                                                                             <i class="fa fa-trash"></i>
                                                                         </a>

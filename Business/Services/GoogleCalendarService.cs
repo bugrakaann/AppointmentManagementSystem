@@ -10,15 +10,25 @@ namespace Business.Services
     public class GoogleCalendarService : IGoogleCalendarService
     {
         private readonly CalendarService _calendarService;
-        private readonly string calendarId;
+        private readonly string _calendarId;
 
         public GoogleCalendarService(IConfiguration configuration)
         {
             var serviceAccountKeyFilePath = configuration["GoogleCalendar:ServiceAccountKeyFilePath"];
+            _calendarId = configuration["GoogleCalendar:CalendarID"] ?? "";
+            _calendarService = InitializeCalendarService(serviceAccountKeyFilePath);
+        }
+
+        private CalendarService InitializeCalendarService(string? serviceAccountKeyFilePath)
+        {
+            if (string.IsNullOrEmpty(_calendarId))
+            {
+                throw new Exception("Takvim ID eksik");
+            }
 
             if (string.IsNullOrEmpty(serviceAccountKeyFilePath))
             {
-                throw new Exception("Google Service Account key file path is not configured properly.");
+                throw new Exception("Google servis hesabý eksik");
             }
 
             GoogleCredential credential;
@@ -28,12 +38,11 @@ namespace Business.Services
                     .CreateScoped(CalendarService.Scope.Calendar);
             }
 
-            _calendarService = new CalendarService(new BaseClientService.Initializer()
+            return new CalendarService(new BaseClientService.Initializer()
             {
                 HttpClientInitializer = credential,
 
             });
-            calendarId = configuration["GoogleCalendar:CalendarID"] ?? "primary";
         }
 
         public async Task<Event> AddEventAsync(string summary, string description, DateTimeOffset start, DateTimeOffset end)
@@ -54,7 +63,7 @@ namespace Business.Services
                     TimeZone = "UTC",
                 },
             };
-            var request = _calendarService.Events.Insert(newEvent, calendarId);
+            var request = _calendarService.Events.Insert(newEvent, _calendarId);
             return await request.ExecuteAsync();
         }
 
@@ -68,7 +77,7 @@ namespace Business.Services
                 Address = webhookUrl
             };
 
-            var watchRequest = _calendarService.Events.Watch(channel, calendarId);
+            var watchRequest = _calendarService.Events.Watch(channel, _calendarId);
             return await watchRequest.ExecuteAsync();
         }
 

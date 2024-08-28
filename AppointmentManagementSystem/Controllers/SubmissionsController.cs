@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models.Enums;
-using Models.ViewModel;
+using Models.DTOs;
 using Business.Services.Abstract;
 
 namespace AppointmentManagementSystem.Controllers;
@@ -25,7 +25,7 @@ public class SubmissionsController : Controller
     )
     {
         var appointments = await _appointmentService.GetPaged(page, status);
-        var view = new SubmissionsViewModel
+        var view = new SubmissionsDto
         {
             PagedResult = appointments,
             AppointmentStatus = status

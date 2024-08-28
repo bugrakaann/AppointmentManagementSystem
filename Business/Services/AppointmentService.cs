@@ -21,18 +21,18 @@ public class AppointmentService : IAppointmentService
         _googleCalendarService = googleCalendarService;
     }
 
-    public async Task<IEnumerable<AppointmentDto>> GetByDateRange(DateOnly startDate, DateOnly endDate)
+    public async Task<IEnumerable<AppointmentSlotDto>> GetByDateRange(DateOnly startDate, DateOnly endDate)
     {
         var startTime = startDate.ToDateTime(TimeOnly.MinValue);
         var endTime = endDate.ToDateTime(TimeOnly.MaxValue);
         var list = await _appointmentRepository.GetByDateRange(startTime, endTime);
-        var listDto = _mapper.Map<IEnumerable<AppointmentDto>>(list);
+        var listDto = _mapper.Map<IEnumerable<AppointmentSlotDto>>(list);
         return listDto;
     }
 
     public async Task<PagedResultDto<AppointmentDto>> GetPaged(int pageNumber, AppointmentStatus status)
     {
-        const int pageSize = 1;
+        const int pageSize = 5;
         pageNumber = Math.Max(1, pageNumber);
         var startIndex = (pageNumber - 1) * pageSize;
         var totalCount = await _appointmentRepository.GetCountByStatus(status);
@@ -47,24 +47,25 @@ public class AppointmentService : IAppointmentService
         };
     }
 
-    public async Task<AppointmentDto> Deny(int id)
+    public async Task<AppointmentSlotDto> Deny(int id)
     {
         var appointment = await _appointmentRepository.GetById(id);
         appointment.status = AppointmentStatus.Available;
-        appointment.FlushCustomer();
+        appointment.customerId = null;
+        appointment.customer = null;
         await _appointmentRepository.Update(appointment);
-        return _mapper.Map<AppointmentDto>(appointment);
+        return _mapper.Map<AppointmentSlotDto>(appointment);
     }
 
-    public async Task<AppointmentDto> Approve(int id)
+    public async Task<AppointmentSlotDto> Approve(int id)
     {
         var appointment = await _appointmentRepository.GetById(id);
         appointment.status = AppointmentStatus.Approved;
         await _appointmentRepository.Update(appointment);
-        return _mapper.Map<AppointmentDto>(appointment);
+        return _mapper.Map<AppointmentSlotDto>(appointment);
     }
 
-    public async Task Book(BookingDto bookingDto)
+    public async Task<Appointment> Book(BookingDto bookingDto)
     {
         CheckPastTime(bookingDto);
         await CheckOverlap(bookingDto);
@@ -89,6 +90,8 @@ public class AppointmentService : IAppointmentService
         appointment = await _appointmentRepository.Add(appointment);
 
         await AddToGoogleCalendar(customer, appointment);
+
+        return appointment;
     }
 
     private async Task AddToGoogleCalendar(Customer customer, Appointment appointment)

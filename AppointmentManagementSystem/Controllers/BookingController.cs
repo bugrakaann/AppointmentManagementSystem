@@ -29,7 +29,7 @@ public class BookingController : Controller
         }
         catch (ArgumentException ex)
         {
-            ModelState.AddModelError("", ex.Message);
+            ModelState.AddModelError(string.Empty, ex.Message);
             return View("Index", bookingDto);
         }
 

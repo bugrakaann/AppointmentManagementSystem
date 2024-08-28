@@ -1,5 +1,5 @@
 @using Models.Enums
-@model Models.ViewModel.SubmissionsViewModel
+@model Models.DTOs.SubmissionsDto
 @{
     ViewData["Title"] = "Randevu Talepleri";
 
@@ -83,15 +83,15 @@
                                         </a>
                                         <div class="profile-det-info">
                                             <h3>
-                                                <a href="#">@appointment.Customer?.name @appointment.Customer?.surname</a>
+                                                <a href="#">@appointment.Customer.Name @appointment.Customer.Surname</a>
                                             </h3>
                                             <div class="customer-details">
-                                                <h5><i class="far fa-clock"></i>@appointment.startTime - @appointment.endTime.TimeOfDay</h5>
+                                                <h5><i class="far fa-clock"></i>@appointment.StartTime - @appointment.EndTime.TimeOfDay</h5>
                                                 <h5>
-                                                    <i class="fas fa-envelope"></i>@appointment.Customer?.email
+                                                    <i class="fas fa-envelope"></i>@appointment.Customer.Email
                                                 </h5>
                                                 <h5 class="mb-0">
-                                                    <i class="fas fa-phone"></i>@appointment.Customer?.phoneNumber
+                                                    <i class="fas fa-phone"></i>@appointment.Customer.PhoneNumber
                                                 </h5>
                                             </div>
                                         </div>
@@ -101,21 +101,20 @@
                                            class="btn btn-sm bg-info-light"
                                            data-bs-toggle="modal"
                                            data-bs-target="#appt_details"
-                                           data-id="@appointment.Id"
-                                           data-status="@appointment.status"
-                                           data-description="@appointment.description"
-                                           data-name="@appointment.Customer?.name"
-                                           data-surname="@appointment.Customer?.surname"
-                                           data-email="@appointment.Customer?.email"
-                                           data-phone="@appointment.Customer?.phoneNumber"
-                                           data-address="@appointment.Customer?.address"
-                                           data-starttime="@appointment.startTime.ToString("dd MMM yyyy hh:mm tt")"
-                                           data-endtime="@appointment.endTime.ToString("dd MMM yyyy hh:mm tt")">
+                                           data-Status="@appointment.Status"
+                                           data-Description="@appointment.Description"
+                                           data-Name="@appointment.Customer.Name"
+                                           data-Surname="@appointment.Customer.Surname"
+                                           data-Email="@appointment.Customer.Email"
+                                           data-PhoneNumber="@appointment.Customer.PhoneNumber"
+                                           data-Address="@appointment.Customer.Address"
+                                           data-StartTime="@appointment.StartTime.ToString("dd MMM yyyy hh:mm tt")"
+                                           data-EndTime="@appointment.EndTime.ToString("dd MMM yyyy hh:mm tt")">
                                             <i class="far fa-eye"></i> Detaylar
                                         </a>
-                                        @if (appointment.status == AppointmentStatus.WaitingForApproval)
+                                        @if (appointment.Status == AppointmentStatus.WaitingForApproval)
                                         {
-                                            @if (appointment.endTime < DateTime.Now)
+                                            @if (appointment.EndTime < DateTime.Now)
                                             {
                                                 <button class="btn btn-sm bg-secondary" onclick="alert('Geçersiz Tarih')" style="cursor: not-allowed">Onayla</button>
                                             }
@@ -136,34 +135,43 @@
                             }
                         }
                     </div>
+
                     <!-- Pagination Controls -->
                     @if (Model.PagedResult.TotalPages > 1)
                     {
                         <nav aria-label="Page navigation">
                             <ul class="pagination justify-content-center">
-                                <li class="page-item @(Model.PagedResult.PageNumber == 1 ? "disabled" : "")">
-                                    <a class="page-link" href="@Url.Action("Index", new { status = Model.AppointmentStatus, page = Model.PagedResult.PageNumber - 1 })" aria-label="Previous">
-                                        <span aria-hidden="true">&laquo;</span>
-                                    </a>
-                                </li>
-
-                                @for (int i = 1; i <= Model.PagedResult.TotalPages; i++)
+                                @if (!Model.PagedResult.IsFirstPage)
                                 {
-                                    <li class="page-item @(Model.PagedResult.PageNumber == i ? "active" : "")">
-                                        <a class="page-link" href="@Url.Action("Index", new { status = Model.AppointmentStatus, page = i })">@i</a>
+                                    <li class="page-item">
+                                        <a class="page-link" href="@Url.Action("Index", new { page = 1 })" aria-label="First">
+                                            <span aria-hidden="true">&laquo;</span>
+                                        </a>
                                     </li>
                                 }
-
-                                <li class="page-item @(Model.PagedResult.PageNumber == Model.PagedResult.TotalPages ? "disabled" : "")">
-                                    <a class="page-link" href="@Url.Action("Index", new { status = Model.AppointmentStatus, page = Model.PagedResult.PageNumber + 1 })" aria-label="Next">
-                                        <span aria-hidden="true">&raquo;</span>
-                                    </a>
-                                </li>
+                                @{
+                                    var startPage = Math.Max(1, Model.PagedResult.PageNumber - 2);
+                                    var endPage = Math.Min(Model.PagedResult.TotalPages, Model.PagedResult.PageNumber + 2);
+                                    for (var i = startPage; i <= endPage; i++)
+                                    {
+                                        <li class="page-item @(Model.PagedResult.PageNumber == i ? "active" : "")">
+                                            <a class="page-link" href="@Url.Action("Index", new { page = i })">@i</a>
+                                        </li>
+                                    }
+                                }
+                                @if (!Model.PagedResult.IsLastPage)
+                                {
+                                    <li class="page-item">
+                                        <a class="page-link" href="@Url.Action("Index", new { page = Model.PagedResult.TotalPages })" aria-label="Last">
+                                            <span aria-hidden="true">&raquo;</span>
+                                        </a>
+                                    </li>
+                                }
                             </ul>
                         </nav>
                     }
-
                     <!-- /Pagination Controls -->
+
                 </div>
             </div>
 
@@ -185,22 +193,22 @@
             </div>
             <div class="modal-body">
                 <div class="mb-3">
-                    <strong>Randevu Zamaný:</strong> <span id="appt_time"></span>
+                    <strong>Randevu Zamaný:</strong> <span id="appt_Time"></span>
                 </div>
                 <div class="mb-3">
-                    <strong>Müþteri:</strong> <span id="customer_name"></span>
+                    <strong>Müþteri:</strong> <span id="customer_FullName"></span>
                 </div>
                 <div class="mb-3">
-                    <strong>Email:</strong> <span id="customer_email"></span>
+                    <strong>Email:</strong> <span id="customer_Email"></span>
                 </div>
                 <div class="mb-3">
-                    <strong>Telefon:</strong> <span id="customer_phone"></span>
+                    <strong>Telefon:</strong> <span id="customer_PhoneNumber"></span>
                 </div>
                 <div class="mb-3">
-                    <strong>Adres:</strong> <span id="customer_address"></span>
+                    <strong>Adres:</strong> <span id="customer_Address"></span>
                 </div>
                 <div class="mb-3">
-                    <strong>Açýklama:</strong> <span id="appt_description"></span>
+                    <strong>Açýklama:</strong> <span id="appt_Description"></span>
                 </div>
             </div>
         </div>
@@ -217,22 +225,23 @@
                 var button = event.relatedTarget;
 
                 var appointmentDetails = {
-                    description: button.getAttribute('data-description'),
-                    name: button.getAttribute('data-name'),
-                    surname: button.getAttribute('data-surname'),
-                    email: button.getAttribute('data-email'),
-                    phone: button.getAttribute('data-phone'),
-                    address: button.getAttribute('data-address'),
-                    startTime: button.getAttribute('data-starttime'),
-                    endTime: button.getAttribute('data-endtime')
+                    Description: button.getAttribute('data-Description'),
+                    Name: button.getAttribute('data-Name'),
+                    Surname: button.getAttribute('data-Surname'),
+                    Email: button.getAttribute('data-Email'),
+                    PhoneNumber: button.getAttribute('data-PhoneNumber'),
+                    Address: button.getAttribute('data-Address'),
+                    StartTime: button.getAttribute('data-StartTime'),
+                    EndTime: button.getAttribute('data-EndTime')
                 };
 
-                apptDetailsModal.querySelector('#customer_name').textContent = `${appointmentDetails.name} ${appointmentDetails.surname}`;
-                apptDetailsModal.querySelector('#customer_email').textContent = appointmentDetails.email;
-                apptDetailsModal.querySelector('#customer_phone').textContent = appointmentDetails.phone;
-                apptDetailsModal.querySelector('#customer_address').textContent = appointmentDetails.address;
-                apptDetailsModal.querySelector('#appt_time').textContent = `${appointmentDetails.startTime} - ${appointmentDetails.endTime}`;
-                apptDetailsModal.querySelector('#appt_description').textContent = appointmentDetails.description;
+
+                apptDetailsModal.querySelector('#appt_Time').textContent = `${appointmentDetails.StartTime} - ${appointmentDetails.EndTime}`;
+                apptDetailsModal.querySelector('#customer_FullName').textContent = `${appointmentDetails.Name} ${appointmentDetails.Surname}`;
+                apptDetailsModal.querySelector('#customer_Email').textContent = appointmentDetails.Email;
+                apptDetailsModal.querySelector('#customer_PhoneNumber').textContent = appointmentDetails.PhoneNumber;
+                apptDetailsModal.querySelector('#customer_Address').textContent = appointmentDetails.Address;
+                apptDetailsModal.querySelector('#appt_Description').textContent = appointmentDetails.Description;
             });
         });
     </script>

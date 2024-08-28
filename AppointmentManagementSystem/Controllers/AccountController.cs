@@ -1,20 +1,17 @@
-using Microsoft.AspNetCore.Identity;
+using Business.Services.Abstract;
 using Microsoft.AspNetCore.Mvc;
-using Models.Models;
-using Models.ViewModel;
+using Models.DTOs;
 
 namespace AppointmentManagementSystem.Controllers;
 
 [Route("Account")]
 public class AccountController : Controller
 {
-    private readonly UserManager<ApplicationUser> _userManager;
-    private readonly SignInManager<ApplicationUser> _signInManager;
+    private readonly IAuthService _authService;
 
-    public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
+    public AccountController(IAuthService authService)
     {
-        _userManager = userManager;
-        _signInManager = signInManager;
+        _authService = authService;
     }
 
 
@@ -25,24 +22,29 @@ public class AccountController : Controller
     }
 
     [HttpPost("Login")]
-    public async Task<IActionResult> Login(LoginViewModel model)
+    public async Task<IActionResult> Login(LoginDto model)
     {
-        if (ModelState.IsValid)
+        if (!ModelState.IsValid)
         {
-            var result = await _signInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, false);
-            if (result.Succeeded)
-            {
-                return RedirectToAction("Index", "Home");
-            }
-            ModelState.AddModelError(string.Empty, "Giriþ baþarýsýz!");
+            return View(model);
         }
-        return View(model);
+
+        try
+        {
+            await _authService.PasswordSignIn(model.UserName, model.Password, model.RememberMe);
+            return RedirectToAction("Index", "Home");
+        }
+        catch (ArgumentException ex)
+        {
+            ModelState.AddModelError(string.Empty, ex.Message);
+            return View(model);
+        }
     }
 
     [HttpPost("Logout")]
     public async Task<IActionResult> Logout()
     {
-        await _signInManager.SignOutAsync();
+        await _authService.SignOut();
         return RedirectToAction("Index", "Home");
     }
 

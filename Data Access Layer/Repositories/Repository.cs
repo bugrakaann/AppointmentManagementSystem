@@ -6,7 +6,7 @@ using Models.Models;
 
 namespace Data_Access_Layer.Repositories;
 
-public class Repository<T> : IRepository<T> where T : IEntity
+public class Repository<T> : IRepository<T> where T : Entity
 {
     protected readonly ApplicationDbContext _context;
     protected readonly DbSet<T> _dbSet;
@@ -36,7 +36,7 @@ public class Repository<T> : IRepository<T> where T : IEntity
 
     public async Task<T> Update(T entity)
     {
-        var existingEntity = _dbSet.Local.FirstOrDefault(e => e.id == (entity as IEntity).id);
+        var existingEntity = _dbSet.Local.FirstOrDefault(e => e.id == (entity as Entity).id);
         if (existingEntity != null)
         {
             _context.Entry(existingEntity).State = EntityState.Detached;

@@ -1,6 +1,6 @@
 namespace Models.Models;
 
-public class Customer : IEntity
+public class Customer : Entity
 {
     public string phoneNumber { get; set; }
     public string name { get; set; }

@@ -1,6 +1,6 @@
 namespace Models.Models;
 
-public class IEntity
+public class Entity
 {
    public int id { get; set; }
 }

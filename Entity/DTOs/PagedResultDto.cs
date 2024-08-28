@@ -11,8 +11,11 @@ public class PagedResultDto<T>
     public bool HasPreviousPage => PageNumber > 1; // Önceki sayfanın olup olmadığını kontrol eder
     public bool HasNextPage => PageNumber < TotalPages; // Sonraki sayfanın olup olmadığını kontrol eder
 
+    public bool IsFirstPage => PageNumber == 1; // İlk sayfa olup olmadığını kontrol eder
+    public bool IsLastPage => PageNumber == TotalPages; // Son sayfa olup olmadığını kontrol eder
+
     public PagedResultDto()
     {
-        Items = [];
+        Items = new List<T>();
     }
 }

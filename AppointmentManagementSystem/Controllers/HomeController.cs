@@ -1,6 +1,5 @@
-using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using Models.ViewModel;
+using Models.DTOs;
 using Business.Services.Abstract;
 
 namespace AppointmentManagementSystem.Controllers;
@@ -20,10 +19,10 @@ public class HomeController : Controller
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-    public IActionResult Error(int id = 0)
+    public IActionResult Error(int code = 0)
     {
-        var message = _homeService.GetHttpErrorMessage(id);
-        return View(new ErrorViewModel { Message = message });
+        var message = _homeService.GetHttpErrorMessage(code);
+        return View(new ErrorDto { Message = message });
     }
 
 }

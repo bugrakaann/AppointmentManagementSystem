@@ -2,10 +2,9 @@ namespace Models.DTOs;
 
 public class CustomerDto
 {
-    public int id { get; set; }
-    public string phoneNumber { get; set; }
-    public string name { get; set; }
-    public string surname { get; set; }
-    public string email { get; set; }
-    public string address { get; set; }
+    public string Name { get; set; }
+    public string Surname { get; set; }
+    public string PhoneNumber { get; set; }
+    public string Email { get; set; }
+    public string Address { get; set; }
 }

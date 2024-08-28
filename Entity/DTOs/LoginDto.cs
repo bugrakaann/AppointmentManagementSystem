@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Models.ViewModel;
+namespace Models.DTOs;
 
-public class LoginViewModel
+public class LoginDto
 {
     [Required]
     [DataType(DataType.Text)]

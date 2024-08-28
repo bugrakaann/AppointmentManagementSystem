@@ -23,6 +23,7 @@ public static class ServiceRegistrations
         });
 
         // Register services
+        services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IHomeService, HomeService>();
         services.AddScoped<IAppointmentService, AppointmentService>();
         services.AddSingleton<IGoogleCalendarService, GoogleCalendarService>();
