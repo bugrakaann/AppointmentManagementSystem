@@ -66,7 +66,23 @@ namespace Business.Services
             var request = _calendarService.Events.Insert(newEvent, _calendarId);
             return await request.ExecuteAsync();
         }
+        public async Task DeleteEvent(string eventId)
+        {
+            var deleteRequest = _calendarService.Events.Delete(_calendarId, eventId);
+            await deleteRequest.ExecuteAsync();
+        }
 
+        public async Task<Event> UpdateEventColor(string eventId, string colorId)
+        {
+            var existingEvent = await _calendarService.Events.Get(_calendarId, eventId).ExecuteAsync();
+            if (existingEvent == null)
+            {
+                throw new InvalidOperationException("Etkinlik bulunamadý");
+            }
+            existingEvent.ColorId = colorId;
+            var updateRequest = _calendarService.Events.Update(existingEvent, _calendarId, eventId);
+            return await updateRequest.ExecuteAsync();
+        }
 
         public async Task<Channel> WatchCalendarAsync(string webhookUrl)
         {

@@ -72,7 +72,7 @@
                         event.url = slot.url;
                     }
                     if (slot.customer) {
-                        event.title += " - " + slot.customer.name;
+                        event.title = slot.customer.fullName;
                     }
                     if (!calendar.getEventById(event.id)) {
                         calendar.addEvent(event);

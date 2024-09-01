@@ -6,6 +6,10 @@ public interface IGoogleCalendarService
 {
     Task<Event> AddEvent(string summary, string description, DateTimeOffset start, DateTimeOffset end, string colorId);
 
+    Task DeleteEvent(string eventId);
+
+    Task<Event> UpdateEventColor(string eventId, string colorId);
+
     Task<Channel> WatchCalendarAsync(string webhookUrl);
 
     Task StopWatchingCalendarAsync(string channelId, string resourceId);

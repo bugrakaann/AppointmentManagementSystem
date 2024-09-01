@@ -83,7 +83,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const formModal = $("#formModal");
-            const eventsURL = '@Url.Action("GetSlots", "Appointments")';
+            const eventsURL = '@Url.Action("GetSlotsWithDetails", "Appointments")';
             renderCalendar(eventsURL, {
                 select: ({ start, end }) => {
                     const StartTime = formattedTime(start);

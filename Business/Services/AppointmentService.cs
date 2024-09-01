@@ -13,18 +13,17 @@ public class AppointmentService : IAppointmentService
     private readonly IMapper _mapper;
     private readonly IAppointmentRepository _appointmentRepository;
     private readonly IGoogleCalendarService _googleCalendarService;
-    private readonly IUtilService _utilService;
     private readonly IAuthService _authService;
+    private readonly IUtilService _utilService;
 
     public AppointmentService(IMapper mapper, IAppointmentRepository appointmentRepository,
-        IGoogleCalendarService googleCalendarService, IUtilService utilService,
-        IAuthService authService)
+        IGoogleCalendarService googleCalendarService, IAuthService authService, IUtilService utilService)
     {
         _mapper = mapper;
         _appointmentRepository = appointmentRepository;
         _googleCalendarService = googleCalendarService;
-        _utilService = utilService;
         _authService = authService;
+        _utilService = utilService;
         Init();
     }
 
@@ -36,31 +35,43 @@ public class AppointmentService : IAppointmentService
 
     private AppointmentStatus[] GetValidAppointmentStatusArray()
     {
-        return _utilService
-            .GetAppointmentStatuses()
+        return GetAppointmentStatuses()
             .Values
             .Where(s => s.IsValid)
             .Select(s => s.Status)
             .ToArray();
     }
 
-    public async Task<IEnumerable<AppointmentSlotDto>> GetByDateRange(DateOnly startDate, DateOnly endDate)
+    public async Task<IEnumerable<AppointmentDto>> GetByDateRange(DateOnly startDate, DateOnly endDate)
     {
         var startTime = startDate.ToDateTime(TimeOnly.MinValue);
         var endTime = endDate.ToDateTime(TimeOnly.MaxValue);
         var list = await _appointmentRepository.GetByDateRange(startTime, endTime);
-        var listDto = _mapper.Map<IEnumerable<AppointmentSlotDto>>(list);
-        return FillSlotsProps(listDto);
+        var listDto = _mapper.Map<IEnumerable<AppointmentDto>>(list);
+        return listDto;
     }
 
-    private IEnumerable<AppointmentSlotDto> FillSlotsProps(IEnumerable<AppointmentSlotDto> list)
+    public async Task<IEnumerable<AppointmentSlotDto>> GetSlots(DateOnly startDate, DateOnly endDate)
     {
-        foreach (var item in list)
+        var list = await GetByDateRange(startDate, endDate);
+        var listDto = _mapper.Map<IEnumerable<AppointmentSlotDto>>(list);
+        foreach (var item in listDto)
         {
-            item.Props = _utilService.GetAppointmentStatus(item.Status);
+            item.Props = GetAppointmentStatus(item.Status);
         }
+        return listDto;
+    }
 
-        return list;
+    public async Task<IEnumerable<AppointmentDetailsDto>> GetSlotsWithDetails(DateOnly startDate, DateOnly endDate)
+    {
+        var list = await GetByDateRange(startDate, endDate);
+        var listDto = _mapper.Map<IEnumerable<AppointmentDetailsDto>>(list);
+        foreach (var item in listDto)
+        {
+            item.Props = GetAppointmentStatus(item.Status);
+            item.Url = _utilService.UrlToAction("Details", "Submissions", new { id = item.Id });
+        }
+        return listDto;
     }
 
     public async Task<PagedResultDto<AppointmentDto>> GetPaged(int pageNumber, AppointmentStatus status)
@@ -79,20 +90,42 @@ public class AppointmentService : IAppointmentService
             PageSize = pageSize
         };
     }
+    public async Task<PagedResultDto<AppointmentDto>> GetByIdPaged(int id)
+    {
+        var appointment = await _appointmentRepository.GetById(id);
+        var list = new List<Appointment> { appointment };
+        var listDto = _mapper.Map<IEnumerable<AppointmentDto>>(list);
+        return new PagedResultDto<AppointmentDto>
+        {
+            Items = listDto.ToList(),
+            TotalItems = 1,
+            PageNumber = 1,
+            PageSize = 1
+        };
+    }
 
     public async Task<AppointmentDto> Deny(int id)
     {
         var appointment = await _appointmentRepository.GetById(id);
         appointment.Status = AppointmentStatus.Denied;
         await _appointmentRepository.Update(appointment);
+        if (appointment.GoogleEventId != null)
+        {
+            await _googleCalendarService.DeleteEvent(appointment.GoogleEventId);
+        }
         return _mapper.Map<AppointmentDto>(appointment);
     }
 
     public async Task<AppointmentDto> Approve(int id)
     {
         var appointment = await _appointmentRepository.GetById(id);
-        appointment.Status = AppointmentStatus.Approved;
+        var appointmentStatus = GetAppointmentStatus(AppointmentStatus.Approved);
+        appointment.Status = appointmentStatus.Status;
         await _appointmentRepository.Update(appointment);
+        if (appointment.GoogleEventId != null)
+        {
+            await _googleCalendarService.UpdateEventColor(appointment.GoogleEventId, appointmentStatus.ColorId);
+        }
         return _mapper.Map<AppointmentDto>(appointment);
     }
 
@@ -102,7 +135,7 @@ public class AppointmentService : IAppointmentService
         await CheckOverlap(busyingDto.StartTime, busyingDto.EndTime);
 
         var user = await _authService.GetLoggedUser();
-        var appointmentStatus = _utilService.GetAppointmentStatus(AppointmentStatus.Busy);
+        var appointmentStatus = GetAppointmentStatus(AppointmentStatus.Busy);
         var customer = new Customer
         {
             Name = user.UserName ?? "ADMIN",
@@ -137,7 +170,7 @@ public class AppointmentService : IAppointmentService
         CheckPastTime(bookingDto.StartTime, bookingDto.EndTime);
         await CheckOverlap(bookingDto.StartTime, bookingDto.EndTime);
 
-        var appointmentStatus = _utilService.GetAppointmentStatus(AppointmentStatus.WaitingForApproval);
+        var appointmentStatus = GetAppointmentStatus(AppointmentStatus.WaitingForApproval);
         var customer = new Customer
         {
             Name = bookingDto.Name,
@@ -164,13 +197,15 @@ public class AppointmentService : IAppointmentService
             $"Adres: {customer.Address}",
             $"Açýklama: {appointment.Description}"
         ];
-        await _googleCalendarService.AddEvent(
+        var gEvent = await _googleCalendarService.AddEvent(
             title,
             string.Join("\n", desc),
             appointment.StartTime
             , appointment.EndTime,
             appointmentStatus.ColorId
         );
+        appointment.GoogleEventId = gEvent.Id;
+        await _appointmentRepository.Update(appointment);
 
         return _mapper.Map<AppointmentDto>(appointment);
     }
@@ -190,4 +225,62 @@ public class AppointmentService : IAppointmentService
             throw new ArgumentException("Geçmiþ tarihli randevu oluþturulamaz!");
         }
     }
+
+    public AppointmentStatusPropsDto GetAppointmentStatus(AppointmentStatus status)
+    {
+        var statuses = GetAppointmentStatuses();
+        return statuses[status];
+    }
+
+    public IDictionary<AppointmentStatus, AppointmentStatusPropsDto> GetAppointmentStatuses()
+    {
+        return new Dictionary<AppointmentStatus, AppointmentStatusPropsDto>
+        {
+            {
+                AppointmentStatus.Busy,
+                new AppointmentStatusPropsDto
+                {
+                    Status = AppointmentStatus.Busy,
+                    ColorId = "5",
+                    ColorCode = "orange",
+                    Title = "MÜSAÝT DEÐÝL",
+                    IsValid = true
+                }
+            },
+            {
+                AppointmentStatus.WaitingForApproval,
+                new AppointmentStatusPropsDto
+                {
+                    Status = AppointmentStatus.WaitingForApproval,
+                    ColorId = "8",
+                    ColorCode = "gray",
+                    Title = "MEÞGUL",
+                    IsValid = true
+                }
+            },
+            {
+                AppointmentStatus.Approved,
+                new AppointmentStatusPropsDto
+                {
+                    Status = AppointmentStatus.Approved,
+                    ColorId = "11",
+                    ColorCode = "red",
+                    Title = "REZERVE",
+                    IsValid = true
+                }
+            },
+            {
+                AppointmentStatus.Denied,
+                new AppointmentStatusPropsDto
+                {
+                    Status = AppointmentStatus.Denied,
+                    ColorId = "9",
+                    ColorCode = "blue",
+                    Title = "REDDEDÝLDÝ",
+                    IsValid = false
+                }
+            }
+        };
+    }
+
 }

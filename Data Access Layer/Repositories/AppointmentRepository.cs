@@ -71,4 +71,12 @@ public class AppointmentRepository : Repository<Appointment>, IAppointmentReposi
             )
         );
     }
+
+    public new async Task<Appointment> GetById(int id)
+    {
+        return await _dbSet
+            .Include(a => a.Customer)
+            .FirstAsync(a => a.Id == id);
+    }
+
 }

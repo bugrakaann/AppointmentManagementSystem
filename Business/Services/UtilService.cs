@@ -1,5 +1,6 @@
 ﻿using Business.Services.Abstract;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
 using Models.DTOs;
 using Models.Enums;
 
@@ -7,9 +8,13 @@ namespace Business.Services;
 
 public class UtilService : IUtilService
 {
+    private readonly LinkGenerator _linkGenerator;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public UtilService()
+    public UtilService(LinkGenerator linkGenerator, IHttpContextAccessor httpContextAccessor)
     {
+        _linkGenerator = linkGenerator;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     public string GetHttpErrorMessage(int code)
@@ -35,66 +40,16 @@ public class UtilService : IUtilService
         }
     }
 
-    public AppointmentStatusPropsDto GetAppointmentStatus(AppointmentStatus status)
-    {
-        var statuses = GetAppointmentStatuses();
-        return statuses[status];
-    }
-
-    public IDictionary<AppointmentStatus, AppointmentStatusPropsDto> GetAppointmentStatuses()
-    {
-        return new Dictionary<AppointmentStatus, AppointmentStatusPropsDto>
-        {
-            {
-                AppointmentStatus.Busy,
-                new AppointmentStatusPropsDto
-                {
-                    Status = AppointmentStatus.Busy,
-                    ColorId = "5",
-                    ColorCode = "orange",
-                    Title = "MÜSAİT DEĞİL",
-                    IsValid = true
-                }
-            },
-            {
-                AppointmentStatus.WaitingForApproval,
-                new AppointmentStatusPropsDto
-                {
-                    Status = AppointmentStatus.WaitingForApproval,
-                    ColorId = "8",
-                    ColorCode = "gray",
-                    Title = "MEŞGUL",
-                    IsValid = true
-                }
-            },
-            {
-                AppointmentStatus.Approved,
-                new AppointmentStatusPropsDto
-                {
-                    Status = AppointmentStatus.Approved,
-                    ColorId = "4",
-                    ColorCode = "red",
-                    Title = "REZERVE",
-                    IsValid = true
-                }
-            },
-            {
-                AppointmentStatus.Denied,
-                new AppointmentStatusPropsDto
-                {
-                    Status = AppointmentStatus.Denied,
-                    ColorId = "9",
-                    ColorCode = "blue",
-                    Title = "REDDEDİLDİ",
-                    IsValid = false
-                }
-            }
-        };
-    }
-
     public string GetJson(object obj)
     {
         return System.Text.Json.JsonSerializer.Serialize(obj);
+    }
+
+    public string UrlToAction(string actionName, string controllerName, object routeValues = null)
+    {
+        var httpContext = _httpContextAccessor.HttpContext;
+        var url = _linkGenerator.GetPathByAction(httpContext, actionName, controllerName, routeValues);
+        return url;
     }
 
 }

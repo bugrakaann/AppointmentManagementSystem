@@ -17,7 +17,7 @@ namespace AppointmentManagementSystem.Controllers
         [HttpGet("GetSlots")]
         public async Task<IActionResult> GetSlots([FromQuery] DateOnly startDate, [FromQuery] DateOnly endDate)
         {
-            var slots = await _appointmentService.GetByDateRange(startDate, endDate);
+            var slots = await _appointmentService.GetSlots(startDate, endDate);
             return Json(slots);
         }
 
@@ -25,7 +25,7 @@ namespace AppointmentManagementSystem.Controllers
         [HttpGet("GetSlotsWithDetails")]
         public async Task<IActionResult> GetSlotsWithDetails([FromQuery] DateOnly startDate, [FromQuery] DateOnly endDate)
         {
-            var slots = await _appointmentService.GetByDateRange(startDate, endDate);
+            var slots = await _appointmentService.GetSlotsWithDetails(startDate, endDate);
             return Json(slots);
         }
 

@@ -33,18 +33,30 @@ public class SubmissionsController : Controller
         return View(view);
     }
 
+    [HttpGet("Details/{id:int}")]
+    public async Task<IActionResult> Details(int id = 1)
+    {
+        var appointments = await _appointmentService.GetByIdPaged(id);
+        var view = new SubmissionsDto
+        {
+            PagedResult = appointments,
+            AppointmentStatus = appointments.Items.First().Status
+        };
+        return View("Index", view);
+    }
+
 
     [HttpGet("Deny/{Id:int}")]
     public async Task<IActionResult> Deny([FromRoute] int id)
     {
         await _appointmentService.Deny(id);
-        return RedirectToAction(nameof(Index));
+        return RedirectToAction("Index");
     }
 
     [HttpGet("Approve/{Id:int}")]
     public async Task<IActionResult> Approve([FromRoute] int id)
     {
         await _appointmentService.Approve(id);
-        return RedirectToAction(nameof(Index));
+        return RedirectToAction("Index");
     }
 }

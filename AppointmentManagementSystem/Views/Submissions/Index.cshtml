@@ -7,13 +7,16 @@
     switch (Model.AppointmentStatus)
     {
         case AppointmentStatus.WaitingForApproval:
-            statusIcon = "https://cdn-icons-png.flaticon.com/512/1827/1827336.png";
+            statusIcon = "https://cdn-icons-png.flaticon.com/256/1827/1827336.png";
             break;
         case AppointmentStatus.Approved:
             statusIcon = "https://cdn-icons-png.flaticon.com/256/9826/9826449.png";
             break;
+        case AppointmentStatus.Denied:
+            statusIcon = "https://cdn-icons-png.flaticon.com/256/9838/9838712.png";
+            break;
         default:
-            statusIcon = "https://cdn0.iconfinder.com/data/icons/expenses-vs-income/30/__pending_transaction_clock_wait-512.png";
+            statusIcon = "https://cdn-icons-png.flaticon.com/256/2838/2838773.png";
             break;
     }
 }
@@ -54,7 +57,13 @@
                                     <li class="@(Model.AppointmentStatus == AppointmentStatus.Approved ? "active" : "")">
                                         <a href="@Url.Action("Index", new { status = AppointmentStatus.Approved, page = 1 })">
                                             <i class="fas fa-calendar-check"></i>
-                                            <span>Onaylý</span>
+                                            <span>Onaylanan</span>
+                                        </a>
+                                    </li>
+                                    <li class="@(Model.AppointmentStatus == AppointmentStatus.Denied ? "active" : "")">
+                                        <a href="@Url.Action("Index", new { status = AppointmentStatus.Denied, page = 1 })">
+                                            <i class="fas fa-calendar-times"></i>
+                                            <span>Reddedilen</span>
                                         </a>
                                     </li>
                                 </ul>
@@ -104,8 +113,7 @@
                                            data-bs-target="#appt_details"
                                            data-Status="@appointment.Status"
                                            data-Description="@appointment.Description"
-                                           data-Name="@appointment.Customer.Name"
-                                           data-Surname="@appointment.Customer.Surname"
+                                           data-FullName="@appointment.Customer.FullName"
                                            data-Email="@appointment.Customer.Email"
                                            data-PhoneNumber="@appointment.Customer.PhoneNumber"
                                            data-Address="@appointment.Customer.Address"
@@ -227,8 +235,7 @@
 
                 var appointmentDetails = {
                     Description: button.getAttribute('data-Description'),
-                    Name: button.getAttribute('data-Name'),
-                    Surname: button.getAttribute('data-Surname'),
+                    FullName: button.getAttribute('data-FullName'),
                     Email: button.getAttribute('data-Email'),
                     PhoneNumber: button.getAttribute('data-PhoneNumber'),
                     Address: button.getAttribute('data-Address'),
@@ -238,7 +245,7 @@
 
 
                 apptDetailsModal.querySelector('#appt_Time').textContent = `${appointmentDetails.StartTime} - ${appointmentDetails.EndTime}`;
-                apptDetailsModal.querySelector('#customer_FullName').textContent = `${appointmentDetails.Name} ${appointmentDetails.Surname}`;
+                apptDetailsModal.querySelector('#customer_FullName').textContent = appointmentDetails.FullName;
                 apptDetailsModal.querySelector('#customer_Email').textContent = appointmentDetails.Email;
                 apptDetailsModal.querySelector('#customer_PhoneNumber').textContent = appointmentDetails.PhoneNumber;
                 apptDetailsModal.querySelector('#customer_Address').textContent = appointmentDetails.Address;
