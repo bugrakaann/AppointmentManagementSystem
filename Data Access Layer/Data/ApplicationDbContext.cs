@@ -20,9 +20,9 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser,IdentityRo
         base.OnModelCreating(modelBuilder);
         
         modelBuilder.Entity<Appointment>()
-            .HasOne(a => a.customer)
+            .HasOne(a => a.Customer)
             .WithMany(c => c.Appointments)
-            .HasForeignKey(a => a.customerId); //??
+            .HasForeignKey(a => a.CustomerId); //??
         
     }
 

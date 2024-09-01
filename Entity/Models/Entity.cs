@@ -2,5 +2,5 @@ namespace Models.Models;
 
 public class Entity
 {
-   public int id { get; set; }
+   public int Id { get; set; }
 }

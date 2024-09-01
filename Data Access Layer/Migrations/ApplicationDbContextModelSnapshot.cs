@@ -222,13 +222,13 @@ namespace Data_Access_Layer.Migrations
 
             modelBuilder.Entity("Models.Models.Appointment", b =>
                 {
-                    b.Property<int>("id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("customerId")
+                    b.Property<int?>("CustomerId")
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
@@ -238,26 +238,29 @@ namespace Data_Access_Layer.Migrations
                     b.Property<DateTime>("EndTime")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("GoogleEventId")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.HasKey("id");
+                    b.HasKey("Id");
 
-                    b.HasIndex("customerId");
+                    b.HasIndex("CustomerId");
 
                     b.ToTable("Appointments");
                 });
 
             modelBuilder.Entity("Models.Models.Customer", b =>
                 {
-                    b.Property<int>("id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Address")
                         .IsRequired()
@@ -279,7 +282,7 @@ namespace Data_Access_Layer.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("id");
+                    b.HasKey("Id");
 
                     b.ToTable("Customers");
                 });
@@ -337,11 +340,11 @@ namespace Data_Access_Layer.Migrations
 
             modelBuilder.Entity("Models.Models.Appointment", b =>
                 {
-                    b.HasOne("Models.Models.Customer", "customer")
+                    b.HasOne("Models.Models.Customer", "Customer")
                         .WithMany("Appointments")
-                        .HasForeignKey("customerId");
+                        .HasForeignKey("CustomerId");
 
-                    b.Navigation("customer");
+                    b.Navigation("Customer");
                 });
 
             modelBuilder.Entity("Models.Models.Customer", b =>

@@ -83,7 +83,7 @@ public class AppointmentService : IAppointmentService
     public async Task<AppointmentDto> Deny(int id)
     {
         var appointment = await _appointmentRepository.GetById(id);
-        appointment.status = AppointmentStatus.Denied;
+        appointment.Status = AppointmentStatus.Denied;
         await _appointmentRepository.Update(appointment);
         return _mapper.Map<AppointmentDto>(appointment);
     }
@@ -91,7 +91,7 @@ public class AppointmentService : IAppointmentService
     public async Task<AppointmentDto> Approve(int id)
     {
         var appointment = await _appointmentRepository.GetById(id);
-        appointment.status = AppointmentStatus.Approved;
+        appointment.Status = AppointmentStatus.Approved;
         await _appointmentRepository.Update(appointment);
         return _mapper.Map<AppointmentDto>(appointment);
     }
@@ -105,27 +105,27 @@ public class AppointmentService : IAppointmentService
         var appointmentStatus = _utilService.GetAppointmentStatus(AppointmentStatus.Busy);
         var customer = new Customer
         {
-            name = user.UserName ?? "ADMIN",
-            surname = "",
-            phoneNumber = "",
-            email = user.Email ?? "",
-            address = ""
+            Name = user.UserName ?? "ADMIN",
+            Surname = "",
+            PhoneNumber = "",
+            Email = user.Email ?? "",
+            Address = ""
         };
         var appointment = new Appointment
         {
-            description = appointmentStatus.Title,
-            status = appointmentStatus.Status,
-            startTime = busyingDto.StartTime,
-            endTime = busyingDto.EndTime,
-            customer = customer
+            Description = appointmentStatus.Title,
+            Status = appointmentStatus.Status,
+            StartTime = busyingDto.StartTime,
+            EndTime = busyingDto.EndTime,
+            Customer = customer
         };
         appointment = await _appointmentRepository.Add(appointment);
 
         await _googleCalendarService.AddEvent(
             $"Randevu - {appointmentStatus.Title}",
             "",
-            appointment.startTime
-            , appointment.endTime,
+            appointment.StartTime
+            , appointment.EndTime,
             appointmentStatus.ColorId
         );
 
@@ -137,38 +137,38 @@ public class AppointmentService : IAppointmentService
         CheckPastTime(bookingDto.StartTime, bookingDto.EndTime);
         await CheckOverlap(bookingDto.StartTime, bookingDto.EndTime);
 
-        var appointmentStatus = _utilService.GetAppointmentStatus(AppointmentStatus.Busy);
+        var appointmentStatus = _utilService.GetAppointmentStatus(AppointmentStatus.WaitingForApproval);
         var customer = new Customer
         {
-            name = bookingDto.Name,
-            surname = bookingDto.Surname,
-            phoneNumber = bookingDto.PhoneNumber,
-            email = bookingDto.Email,
-            address = bookingDto.Address
+            Name = bookingDto.Name,
+            Surname = bookingDto.Surname,
+            PhoneNumber = bookingDto.PhoneNumber,
+            Email = bookingDto.Email,
+            Address = bookingDto.Address
         };
         var appointment = new Appointment
         {
-            description = bookingDto.Description,
-            status = appointmentStatus.Status,
-            startTime = bookingDto.StartTime,
-            endTime = bookingDto.EndTime,
-            customer = customer
+            Description = bookingDto.Description,
+            Status = appointmentStatus.Status,
+            StartTime = bookingDto.StartTime,
+            EndTime = bookingDto.EndTime,
+            Customer = customer
         };
         appointment = await _appointmentRepository.Add(appointment);
 
-        var title = $"Randevu - {customer.name} {customer.surname}";
+        var title = $"Randevu - {customer.Name} {customer.Surname}";
         string[] desc =
         [
-            $"Email: {customer.email}",
-            $"Tel: {customer.phoneNumber}",
-            $"Adres: {customer.address}",
-            $"Açýklama: {appointment.description}"
+            $"Email: {customer.Email}",
+            $"Tel: {customer.PhoneNumber}",
+            $"Adres: {customer.Address}",
+            $"Açýklama: {appointment.Description}"
         ];
         await _googleCalendarService.AddEvent(
             title,
             string.Join("\n", desc),
-            appointment.startTime
-            , appointment.endTime,
+            appointment.StartTime
+            , appointment.EndTime,
             appointmentStatus.ColorId
         );
 

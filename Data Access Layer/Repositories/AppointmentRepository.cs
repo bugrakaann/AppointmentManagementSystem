@@ -22,12 +22,12 @@ public class AppointmentRepository : Repository<Appointment>, IAppointmentReposi
     public async Task<IEnumerable<Appointment>> GetRangeByStatus(AppointmentStatus status, int startIndex, int count)
     {
         var appointments = await _dbSet
-            .Include(a => a.customer)
-            .Where(a => a.status == status)
+            .Include(a => a.Customer)
+            .Where(a => a.Status == status)
             .Skip(startIndex * count)
             .Take(count)
-            .OrderByDescending(a => a.id)
-            .ThenBy(a => a.startTime)
+            .OrderByDescending(a => a.Id)
+            .ThenBy(a => a.StartTime)
             .ToListAsync();
 
         return appointments;
@@ -36,17 +36,17 @@ public class AppointmentRepository : Repository<Appointment>, IAppointmentReposi
     public async Task<int> GetCountByStatus(AppointmentStatus status)
     {
         return await _dbSet
-            .CountAsync(a => a.status == status);
+            .CountAsync(a => a.Status == status);
     }
 
     public async Task<IEnumerable<Appointment>> GetByDateRange(DateTime startTime, DateTime endTime)
     {
         return await _dbSet
-            .Include(a => a.customer)
+            .Include(a => a.Customer)
             .Where(a =>
-                ValidStatuses.Contains(a.status) &&
-                a.startTime >= startTime &&
-                a.endTime <= endTime
+                ValidStatuses.Contains(a.Status) &&
+                a.StartTime >= startTime &&
+                a.EndTime <= endTime
             )
             .ToListAsync();
     }
@@ -54,20 +54,20 @@ public class AppointmentRepository : Repository<Appointment>, IAppointmentReposi
     public async Task<IEnumerable<Appointment>> GetByDateRange(DateTime startTime, DateTime endTime, int customerId)
     {
         return await Find(a =>
-            ValidStatuses.Contains(a.status) &&
-            a.startTime >= startTime &&
-            a.endTime <= endTime
+            ValidStatuses.Contains(a.Status) &&
+            a.StartTime >= startTime &&
+            a.EndTime <= endTime
         );
     }
 
     public async Task<bool> IsOverlapping(DateTime startTime, DateTime endTime)
     {
         return await Contains(a =>
-            ValidStatuses.Contains(a.status) &&
+            ValidStatuses.Contains(a.Status) &&
             (
-                (startTime >= a.startTime && startTime < a.endTime) || // baþlangýç zamaný mevcut randevunun içinde 
-                (endTime > a.startTime && endTime <= a.endTime) || // bitiþ zamaný mevcut randevunun içinde
-                (startTime <= a.startTime && endTime >= a.endTime) // yeni randevu mevcut randevuyu kapsýyor
+                (startTime >= a.StartTime && startTime < a.EndTime) || // baþlangýç zamaný mevcut randevunun içinde 
+                (endTime > a.StartTime && endTime <= a.EndTime) || // bitiþ zamaný mevcut randevunun içinde
+                (startTime <= a.StartTime && endTime >= a.EndTime) // yeni randevu mevcut randevuyu kapsýyor
             )
         );
     }

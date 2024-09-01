@@ -37,12 +37,12 @@
 <!-- /Main Wrapper -->
 
 <!-- Booking Modal -->
-<div class="modal fade custom-modal" id="modal" tabindex="-1" aria-hidden="true">
+<div class="modal fade custom-modal" id="formModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header bg-secondary text-white">
                 <h5 class="modal-title">Randevu Bilgileri</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="formModal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="form-section">
@@ -114,11 +114,11 @@
             const eventsURL = '@Url.Action("GetSlots", "Appointments")';
             renderCalendar(eventsURL, {
                 select: ({start, end}) => {
-                    const startTime = formattedTime(start);
-                    const endTime = formattedTime(end);
-                    $("#AppointmentRange").html(startTime + " &nbsp;&nbsp;&nbsp;&nbsp; " + endTime)
-                    $("#StartTime").val(startTime);
-                    $("#EndTime").val(endTime);
+                    const StartTime = formattedTime(start);
+                    const EndTime = formattedTime(end);
+                    $("#AppointmentRange").html(StartTime + " &nbsp;&nbsp;&nbsp;&nbsp; " + EndTime)
+                    $("#StartTime").val(StartTime);
+                    $("#EndTime").val(EndTime);
                     formModal.modal('show');
                 },
                 selectAllow: (info) => {

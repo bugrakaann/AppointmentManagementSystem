@@ -86,11 +86,11 @@
             const eventsURL = '@Url.Action("GetSlots", "Appointments")';
             renderCalendar(eventsURL, {
                 select: ({ start, end }) => {
-                    const startTime = formattedTime(start);
-                    const endTime = formattedTime(end);
-                    const range = startTime + "    " + endTime;
-                    $("#StartTime").val(startTime);
-                    $("#EndTime").val(endTime);
+                    const StartTime = formattedTime(start);
+                    const EndTime = formattedTime(end);
+                    const range = StartTime + "    " + EndTime;
+                    $("#StartTime").val(StartTime);
+                    $("#EndTime").val(EndTime);
                     formModal.modal('show');
                 },
                 selectAllow: (info) => {

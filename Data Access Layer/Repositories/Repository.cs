@@ -24,7 +24,7 @@ public class Repository<T> : IRepository<T> where T : Entity
 
     public async Task<T> GetById(int id)
     {
-        return await _dbSet.FirstAsync(a => a.id == id);
+        return await _dbSet.FirstAsync(a => a.Id == id);
     }
 
     public async Task<T> Add(T entity)
@@ -36,7 +36,7 @@ public class Repository<T> : IRepository<T> where T : Entity
 
     public async Task<T> Update(T entity)
     {
-        var existingEntity = _dbSet.Local.FirstOrDefault(e => e.id == (entity as Entity).id);
+        var existingEntity = _dbSet.Local.FirstOrDefault(e => e.Id == (entity as Entity).Id);
         if (existingEntity != null)
         {
             _context.Entry(existingEntity).State = EntityState.Detached;
@@ -50,7 +50,7 @@ public class Repository<T> : IRepository<T> where T : Entity
 
     public async Task Delete(int id)
     {
-        var entity = await _dbSet.FirstOrDefaultAsync(a => a.id == id);
+        var entity = await _dbSet.FirstOrDefaultAsync(a => a.Id == id);
         if (entity == null) return;
         _dbSet.Remove(entity);
         await _context.SaveChangesAsync();

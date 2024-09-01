@@ -4,11 +4,12 @@ namespace Models.Models;
 
 public class Appointment : Entity
 {
-    public int? customerId { get; set; }
+    public int? CustomerId { get; set; }
 
-    public DateTime startTime { get; set; }
-    public DateTime endTime { get; set; }
-    public string description { get; set; }
-    public AppointmentStatus status { get; set; }
-    public Customer? customer { get; set; }
+    public DateTime StartTime { get; set; }
+    public DateTime EndTime { get; set; }
+    public string Description { get; set; }
+    public AppointmentStatus Status { get; set; }
+    public string? GoogleEventId { get; set; }
+    public Customer? Customer { get; set; }
 }

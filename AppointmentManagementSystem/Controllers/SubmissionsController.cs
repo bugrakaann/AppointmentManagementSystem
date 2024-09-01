@@ -34,14 +34,14 @@ public class SubmissionsController : Controller
     }
 
 
-    [HttpGet("Deny/{id:int}")]
+    [HttpGet("Deny/{Id:int}")]
     public async Task<IActionResult> Deny([FromRoute] int id)
     {
         await _appointmentService.Deny(id);
         return RedirectToAction(nameof(Index));
     }
 
-    [HttpGet("Approve/{id:int}")]
+    [HttpGet("Approve/{Id:int}")]
     public async Task<IActionResult> Approve([FromRoute] int id)
     {
         await _appointmentService.Approve(id);
