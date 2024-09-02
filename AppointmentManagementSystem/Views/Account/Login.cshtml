@@ -1,6 +1,6 @@
 @model Models.DTOs.LoginDto
 @{
-    ViewData["title"] = "Giriþ";
+    ViewData["title"] = "GiriÅŸ";
 }
 
 <div class="card">
@@ -8,7 +8,7 @@
         <form asp-action="Login" method="post" autocomplete="off">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group  mb-3">
-                <label asp-for="UserName">Kullanýcý Adý</label>
+                <label asp-for="UserName">KullanÄ±cÄ± AdÄ±</label>
                 <input asp-for="UserName" class="form-control" required />
                 <span asp-validation-for="UserName" class="text-danger"></span>
             </div>
@@ -19,9 +19,9 @@
             </div>
             <div class="form-group form-check mb-3">
                 <input asp-for="RememberMe" class="form-check-input" checked />
-                <label asp-for="RememberMe" class="form-check-label">Beni Hatýrla</label>
+                <label asp-for="RememberMe" class="form-check-label">Beni HatÄ±rla</label>
             </div>
-            <button type="submit" class="btn btn-info"><i class="fas fa-sign-in-alt"></i> Giriþ Yap</button>
+            <button type="submit" class="btn btn-info"><i class="fas fa-sign-in-alt"></i> GiriÅŸ Yap</button>
         </form>
     </div>
 </div>

@@ -1,6 +1,6 @@
 @model Models.DTOs.BookingDto
 @{
-    ViewData["title"] = "Randevu Oluþtur";
+    ViewData["title"] = "Randevu OluÅŸtur";
 }
 
 <!-- Main Wrapper -->
@@ -11,7 +11,7 @@
         <div class="container-fluid">
             <div class="row align-items-center">
                 <div class="col-md-12 col-12">
-                    <h2 class="breadcrumb-title">Randevu Oluþtur</h2>
+                    <h2 class="breadcrumb-title">Randevu OluÅŸtur</h2>
                 </div>
             </div>
         </div>
@@ -52,7 +52,7 @@
                         <input asp-for="EndTime" type="hidden"/>
                         <div asp-validation-summary="All" class="text-danger"></div>
                         <div class="form-group row mb-3">
-                            <label asp-for="Name" class="col-sm-3 col-form-label">Ýsim</label>
+                            <label asp-for="Name" class="col-sm-3 col-form-label">Ä°sim</label>
                             <div class="col-sm-9">
                                 <input asp-for="Name" class="form-control" required/>
                             </div>
@@ -87,7 +87,7 @@
                             <span asp-validation-for="Address" class="text-danger"></span>
                         </div>
                         <div class="form-group row mb-3">
-                            <label asp-for="Description" class="col-sm-3 col-form-label">Açýklama</label>
+                            <label asp-for="Description" class="col-sm-3 col-form-label">AÃ§Ä±klama</label>
                             <div class="col-sm-9">
                                 <input asp-for="Description" class="form-control" required/>
                             </div>

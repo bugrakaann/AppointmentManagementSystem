@@ -28,7 +28,7 @@ namespace Business.Services
 
             if (string.IsNullOrEmpty(serviceAccountKeyFilePath))
             {
-                throw new Exception("Google servis hesabý eksik");
+                throw new Exception("Google servis hesabÄ± eksik");
             }
 
             GoogleCredential credential;
@@ -77,7 +77,7 @@ namespace Business.Services
             var existingEvent = await _calendarService.Events.Get(_calendarId, eventId).ExecuteAsync();
             if (existingEvent == null)
             {
-                throw new InvalidOperationException("Etkinlik bulunamadý");
+                throw new InvalidOperationException("Etkinlik bulunamadÄ±");
             }
             existingEvent.ColorId = colorId;
             var updateRequest = _calendarService.Events.Update(existingEvent, _calendarId, eventId);

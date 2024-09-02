@@ -1,7 +1,6 @@
 using AutoMapper;
 using Business.Services.Abstract;
 using Data_Access_Layer.Repositories.Abstract;
-using Microsoft.AspNetCore.Http;
 using Models.DTOs;
 using Models.Enums;
 using Models.Models;
@@ -195,7 +194,7 @@ public class AppointmentService : IAppointmentService
             $"Email: {customer.Email}",
             $"Tel: {customer.PhoneNumber}",
             $"Adres: {customer.Address}",
-            $"Açýklama: {appointment.Description}"
+            $"AÃ§Ä±klama: {appointment.Description}"
         ];
         var gEvent = await _googleCalendarService.AddEvent(
             title,
@@ -214,7 +213,7 @@ public class AppointmentService : IAppointmentService
     {
         if (await _appointmentRepository.IsOverlapping(starTime, endTime))
         {
-            throw new ArgumentException("Bu tarih aralýðý dolu!");
+            throw new ArgumentException("Bu tarih aralÄ±ÄŸÄ± dolu!");
         }
     }
 
@@ -222,7 +221,7 @@ public class AppointmentService : IAppointmentService
     {
         if (starTime < DateTime.Now || endTime < DateTime.Now)
         {
-            throw new ArgumentException("Geçmiþ tarihli randevu oluþturulamaz!");
+            throw new ArgumentException("GeÃ§miÅŸ tarihli randevu oluÅŸturulamaz!");
         }
     }
 
@@ -243,7 +242,7 @@ public class AppointmentService : IAppointmentService
                     Status = AppointmentStatus.Busy,
                     ColorId = "5",
                     ColorCode = "orange",
-                    Title = "MÜSAÝT DEÐÝL",
+                    Title = "MÃœSAÄ°T DEÄžÄ°L",
                     IsValid = true
                 }
             },
@@ -254,7 +253,7 @@ public class AppointmentService : IAppointmentService
                     Status = AppointmentStatus.WaitingForApproval,
                     ColorId = "8",
                     ColorCode = "gray",
-                    Title = "MEÞGUL",
+                    Title = "MEÅžGUL",
                     IsValid = true
                 }
             },
@@ -276,7 +275,7 @@ public class AppointmentService : IAppointmentService
                     Status = AppointmentStatus.Denied,
                     ColorId = "9",
                     ColorCode = "blue",
-                    Title = "REDDEDÝLDÝ",
+                    Title = "REDDEDÄ°LDÄ°",
                     IsValid = false
                 }
             }

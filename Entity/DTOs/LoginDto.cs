@@ -6,7 +6,7 @@ public class LoginDto
 {
     [Required]
     [DataType(DataType.Text)]
-    [Display(Name = "Kullanıcı Adı")]
+    [Display(Name = "KullanÄ±cÄ± AdÄ±")]
     public string UserName { get; set; }
 
     [Required]
@@ -14,6 +14,6 @@ public class LoginDto
     [Display(Name = "Parola")]
     public string Password { get; set; }
 
-    [Display(Name = "Beni Hatırla?")]
+    [Display(Name = "Beni HatÄ±rla")]
     public bool RememberMe { get; set; }
 }

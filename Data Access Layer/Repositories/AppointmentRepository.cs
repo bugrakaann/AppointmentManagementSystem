@@ -1,4 +1,4 @@
-using Data_Access_Layer.Data;
+ï»¿using Data_Access_Layer.Data;
 using Data_Access_Layer.Repositories.Abstract;
 using Microsoft.EntityFrameworkCore;
 using Models.Enums;
@@ -65,9 +65,9 @@ public class AppointmentRepository : Repository<Appointment>, IAppointmentReposi
         return await Contains(a =>
             ValidStatuses.Contains(a.Status) &&
             (
-                (startTime >= a.StartTime && startTime < a.EndTime) || // baþlangýç zamaný mevcut randevunun içinde 
-                (endTime > a.StartTime && endTime <= a.EndTime) || // bitiþ zamaný mevcut randevunun içinde
-                (startTime <= a.StartTime && endTime >= a.EndTime) // yeni randevu mevcut randevuyu kapsýyor
+                (startTime >= a.StartTime && startTime < a.EndTime) || // baÅŸlangÄ±Ã§ mevcut randevunun iÃ§inde 
+                (endTime > a.StartTime && endTime <= a.EndTime) || // bitiÅŸ mevcut randevunun iÃ§inde
+                (startTime <= a.StartTime && endTime >= a.EndTime) // yeni randevu mevcut randevuyu kapsÄ±yor
             )
         );
     }
