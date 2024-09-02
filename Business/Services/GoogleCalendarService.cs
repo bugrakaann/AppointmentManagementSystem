@@ -1,112 +1,126 @@
+using AutoMapper;
 using Business.Services.Abstract;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Calendar.v3;
 using Google.Apis.Calendar.v3.Data;
 using Google.Apis.Services;
 using Microsoft.Extensions.Configuration;
+using Models.DTOs;
 
-namespace Business.Services
+namespace Business.Services;
+
+public class GoogleCalendarService : IGoogleCalendarService
 {
-    public class GoogleCalendarService : IGoogleCalendarService
+    private readonly IMapper _mapper;
+    private readonly CalendarService _calendarService;
+
+    public string CalendarId { get; }
+
+    public string CalendarToken => $"TOKEN_{CalendarId}";
+
+    public GoogleCalendarService(IMapper mapper, IConfiguration configuration)
     {
-        private readonly CalendarService _calendarService;
-        private readonly string _calendarId;
+        var serviceAccountKeyFilePath = configuration["GoogleCalendar:ServiceAccountKeyFilePath"];
+        CalendarId = configuration["GoogleCalendar:CalendarID"] ?? "";
+        _calendarService = Init(serviceAccountKeyFilePath);
+        _mapper = mapper;
+    }
 
-        public GoogleCalendarService(IConfiguration configuration)
+    private CalendarService Init(string? serviceAccountKeyFilePath)
+    {
+        if (string.IsNullOrEmpty(CalendarId))
         {
-            var serviceAccountKeyFilePath = configuration["GoogleCalendar:ServiceAccountKeyFilePath"];
-            _calendarId = configuration["GoogleCalendar:CalendarID"] ?? "";
-            _calendarService = Init(serviceAccountKeyFilePath);
+            throw new Exception("Takvim ID eksik");
         }
 
-        private CalendarService Init(string? serviceAccountKeyFilePath)
+        if (string.IsNullOrEmpty(serviceAccountKeyFilePath))
         {
-            if (string.IsNullOrEmpty(_calendarId))
-            {
-                throw new Exception("Takvim ID eksik");
-            }
-
-            if (string.IsNullOrEmpty(serviceAccountKeyFilePath))
-            {
-                throw new Exception("Google servis hesabı eksik");
-            }
-
-            GoogleCredential credential;
-            using (var stream = new FileStream(serviceAccountKeyFilePath, FileMode.Open, FileAccess.Read))
-            {
-                credential = GoogleCredential.FromStream(stream)
-                    .CreateScoped(CalendarService.Scope.Calendar);
-            }
-
-            return new CalendarService(new BaseClientService.Initializer()
-            {
-                HttpClientInitializer = credential,
-
-            });
+            throw new Exception("Google servis hesabı eksik");
         }
 
-        public async Task<Event> AddEvent(string summary, string description, DateTimeOffset start, DateTimeOffset end, string colorId)
+        GoogleCredential credential;
+        using (var stream = new FileStream(serviceAccountKeyFilePath, FileMode.Open, FileAccess.Read))
         {
-            var newEvent = new Event()
+            credential = GoogleCredential.FromStream(stream)
+                .CreateScoped(CalendarService.Scope.Calendar);
+        }
+
+        return new CalendarService(new BaseClientService.Initializer()
+        {
+            HttpClientInitializer = credential,
+        });
+    }
+
+    public async Task<GoogleEventDto> AddEvent(string title, string description, DateTimeOffset start,
+        DateTimeOffset end,
+        string colorId)
+    {
+        var newEvent = new Event()
+        {
+            Summary = title,
+            Description = description,
+            ColorId = colorId,
+            Start = new EventDateTime()
             {
-                Summary = summary,
-                Description = description,
-                ColorId = colorId,
-                Start = new EventDateTime()
-                {
-                    DateTimeDateTimeOffset = start.UtcDateTime,
-                    TimeZone = "UTC",
-                },
-                End = new EventDateTime()
-                {
-                    DateTimeDateTimeOffset = end.UtcDateTime,
-                    TimeZone = "UTC",
-                },
-            };
-            var request = _calendarService.Events.Insert(newEvent, _calendarId);
-            return await request.ExecuteAsync();
-        }
-        public async Task DeleteEvent(string eventId)
-        {
-            var deleteRequest = _calendarService.Events.Delete(_calendarId, eventId);
-            await deleteRequest.ExecuteAsync();
-        }
-
-        public async Task<Event> UpdateEventColor(string eventId, string colorId)
-        {
-            var existingEvent = await _calendarService.Events.Get(_calendarId, eventId).ExecuteAsync();
-            if (existingEvent == null)
+                DateTimeDateTimeOffset = start.UtcDateTime,
+                TimeZone = "UTC",
+            },
+            End = new EventDateTime()
             {
-                throw new InvalidOperationException("Etkinlik bulunamadı");
-            }
-            existingEvent.ColorId = colorId;
-            var updateRequest = _calendarService.Events.Update(existingEvent, _calendarId, eventId);
-            return await updateRequest.ExecuteAsync();
-        }
+                DateTimeDateTimeOffset = end.UtcDateTime,
+                TimeZone = "UTC",
+            },
+        };
+        var request = await _calendarService.Events.Insert(newEvent, CalendarId).ExecuteAsync();
+        return _mapper.Map<GoogleEventDto>(request);
+    }
 
-        public async Task<Channel> WatchCalendarAsync(string webhookUrl)
+    public async Task DeleteEvent(string eventId)
+    {
+        var deleteRequest = _calendarService.Events.Delete(CalendarId, eventId);
+        await deleteRequest.ExecuteAsync();
+    }
+
+    private async Task<Event> GetEventData(string eventId)
+    {
+        return await _calendarService.Events.Get(CalendarId, eventId).ExecuteAsync();
+    }
+
+    public async Task<GoogleEventDto> GetEvent(string eventId)
+    {
+        var request = await GetEventData(eventId);
+        return _mapper.Map<GoogleEventDto>(request);
+    }
+
+    public async Task<GoogleEventDto> UpdateEventColor(string eventId, string colorId)
+    {
+        var existingEvent = await GetEventData(eventId);
+        existingEvent.ColorId = colorId;
+        var request = await _calendarService.Events.Update(existingEvent, CalendarId, eventId).ExecuteAsync();
+        return _mapper.Map<GoogleEventDto>(request);
+    }
+
+    public async Task<Channel> StartWatching(string webhookUrl)
+    {
+        var channel = new Channel()
         {
-            var channel = new Channel()
-            {
-                Id = Guid.NewGuid().ToString(),
-                Type = "web_hook",
-                Address = webhookUrl
-            };
+            Id = Guid.NewGuid().ToString(),
+            Type = "web_hook",
+            Address = webhookUrl,
+            Token = CalendarToken
+        };
 
-            var watchRequest = _calendarService.Events.Watch(channel, _calendarId);
-            return await watchRequest.ExecuteAsync();
-        }
+        var watchRequest = _calendarService.Events.Watch(channel, CalendarId);
+        return await watchRequest.ExecuteAsync();
+    }
 
-        public async Task StopWatchingCalendarAsync(string channelId, string resourceId)
+    public async Task StopWatching(string channelId, string resourceId)
+    {
+        var channel = new Channel()
         {
-            var channel = new Channel()
-            {
-                Id = channelId,
-                ResourceId = resourceId
-            };
-
-            await _calendarService.Channels.Stop(channel).ExecuteAsync();
-        }
-
+            Id = channelId,
+            ResourceId = resourceId
+        };
+        await _calendarService.Channels.Stop(channel).ExecuteAsync();
     }
 }

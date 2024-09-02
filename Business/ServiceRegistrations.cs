@@ -24,12 +24,14 @@ public static class ServiceRegistrations
         });
 
         // Register services
+        services.AddHostedService<GoogleCalendarChannelBackgroundService>();
+        
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IUtilService, UtilService>();
         services.AddScoped<IAppointmentService, AppointmentService>();
+        
         services.AddSingleton<IGoogleCalendarService, GoogleCalendarService>();
-
-        // Register repositories
+        
         services.AddScoped<IAppointmentRepository, AppointmentRepository>();
         services.AddScoped<ICustomerRepository, CustomerRepository>();
 

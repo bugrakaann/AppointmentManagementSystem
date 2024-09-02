@@ -31,45 +31,37 @@ public class AppointmentService : IAppointmentService
         _appointmentRepository.ValidStatuses = GetValidAppointmentStatusArray();
     }
 
-
-    private AppointmentStatus[] GetValidAppointmentStatusArray()
-    {
-        return GetAppointmentStatuses()
-            .Values
-            .Where(s => s.IsValid)
-            .Select(s => s.Status)
-            .ToArray();
-    }
-
     public async Task<IEnumerable<AppointmentDto>> GetByDateRange(DateOnly startDate, DateOnly endDate)
     {
         var startTime = startDate.ToDateTime(TimeOnly.MinValue);
         var endTime = endDate.ToDateTime(TimeOnly.MaxValue);
-        var list = await _appointmentRepository.GetByDateRange(startTime, endTime);
-        var listDto = _mapper.Map<IEnumerable<AppointmentDto>>(list);
-        return listDto;
+        var list = await _appointmentRepository.GetByDateRange(startTime, endTime,
+            _appointmentRepository.ValidStatuses);
+        return _mapper.Map<IEnumerable<AppointmentDto>>(list);
     }
 
     public async Task<IEnumerable<AppointmentSlotDto>> GetSlots(DateOnly startDate, DateOnly endDate)
     {
         var list = await GetByDateRange(startDate, endDate);
-        var listDto = _mapper.Map<IEnumerable<AppointmentSlotDto>>(list);
+        var listDto = _mapper.Map<IEnumerable<AppointmentSlotDto>>(list).ToList();
         foreach (var item in listDto)
         {
             item.Props = GetAppointmentStatus(item.Status);
         }
+
         return listDto;
     }
 
     public async Task<IEnumerable<AppointmentDetailsDto>> GetSlotsWithDetails(DateOnly startDate, DateOnly endDate)
     {
         var list = await GetByDateRange(startDate, endDate);
-        var listDto = _mapper.Map<IEnumerable<AppointmentDetailsDto>>(list);
+        var listDto = _mapper.Map<IEnumerable<AppointmentDetailsDto>>(list).ToList();
         foreach (var item in listDto)
         {
             item.Props = GetAppointmentStatus(item.Status);
             item.Url = _utilService.UrlToAction("Details", "Submissions", new { id = item.Id });
         }
+
         return listDto;
     }
 
@@ -89,6 +81,7 @@ public class AppointmentService : IAppointmentService
             PageSize = pageSize
         };
     }
+
     public async Task<PagedResultDto<AppointmentDto>> GetByIdPaged(int id)
     {
         var appointment = await _appointmentRepository.GetById(id);
@@ -103,6 +96,94 @@ public class AppointmentService : IAppointmentService
         };
     }
 
+    public async Task ReceiveEventUpdates(string? channelToken)
+    {
+        if (string.IsNullOrEmpty(channelToken) || channelToken != _googleCalendarService.CalendarToken)
+        {
+            throw new ArgumentException("Geçersiz doğrulama");
+        }
+
+        var today = DateTime.Today;
+        var startOfPreviousWeek = today.AddDays(-(int)today.DayOfWeek - 7);
+        var endOfNextWeek = today.AddDays(7 - (int)today.DayOfWeek + 7);
+        var statuses = GetAppointmentStatuses().Values
+            .Where(s => s.Status != AppointmentStatus.Denied)
+            .Select(s => s.Status)
+            .ToArray();
+        
+        var appointments = await _appointmentRepository.GetByDateRange(startOfPreviousWeek, endOfNextWeek, statuses);
+        appointments = appointments.ToList();
+
+        var eventResults = await GetAppointmentSyncTasks(appointments);
+
+        foreach (var result in eventResults)
+        {
+            try
+            {
+                await UpdateAppointmentSync(result);
+            }
+            catch (Exception)
+            {
+                // Log
+            }
+        }
+    }
+
+    private async Task<IEnumerable<AppointmentSyncDto>> GetAppointmentSyncTasks(IEnumerable<Appointment> appointments)
+    {
+        var eventTasks = new List<Task<AppointmentSyncDto>>();
+        foreach (var appointment in appointments)
+        {
+            eventTasks.Add(GetAppointmentSync(appointment));
+        }
+        return await Task.WhenAll(eventTasks);
+    }
+
+    private async Task<AppointmentSyncDto> GetAppointmentSync(Appointment appointment)
+    {
+        GoogleEventDto? gEvent = null;
+        if (appointment.GoogleEventId != null)
+        {
+            gEvent = await _googleCalendarService.GetEvent(appointment.GoogleEventId);
+        }
+
+        return new AppointmentSyncDto
+        {
+            Appointment = appointment,
+            GoogleEvent = gEvent
+        };
+    }
+
+    private async Task UpdateAppointmentSync(AppointmentSyncDto dto)
+    {
+        var appointment = dto.Appointment;
+        var gEvent = dto.GoogleEvent;
+
+        if (gEvent == null || gEvent.Status == "cancelled")
+        {
+            await CancelledEvent();
+            return;
+        }
+
+        var appointmentStatus = GetAppointmentStatuses().Values.First(s => s.ColorId == gEvent.ColorId);
+
+        if (appointmentStatus.Status == AppointmentStatus.Denied)
+        {
+            await CancelledEvent();
+        }
+        else if (appointment.Status != appointmentStatus.Status)
+        {
+            appointment.Status = appointmentStatus.Status;
+            await _appointmentRepository.Update(appointment);
+        }
+
+        async Task CancelledEvent()
+        {
+            appointment.Status = AppointmentStatus.Denied;
+            await _appointmentRepository.Update(appointment);
+        }
+    }
+
     public async Task<AppointmentDto> Deny(int id)
     {
         var appointment = await _appointmentRepository.GetById(id);
@@ -112,6 +193,7 @@ public class AppointmentService : IAppointmentService
         {
             await _googleCalendarService.DeleteEvent(appointment.GoogleEventId);
         }
+
         return _mapper.Map<AppointmentDto>(appointment);
     }
 
@@ -125,6 +207,7 @@ public class AppointmentService : IAppointmentService
         {
             await _googleCalendarService.UpdateEventColor(appointment.GoogleEventId, appointmentStatus.ColorId);
         }
+
         return _mapper.Map<AppointmentDto>(appointment);
     }
 
@@ -153,13 +236,15 @@ public class AppointmentService : IAppointmentService
         };
         appointment = await _appointmentRepository.Add(appointment);
 
-        await _googleCalendarService.AddEvent(
+        var gEvent = await _googleCalendarService.AddEvent(
             $"Randevu - {appointmentStatus.Title}",
             "",
             appointment.StartTime
             , appointment.EndTime,
             appointmentStatus.ColorId
         );
+        appointment.GoogleEventId = gEvent.Id;
+        await _appointmentRepository.Update(appointment);
 
         return _mapper.Map<AppointmentDto>(appointment);
     }
@@ -225,6 +310,15 @@ public class AppointmentService : IAppointmentService
         }
     }
 
+    private AppointmentStatus[] GetValidAppointmentStatusArray()
+    {
+        return GetAppointmentStatuses()
+            .Values
+            .Where(s => s.IsValid)
+            .Select(s => s.Status)
+            .ToArray();
+    }
+
     public AppointmentStatusPropsDto GetAppointmentStatus(AppointmentStatus status)
     {
         var statuses = GetAppointmentStatuses();
@@ -281,5 +375,4 @@ public class AppointmentService : IAppointmentService
             }
         };
     }
-
 }

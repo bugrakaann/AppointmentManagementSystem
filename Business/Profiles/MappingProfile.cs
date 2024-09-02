@@ -12,5 +12,6 @@ public class MappingProfile : Profile
         CreateMap<Appointment, AppointmentDto>().ReverseMap();
         CreateMap<AppointmentDto, AppointmentSlotDto>().ReverseMap();
         CreateMap<AppointmentDto, AppointmentDetailsDto>().ReverseMap();
+        CreateMap<Google.Apis.Calendar.v3.Data.Event, GoogleEventDto>().ReverseMap();
     }
 }

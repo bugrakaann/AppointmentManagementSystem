@@ -24,7 +24,7 @@ public class AppointmentRepository : Repository<Appointment>, IAppointmentReposi
         var appointments = await _dbSet
             .Include(a => a.Customer)
             .Where(a => a.Status == status)
-            .Skip(startIndex * count)
+            .Skip(startIndex)
             .Take(count)
             .OrderByDescending(a => a.Id)
             .ThenBy(a => a.StartTime)
@@ -39,25 +39,16 @@ public class AppointmentRepository : Repository<Appointment>, IAppointmentReposi
             .CountAsync(a => a.Status == status);
     }
 
-    public async Task<IEnumerable<Appointment>> GetByDateRange(DateTime startTime, DateTime endTime)
+    public async Task<IEnumerable<Appointment>> GetByDateRange(DateTime startTime, DateTime endTime,
+        AppointmentStatus[] statuses)
     {
         return await _dbSet
             .Include(a => a.Customer)
             .Where(a =>
-                ValidStatuses.Contains(a.Status) &&
+                statuses.Contains(a.Status) &&
                 a.StartTime >= startTime &&
                 a.EndTime <= endTime
-            )
-            .ToListAsync();
-    }
-
-    public async Task<IEnumerable<Appointment>> GetByDateRange(DateTime startTime, DateTime endTime, int customerId)
-    {
-        return await Find(a =>
-            ValidStatuses.Contains(a.Status) &&
-            a.StartTime >= startTime &&
-            a.EndTime <= endTime
-        );
+            ).ToListAsync();
     }
 
     public async Task<bool> IsOverlapping(DateTime startTime, DateTime endTime)
@@ -78,5 +69,4 @@ public class AppointmentRepository : Repository<Appointment>, IAppointmentReposi
             .Include(a => a.Customer)
             .FirstAsync(a => a.Id == id);
     }
-
 }
