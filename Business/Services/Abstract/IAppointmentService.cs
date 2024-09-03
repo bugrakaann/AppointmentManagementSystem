@@ -15,6 +15,7 @@ public interface IAppointmentService
     Task<AppointmentDto> Approve(int id);
     Task<AppointmentDto> Book(BookingDto bookingDto);
     Task<AppointmentDto> Busy(BusyingDto busyingDto);
+    Task<AppointmentDto> Update(SubmissionUpdateDto submissionUpdateDto);
     AppointmentStatusPropsDto GetAppointmentStatus(AppointmentStatus status);
     IDictionary<AppointmentStatus, AppointmentStatusPropsDto> GetAppointmentStatuses();
 }

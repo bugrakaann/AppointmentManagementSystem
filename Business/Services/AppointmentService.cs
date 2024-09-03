@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using AutoMapper;
 using Business.Services.Abstract;
 using Data_Access_Layer.Repositories.Abstract;
@@ -138,11 +139,21 @@ public class AppointmentService : IAppointmentService
         }
 
         var gcStatus = GetAppointmentStatuses().Values.First(s => s.ColorId == gcEvent.ColorId);
-        if (appointment.Status != gcStatus.Status)
+
+        appointment.Status = gcStatus.Status;
+        appointment.StartTime = _utilService.DateTimeOffsetToDateTime(gcEvent.StartTime);
+        appointment.EndTime = _utilService.DateTimeOffsetToDateTime(gcEvent.EndTime);
+
+        if (appointment.Customer != null)
         {
-            appointment.Status = gcStatus.Status;
-            await _appointmentRepository.Update(appointment);
+            var gcCustomer = ParseCustomer(gcEvent.Description);
+            appointment.Customer.Name = gcCustomer.Name;
+            appointment.Customer.Surname = gcCustomer.Surname;
+            appointment.Customer.Email = gcCustomer.Email;
+            appointment.Customer.PhoneNumber = gcCustomer.PhoneNumber;
         }
+
+        await _appointmentRepository.Update(appointment);
     }
 
     private async Task AddAppointmentGcEvent(GoogleCalendarEventDto gcEvent)
@@ -155,8 +166,9 @@ public class AppointmentService : IAppointmentService
         await CheckOverlap(startTime, endTime);
 
         var appointmentStatus = GetAppointmentStatuses().Values.First(s => s.ColorId == gcEvent.ColorId);
-        
+
         var customer = ParseCustomer(gcEvent.Description);
+        customer.Address = "-";
         var appointment = new Appointment
         {
             Status = appointmentStatus.Status,
@@ -169,23 +181,24 @@ public class AppointmentService : IAppointmentService
 
         await _appointmentRepository.Add(appointment);
     }
-    
+
     private static Customer ParseCustomer(string details)
     {
-        var summaryParts = details.Split('-');
+        var summaryParts = details.Split('\n');
         var nameField = summaryParts[0].Trim();
-        
-        var fullName = nameField.Contains(' ') 
-            ? nameField.Split(' ', 2) 
+
+        var fullName = nameField.Contains(' ')
+            ? nameField.Split(' ', 2)
             : [nameField, ""];
-        
+
+        Match email = Regex.Match(summaryParts[1].Trim(), @"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}");
+
         var customer = new Customer
         {
             Name = fullName[0].Trim(),
-            Surname = fullName[1].Trim(), 
-            Email = summaryParts[1].Trim(),
-            PhoneNumber = summaryParts[2].Trim(),
-            Address = ""
+            Surname = fullName[1].Trim(),
+            Email = email.Value,
+            PhoneNumber = summaryParts[2].Trim()
         };
 
         return customer;
@@ -231,10 +244,10 @@ public class AppointmentService : IAppointmentService
         var customer = new Customer
         {
             Name = user.UserName ?? "ADMIN",
-            Surname = "",
-            PhoneNumber = "",
+            Surname = " " ?? "ADMIN",
+            PhoneNumber = "-",
             Email = user.Email ?? "",
-            Address = ""
+            Address = "-"
         };
 
         return await AddSync(
@@ -285,7 +298,7 @@ public class AppointmentService : IAppointmentService
 
         var gcEvent = await _googleCalendarService.AddEvent(
             "RANDEVU",
-            $"{customer.Name} {customer.Surname} - {customer.Email} - {customer.PhoneNumber}",
+            $"{customer.Name} {customer.Surname}\n{customer.Email}\n{customer.PhoneNumber}",
             appointment.StartTime
             , appointment.EndTime,
             appointmentStatus.ColorId
@@ -294,6 +307,11 @@ public class AppointmentService : IAppointmentService
         await _appointmentRepository.Update(appointment);
 
         return _mapper.Map<AppointmentDto>(appointment);
+    }
+    
+    public async Task<AppointmentDto> Update(SubmissionUpdateDto submissionUpdateDto)
+    {
+        throw new NotImplementedException();
     }
 
     private async Task CheckOverlap(DateTime starTime, DateTime endTime)

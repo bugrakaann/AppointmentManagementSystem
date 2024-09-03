@@ -59,4 +59,23 @@ public class SubmissionsController : Controller
         await _appointmentService.Approve(id);
         return RedirectToAction("Index");
     }
+
+    [HttpPost("Update")]
+    public async Task<IActionResult> Update(SubmissionUpdateDto submissionUpdateDto)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View("Error", new ErrorDto { Message = "Geçersiz istek!" });
+        }
+
+        try
+        {
+            await _appointmentService.Update(submissionUpdateDto);
+            return RedirectToAction("Details", new { submissionUpdateDto.Id });
+        }
+        catch (ArgumentException ex)
+        {
+            return View("Error", new ErrorDto { Message = ex.Message });
+        }
+    }
 }

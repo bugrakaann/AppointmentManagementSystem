@@ -7,7 +7,7 @@ using AppointmentManagementSystem.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var conString = builder.Configuration.GetConnectionString("DefaultConnection");
+var conString = builder.Configuration.GetConnectionString("DefaultConnection") ?? "";
 
 
 // Add services to the container.

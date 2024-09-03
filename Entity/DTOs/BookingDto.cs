@@ -1,6 +1,6 @@
 ﻿namespace Models.DTOs;
 
-public class BookingDto
+public class BookingDto : BusyingDto
 {
     public string Name { get; set; }
     public string Surname { get; set; }
@@ -8,7 +8,5 @@ public class BookingDto
     public string Email { get; set; }
     public string Address { get; set; }
     public string Description { get; set; }
-    public DateTime StartTime { get; set; }
-    public DateTime EndTime { get; set; }
 
 }

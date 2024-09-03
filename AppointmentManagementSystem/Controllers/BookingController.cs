@@ -8,12 +8,10 @@ namespace AppointmentManagementSystem.Controllers;
 public class BookingController : Controller
 {
     private readonly IAppointmentService _appointmentService;
-    private readonly IUtilService _utilService;
 
-    public BookingController(IAppointmentService appointmentService, IUtilService utilService)
+    public BookingController(IAppointmentService appointmentService)
     {
         _appointmentService = appointmentService;
-        _utilService = utilService;
     }
 
     [HttpGet("")]

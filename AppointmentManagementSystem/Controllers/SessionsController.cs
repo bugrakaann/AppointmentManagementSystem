@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace AppointmentManagementSystem.Controllers;
 
-
 [Authorize(Roles = "Admin")]
 [Route("Sessions")]
 public class SessionsController : Controller

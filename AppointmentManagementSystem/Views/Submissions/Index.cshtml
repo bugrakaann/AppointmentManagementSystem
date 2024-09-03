@@ -111,14 +111,16 @@
                                            class="btn btn-sm bg-info-light"
                                            data-bs-toggle="modal"
                                            data-bs-target="#appt_details"
+                                           data-Id="@appointment.Id"
                                            data-Status="@appointment.Status"
                                            data-Description="@appointment.Description"
-                                           data-FullName="@appointment.Customer.FullName"
+                                           data-Name="@appointment.Customer.Name"
+                                           data-Surname="@appointment.Customer.Surname"
                                            data-Email="@appointment.Customer.Email"
                                            data-PhoneNumber="@appointment.Customer.PhoneNumber"
                                            data-Address="@appointment.Customer.Address"
-                                           data-StartTime="@appointment.StartTime.ToString("dd MMM yyyy hh:mm tt")"
-                                           data-EndTime="@appointment.EndTime.ToString("dd MMM yyyy hh:mm tt")">
+                                           data-StartTime="@appointment.StartTime"
+                                           data-EndTime="@appointment.EndTime">
                                             <i class="far fa-eye"></i> Detaylar
                                         </a>
                                         @if (appointment.Status == AppointmentStatus.WaitingForApproval)
@@ -193,33 +195,94 @@
 <!-- /Main Wrapper -->
 
 <!-- Appointment Details Modal -->
-<div class="modal fade custom-modal" id="appt_details">
+<div class="modal fade custom-modal" id="appt_details" tabindex="-1" aria-labelledby="apptDetailsLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Randevu Detayları</h5>
+                <h5 class="modal-title" id="apptDetailsLabel">Randevu Detayları</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <div class="mb-3">
-                    <strong>Randevu Zamanı:</strong> <span id="appt_Time"></span>
+            <form action="@Url.Action("Update")" method="post" autocomplete="off">
+                <div class="modal-body">
+
+                    <input type="hidden" name="Id" id="appt_Id" />
+                    <div class="row mb-3">
+                        <label for="appt_StartTime" class="col-sm-4 col-form-label text-end">
+                            <strong>Başlangıç Zamanı</strong>
+                        </label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" name="StartTime" id="appt_StartTime" required>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <label for="appt_EndTime" class="col-sm-4 col-form-label text-end">
+                            <strong>Bitiş Zamanı</strong>
+                        </label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" name="EndTime" id="appt_EndTime" required>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <label for="customer_Name" class="col-sm-4 col-form-label text-end">
+                            <strong>Adı</strong>
+                        </label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" name="Name" id="customer_Name" required>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <label for="customer_Surname" class="col-sm-4 col-form-label text-end">
+                            <strong>Soyadı</strong>
+                        </label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" name="Surname" id="customer_Surname" required>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <label for="customer_Email" class="col-sm-4 col-form-label text-end">
+                            <strong>Email</strong>
+                        </label>
+                        <div class="col-sm-8">
+                            <input type="email" class="form-control" name="Email" id="customer_Email" required>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <label for="customer_PhoneNumber" class="col-sm-4 col-form-label text-end">
+                            <strong>Telefon</strong>
+                        </label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" name="PhoneNumber" id="customer_PhoneNumber" required>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <label for="customer_Address" class="col-sm-4 col-form-label text-end">
+                            <strong>Adres</strong>
+                        </label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" name="Address" id="customer_Address" required>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <label for="appt_Description" class="col-sm-4 col-form-label text-end">
+                            <strong>Açıklama</strong>
+                        </label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" name="Description" id="appt_Description" required>
+                        </div>
+                    </div>
+
                 </div>
-                <div class="mb-3">
-                    <strong>Müşteri:</strong> <span id="customer_FullName"></span>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Kaydet</button>
                 </div>
-                <div class="mb-3">
-                    <strong>Email:</strong> <span id="customer_Email"></span>
-                </div>
-                <div class="mb-3">
-                    <strong>Telefon:</strong> <span id="customer_PhoneNumber"></span>
-                </div>
-                <div class="mb-3">
-                    <strong>Adres:</strong> <span id="customer_Address"></span>
-                </div>
-                <div class="mb-3">
-                    <strong>Açıklama:</strong> <span id="appt_Description"></span>
-                </div>
-            </div>
+            </form>
         </div>
     </div>
 </div>
@@ -228,28 +291,18 @@
 @section Scripts {
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            var apptDetailsModal = document.getElementById('appt_details');
-
+            const apptDetailsModal = document.getElementById('appt_details');
             apptDetailsModal.addEventListener('show.bs.modal', function (event) {
-                var button = event.relatedTarget;
-
-                var appointmentDetails = {
-                    Description: button.getAttribute('data-Description'),
-                    FullName: button.getAttribute('data-FullName'),
-                    Email: button.getAttribute('data-Email'),
-                    PhoneNumber: button.getAttribute('data-PhoneNumber'),
-                    Address: button.getAttribute('data-Address'),
-                    StartTime: button.getAttribute('data-StartTime'),
-                    EndTime: button.getAttribute('data-EndTime')
-                };
-
-
-                apptDetailsModal.querySelector('#appt_Time').textContent = `${appointmentDetails.StartTime} - ${appointmentDetails.EndTime}`;
-                apptDetailsModal.querySelector('#customer_FullName').textContent = appointmentDetails.FullName;
-                apptDetailsModal.querySelector('#customer_Email').textContent = appointmentDetails.Email;
-                apptDetailsModal.querySelector('#customer_PhoneNumber').textContent = appointmentDetails.PhoneNumber;
-                apptDetailsModal.querySelector('#customer_Address').textContent = appointmentDetails.Address;
-                apptDetailsModal.querySelector('#appt_Description').textContent = appointmentDetails.Description;
+                const button = event.relatedTarget;
+                apptDetailsModal.querySelector('#appt_Id').value = button.getAttribute('data-Id');
+                apptDetailsModal.querySelector('#appt_StartTime').value = button.getAttribute('data-StartTime');
+                apptDetailsModal.querySelector('#appt_EndTime').value = button.getAttribute('data-EndTime');
+                apptDetailsModal.querySelector('#customer_Name').value = button.getAttribute('data-Name');
+                apptDetailsModal.querySelector('#customer_Surname').value = button.getAttribute('data-Surname');
+                apptDetailsModal.querySelector('#customer_Email').value = button.getAttribute('data-Email');
+                apptDetailsModal.querySelector('#customer_PhoneNumber').value = button.getAttribute('data-PhoneNumber');
+                apptDetailsModal.querySelector('#customer_Address').value = button.getAttribute('data-Address');
+                apptDetailsModal.querySelector('#appt_Description').value = button.getAttribute('data-Description');
             });
         });
     </script>
