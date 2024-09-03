@@ -1,6 +1,6 @@
 namespace Models.DTOs;
 
-public class GoogleEventDto
+public class GoogleCalendarEventDto
 {
     public string Id { get; set; }
     public string Summary { get; set; }

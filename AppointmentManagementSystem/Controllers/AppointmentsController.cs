@@ -35,7 +35,7 @@ public class AppointmentsController : Controller
         try
         {
             Request.Headers.TryGetValue("X-Goog-Channel-Token", out var token);
-            await _appointmentService.ReceiveEventUpdates(token);
+            await _appointmentService.ReceiveGcEventUpdates(token);
         }
         catch (Exception e)
         {
