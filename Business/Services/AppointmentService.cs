@@ -96,99 +96,111 @@ public class AppointmentService : IAppointmentService
         };
     }
 
-    public async Task ReceiveEventUpdates(string? channelToken)
+    public async Task ReceiveGcEventUpdates(string? channelToken)
     {
         if (string.IsNullOrEmpty(channelToken) || channelToken != _googleCalendarService.CalendarToken)
         {
             throw new ArgumentException("Geçersiz doğrulama");
         }
 
-        var today = DateTime.Today;
-        var startOfPreviousWeek = today.AddDays(-(int)today.DayOfWeek - 7);
-        var endOfNextWeek = today.AddDays(7 - (int)today.DayOfWeek + 7);
-        var statuses = GetAppointmentStatuses().Values
-            .Where(s => s.Status != AppointmentStatus.Denied)
-            .Select(s => s.Status)
-            .ToArray();
-        
-        var appointments = await _appointmentRepository.GetByDateRange(startOfPreviousWeek, endOfNextWeek, statuses);
-        appointments = appointments.ToList();
-
-        var eventResults = await GetAppointmentSyncTasks(appointments);
-
-        foreach (var result in eventResults)
+        var gcEvents = await _googleCalendarService.GetUpdatedEvents();
+        foreach (var gcEvent in gcEvents)
         {
             try
             {
-                await UpdateAppointmentSync(result);
+                var appointment = await _appointmentRepository.GetByGoogleEventId(gcEvent.Id);
+                if (appointment != null)
+                {
+                    await UpdateAppointmentGcEvent(appointment, gcEvent);
+                }
+                else
+                {
+                    await AddAppointmentGcEvent(gcEvent);
+                }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // Log
+                Console.WriteLine("HATAAAA" + ex.Message);
             }
         }
     }
 
-    private async Task<IEnumerable<AppointmentSyncDto>> GetAppointmentSyncTasks(IEnumerable<Appointment> appointments)
+    private async Task UpdateAppointmentGcEvent(Appointment appointment, GoogleCalendarEventDto gcEvent)
     {
-        var eventTasks = new List<Task<AppointmentSyncDto>>();
-        foreach (var appointment in appointments)
+        if (gcEvent.Status == "cancelled")
         {
-            eventTasks.Add(GetAppointmentSync(appointment));
-        }
-        return await Task.WhenAll(eventTasks);
-    }
+            if (appointment.Status != AppointmentStatus.Denied)
+            {
+                await SetDenied(appointment);
+            }
 
-    private async Task<AppointmentSyncDto> GetAppointmentSync(Appointment appointment)
-    {
-        GoogleEventDto? gEvent = null;
-        if (appointment.GoogleEventId != null)
-        {
-            gEvent = await _googleCalendarService.GetEvent(appointment.GoogleEventId);
-        }
-
-        return new AppointmentSyncDto
-        {
-            Appointment = appointment,
-            GoogleEvent = gEvent
-        };
-    }
-
-    private async Task UpdateAppointmentSync(AppointmentSyncDto dto)
-    {
-        var appointment = dto.Appointment;
-        var gEvent = dto.GoogleEvent;
-
-        if (gEvent == null || gEvent.Status == "cancelled")
-        {
-            await CancelledEvent();
             return;
         }
 
-        var appointmentStatus = GetAppointmentStatuses().Values.First(s => s.ColorId == gEvent.ColorId);
-
-        if (appointmentStatus.Status == AppointmentStatus.Denied)
+        var gcStatus = GetAppointmentStatuses().Values.First(s => s.ColorId == gcEvent.ColorId);
+        if (appointment.Status != gcStatus.Status)
         {
-            await CancelledEvent();
-        }
-        else if (appointment.Status != appointmentStatus.Status)
-        {
-            appointment.Status = appointmentStatus.Status;
+            appointment.Status = gcStatus.Status;
             await _appointmentRepository.Update(appointment);
         }
+    }
 
-        async Task CancelledEvent()
+    private async Task AddAppointmentGcEvent(GoogleCalendarEventDto gcEvent)
+    {
+        if (gcEvent.Status == "cancelled") return;
+
+        var startTime = _utilService.DateTimeOffsetToDateTime(gcEvent.StartTime);
+        var endTime = _utilService.DateTimeOffsetToDateTime(gcEvent.EndTime);
+
+        await CheckOverlap(startTime, endTime);
+
+        var appointmentStatus = GetAppointmentStatuses().Values.First(s => s.ColorId == gcEvent.ColorId);
+        
+        var customer = ParseCustomer(gcEvent.Description);
+        var appointment = new Appointment
         {
-            appointment.Status = AppointmentStatus.Denied;
-            await _appointmentRepository.Update(appointment);
-        }
+            Status = appointmentStatus.Status,
+            StartTime = startTime,
+            EndTime = endTime,
+            Description = "GOOGLE TAKVİMLER",
+            Customer = customer,
+            GoogleEventId = gcEvent.Id
+        };
+
+        await _appointmentRepository.Add(appointment);
+    }
+    
+    private static Customer ParseCustomer(string details)
+    {
+        var summaryParts = details.Split('-');
+        var nameField = summaryParts[0].Trim();
+        
+        var fullName = nameField.Contains(' ') 
+            ? nameField.Split(' ', 2) 
+            : [nameField, ""];
+        
+        var customer = new Customer
+        {
+            Name = fullName[0].Trim(),
+            Surname = fullName[1].Trim(), 
+            Email = summaryParts[1].Trim(),
+            PhoneNumber = summaryParts[2].Trim(),
+            Address = ""
+        };
+
+        return customer;
+    }
+
+    private async Task SetDenied(Appointment appointment)
+    {
+        appointment.Status = AppointmentStatus.Denied;
+        await _appointmentRepository.Update(appointment);
     }
 
     public async Task<AppointmentDto> Deny(int id)
     {
         var appointment = await _appointmentRepository.GetById(id);
-        appointment.Status = AppointmentStatus.Denied;
-        await _appointmentRepository.Update(appointment);
+        await SetDenied(appointment);
         if (appointment.GoogleEventId != null)
         {
             await _googleCalendarService.DeleteEvent(appointment.GoogleEventId);
@@ -213,11 +225,9 @@ public class AppointmentService : IAppointmentService
 
     public async Task<AppointmentDto> Busy(BusyingDto busyingDto)
     {
-        CheckPastTime(busyingDto.StartTime, busyingDto.EndTime);
         await CheckOverlap(busyingDto.StartTime, busyingDto.EndTime);
 
         var user = await _authService.GetLoggedUser();
-        var appointmentStatus = GetAppointmentStatus(AppointmentStatus.Busy);
         var customer = new Customer
         {
             Name = user.UserName ?? "ADMIN",
@@ -226,27 +236,14 @@ public class AppointmentService : IAppointmentService
             Email = user.Email ?? "",
             Address = ""
         };
-        var appointment = new Appointment
-        {
-            Description = appointmentStatus.Title,
-            Status = appointmentStatus.Status,
-            StartTime = busyingDto.StartTime,
-            EndTime = busyingDto.EndTime,
-            Customer = customer
-        };
-        appointment = await _appointmentRepository.Add(appointment);
 
-        var gEvent = await _googleCalendarService.AddEvent(
-            $"Randevu - {appointmentStatus.Title}",
-            "",
-            appointment.StartTime
-            , appointment.EndTime,
-            appointmentStatus.ColorId
+        return await AddSync(
+            customer,
+            AppointmentStatus.Busy,
+            busyingDto.StartTime,
+            busyingDto.EndTime,
+            ""
         );
-        appointment.GoogleEventId = gEvent.Id;
-        await _appointmentRepository.Update(appointment);
-
-        return _mapper.Map<AppointmentDto>(appointment);
     }
 
     public async Task<AppointmentDto> Book(BookingDto bookingDto)
@@ -254,7 +251,6 @@ public class AppointmentService : IAppointmentService
         CheckPastTime(bookingDto.StartTime, bookingDto.EndTime);
         await CheckOverlap(bookingDto.StartTime, bookingDto.EndTime);
 
-        var appointmentStatus = GetAppointmentStatus(AppointmentStatus.WaitingForApproval);
         var customer = new Customer
         {
             Name = bookingDto.Name,
@@ -263,32 +259,38 @@ public class AppointmentService : IAppointmentService
             Email = bookingDto.Email,
             Address = bookingDto.Address
         };
+
+        return await AddSync(
+            customer,
+            AppointmentStatus.WaitingForApproval,
+            bookingDto.StartTime,
+            bookingDto.EndTime,
+            bookingDto.Description
+        );
+    }
+
+    private async Task<AppointmentDto> AddSync(Customer customer, AppointmentStatus status, DateTime startTime,
+        DateTime endTime, string description)
+    {
+        var appointmentStatus = GetAppointmentStatus(status);
         var appointment = new Appointment
         {
-            Description = bookingDto.Description,
+            Customer = customer,
             Status = appointmentStatus.Status,
-            StartTime = bookingDto.StartTime,
-            EndTime = bookingDto.EndTime,
-            Customer = customer
+            StartTime = startTime,
+            EndTime = endTime,
+            Description = description
         };
         appointment = await _appointmentRepository.Add(appointment);
 
-        var title = $"Randevu - {customer.Name} {customer.Surname}";
-        string[] desc =
-        [
-            $"Email: {customer.Email}",
-            $"Tel: {customer.PhoneNumber}",
-            $"Adres: {customer.Address}",
-            $"Açıklama: {appointment.Description}"
-        ];
-        var gEvent = await _googleCalendarService.AddEvent(
-            title,
-            string.Join("\n", desc),
+        var gcEvent = await _googleCalendarService.AddEvent(
+            "RANDEVU",
+            $"{customer.Name} {customer.Surname} - {customer.Email} - {customer.PhoneNumber}",
             appointment.StartTime
             , appointment.EndTime,
             appointmentStatus.ColorId
         );
-        appointment.GoogleEventId = gEvent.Id;
+        appointment.GoogleEventId = gcEvent.Id;
         await _appointmentRepository.Update(appointment);
 
         return _mapper.Map<AppointmentDto>(appointment);

@@ -10,4 +10,5 @@ public interface IAppointmentRepository : IRepository<Appointment>
     Task<int> GetCountByStatus(AppointmentStatus status);
     Task<IEnumerable<Appointment>> GetByDateRange(DateTime startTime, DateTime endTime, AppointmentStatus[] statuses);
     Task<bool> IsOverlapping(DateTime startTime, DateTime endTime);
+    Task<Appointment?> GetByGoogleEventId(string eventId);
 }

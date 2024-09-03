@@ -51,28 +51,28 @@ public class GoogleCalendarService : IGoogleCalendarService
         });
     }
 
-    public async Task<GoogleEventDto> AddEvent(string title, string description, DateTimeOffset start,
+    public async Task<GoogleCalendarEventDto> AddEvent(string summary, string description, DateTimeOffset start,
         DateTimeOffset end,
         string colorId)
     {
         var newEvent = new Event()
         {
-            Summary = title,
+            Summary = summary,
             Description = description,
             ColorId = colorId,
             Start = new EventDateTime()
             {
-                DateTimeDateTimeOffset = start.UtcDateTime,
-                TimeZone = "UTC",
+                DateTimeDateTimeOffset = start,
+                TimeZone = TimeZoneInfo.Local.ToString()
             },
             End = new EventDateTime()
             {
-                DateTimeDateTimeOffset = end.UtcDateTime,
-                TimeZone = "UTC",
+                DateTimeDateTimeOffset = end,
+                TimeZone = TimeZoneInfo.Local.ToString()
             },
         };
         var request = await _calendarService.Events.Insert(newEvent, CalendarId).ExecuteAsync();
-        return _mapper.Map<GoogleEventDto>(request);
+        return _mapper.Map<GoogleCalendarEventDto>(request);
     }
 
     public async Task DeleteEvent(string eventId)
@@ -86,18 +86,29 @@ public class GoogleCalendarService : IGoogleCalendarService
         return await _calendarService.Events.Get(CalendarId, eventId).ExecuteAsync();
     }
 
-    public async Task<GoogleEventDto> GetEvent(string eventId)
+    public async Task<GoogleCalendarEventDto> GetEvent(string eventId)
     {
         var request = await GetEventData(eventId);
-        return _mapper.Map<GoogleEventDto>(request);
+        return _mapper.Map<GoogleCalendarEventDto>(request);
     }
 
-    public async Task<GoogleEventDto> UpdateEventColor(string eventId, string colorId)
+    public async Task<IEnumerable<GoogleCalendarEventDto>> GetUpdatedEvents()
+    {
+        var q = _calendarService.Events.List(CalendarId);
+        q.TimeZone = TimeZoneInfo.Local.ToString();
+        q.UpdatedMinDateTimeOffset = DateTimeOffset.Now.AddDays(-29);
+        q.ShowDeleted = true;
+        q.MaxResults = 2500;
+        var events = await q.ExecuteAsync();
+        return events.Items.Reverse().Select(e => _mapper.Map<GoogleCalendarEventDto>(e));
+    }
+
+    public async Task<GoogleCalendarEventDto> UpdateEventColor(string eventId, string colorId)
     {
         var existingEvent = await GetEventData(eventId);
         existingEvent.ColorId = colorId;
         var request = await _calendarService.Events.Update(existingEvent, CalendarId, eventId).ExecuteAsync();
-        return _mapper.Map<GoogleEventDto>(request);
+        return _mapper.Map<GoogleCalendarEventDto>(request);
     }
 
     public async Task<Channel> StartWatching(string webhookUrl)
@@ -123,4 +134,5 @@ public class GoogleCalendarService : IGoogleCalendarService
         };
         await _calendarService.Channels.Stop(channel).ExecuteAsync();
     }
+    
 }

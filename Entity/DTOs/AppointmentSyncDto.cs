@@ -5,5 +5,5 @@ namespace Models.DTOs;
 public class AppointmentSyncDto
 {
     public Appointment Appointment { get; set; }
-    public GoogleEventDto? GoogleEvent { get; set; }
+    public GoogleCalendarEventDto? GoogleEvent { get; set; }
 }

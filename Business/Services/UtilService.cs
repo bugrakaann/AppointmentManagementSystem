@@ -51,5 +51,13 @@ public class UtilService : IUtilService
         var url = _linkGenerator.GetPathByAction(httpContext, actionName, controllerName, routeValues);
         return url;
     }
+    
+    public DateTime DateTimeOffsetToDateTime(DateTimeOffset dateTimeOffset)
+    {
+        var dateTimeWithOffset = dateTimeOffset.DateTime;
+        var offset = dateTimeOffset.Offset;
+        return dateTimeWithOffset.ToUniversalTime().Add(offset);
+    }
+
 
 }

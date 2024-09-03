@@ -8,5 +8,6 @@ namespace Business.Services.Abstract
         string GetHttpErrorMessage(int code);
         string GetJson(object obj);
         string UrlToAction(string actionName, string controllerName, object routeValues = null);
+        DateTime DateTimeOffsetToDateTime(DateTimeOffset dateTimeOffset);
     }
 }

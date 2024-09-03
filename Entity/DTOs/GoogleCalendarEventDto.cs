@@ -7,4 +7,6 @@ public class GoogleCalendarEventDto
     public string Description { get; set; }
     public string ColorId { get; set; }
     public string Status { get; set; }
+    public DateTimeOffset StartTime { get; set; }
+    public DateTimeOffset EndTime { get; set; }
 }

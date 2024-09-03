@@ -69,4 +69,11 @@ public class AppointmentRepository : Repository<Appointment>, IAppointmentReposi
             .Include(a => a.Customer)
             .FirstAsync(a => a.Id == id);
     }
+
+    public async Task<Appointment?> GetByGoogleEventId(string eventId)
+    {
+        return await _dbSet
+            .Include(a => a.Customer)
+            .FirstOrDefaultAsync(a => a.GoogleEventId == eventId);
+    }
 }
