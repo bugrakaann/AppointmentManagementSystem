@@ -51,34 +51,36 @@ public class GoogleCalendarService : IGoogleCalendarService
         });
     }
 
-    public async Task<GoogleCalendarEventDto> AddEvent(string summary, string description, DateTimeOffset start,
-        DateTimeOffset end,
-        string colorId)
+    private Event EventBody(GoogleCalendarEventDto dto)
     {
-        var newEvent = new Event()
+        return new Event()
         {
-            Summary = summary,
-            Description = description,
-            ColorId = colorId,
+            Summary = dto.Summary,
+            Description = dto.Description,
+            ColorId = dto.ColorId,
             Start = new EventDateTime()
             {
-                DateTimeDateTimeOffset = start,
+                DateTimeDateTimeOffset = dto.StartTime,
                 TimeZone = TimeZoneInfo.Local.ToString()
             },
             End = new EventDateTime()
             {
-                DateTimeDateTimeOffset = end,
+                DateTimeDateTimeOffset = dto.EndTime,
                 TimeZone = TimeZoneInfo.Local.ToString()
             },
         };
-        var request = await _calendarService.Events.Insert(newEvent, CalendarId).ExecuteAsync();
-        return _mapper.Map<GoogleCalendarEventDto>(request);
+    }
+
+    public async Task<GoogleCalendarEventDto> AddEvent(GoogleCalendarEventDto dto)
+    {
+        var eventBody = EventBody(dto);
+        var result = await _calendarService.Events.Insert(eventBody, CalendarId).ExecuteAsync();
+        return _mapper.Map<GoogleCalendarEventDto>(result);
     }
 
     public async Task DeleteEvent(string eventId)
     {
-        var deleteRequest = _calendarService.Events.Delete(CalendarId, eventId);
-        await deleteRequest.ExecuteAsync();
+        await _calendarService.Events.Delete(CalendarId, eventId).ExecuteAsync();
     }
 
     private async Task<Event> GetEventData(string eventId)
@@ -88,27 +90,35 @@ public class GoogleCalendarService : IGoogleCalendarService
 
     public async Task<GoogleCalendarEventDto> GetEvent(string eventId)
     {
-        var request = await GetEventData(eventId);
-        return _mapper.Map<GoogleCalendarEventDto>(request);
+        var result = await GetEventData(eventId);
+        return _mapper.Map<GoogleCalendarEventDto>(result);
     }
 
     public async Task<IEnumerable<GoogleCalendarEventDto>> GetUpdatedEvents()
     {
         var q = _calendarService.Events.List(CalendarId);
         q.TimeZone = TimeZoneInfo.Local.ToString();
-        q.UpdatedMinDateTimeOffset = DateTimeOffset.Now.AddDays(-29);
-        q.ShowDeleted = true;
+        q.UpdatedMinDateTimeOffset = DateTimeOffset.Now.AddDays(-14);
         q.MaxResults = 2500;
-        var events = await q.ExecuteAsync();
-        return events.Items.Reverse().Select(e => _mapper.Map<GoogleCalendarEventDto>(e));
+        var result = await q.ExecuteAsync();
+        return result.Items.Reverse().Select(e => _mapper.Map<GoogleCalendarEventDto>(e));
     }
 
     public async Task<GoogleCalendarEventDto> UpdateEventColor(string eventId, string colorId)
     {
-        var existingEvent = await GetEventData(eventId);
-        existingEvent.ColorId = colorId;
-        var request = await _calendarService.Events.Update(existingEvent, CalendarId, eventId).ExecuteAsync();
-        return _mapper.Map<GoogleCalendarEventDto>(request);
+        var eventBody = new Event
+        {
+            ColorId = colorId,
+        };
+        var result = await _calendarService.Events.Patch(eventBody, CalendarId, eventId).ExecuteAsync();
+        return _mapper.Map<GoogleCalendarEventDto>(result);
+    }
+
+    public async Task<GoogleCalendarEventDto> UpdateEvent(GoogleCalendarEventDto dto)
+    {
+        var eventBody = EventBody(dto);
+        var result = await _calendarService.Events.Patch(eventBody, CalendarId, dto.Id).ExecuteAsync();
+        return _mapper.Map<GoogleCalendarEventDto>(result);
     }
 
     public async Task<Channel> StartWatching(string webhookUrl)
@@ -120,9 +130,7 @@ public class GoogleCalendarService : IGoogleCalendarService
             Address = webhookUrl,
             Token = CalendarToken
         };
-
-        var watchRequest = _calendarService.Events.Watch(channel, CalendarId);
-        return await watchRequest.ExecuteAsync();
+        return await _calendarService.Events.Watch(channel, CalendarId).ExecuteAsync();
     }
 
     public async Task StopWatching(string channelId, string resourceId)
@@ -134,5 +142,4 @@ public class GoogleCalendarService : IGoogleCalendarService
         };
         await _calendarService.Channels.Stop(channel).ExecuteAsync();
     }
-    
 }

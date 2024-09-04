@@ -121,7 +121,7 @@ public class AppointmentService : IAppointmentService
             }
             catch (Exception ex)
             {
-                Console.WriteLine("HATAAAA" + ex.Message);
+                Console.WriteLine(ex.Message);
             }
         }
     }
@@ -182,23 +182,27 @@ public class AppointmentService : IAppointmentService
         await _appointmentRepository.Add(appointment);
     }
 
-    private static Customer ParseCustomer(string details)
+    private static Customer ParseCustomer(string description)
     {
-        var summaryParts = details.Split('\n');
-        var nameField = summaryParts[0].Trim();
-
+        description = description.Replace("<br>", "\n");
+        var summaryParts = description
+            .Split('\n')
+            .Select(s => Regex.Replace(s, "<.*?>", String.Empty).Trim())
+            .ToArray();
+        
+        var nameField = summaryParts[0];
         var fullName = nameField.Contains(' ')
             ? nameField.Split(' ', 2)
             : [nameField, ""];
 
-        Match email = Regex.Match(summaryParts[1].Trim(), @"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}");
+        Match email = Regex.Match(summaryParts[2], @"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}");
 
         var customer = new Customer
         {
             Name = fullName[0].Trim(),
             Surname = fullName[1].Trim(),
+            PhoneNumber = summaryParts[1],
             Email = email.Value,
-            PhoneNumber = summaryParts[2].Trim()
         };
 
         return customer;
@@ -255,7 +259,7 @@ public class AppointmentService : IAppointmentService
             AppointmentStatus.Busy,
             busyingDto.StartTime,
             busyingDto.EndTime,
-            ""
+            "-"
         );
     }
 
@@ -285,38 +289,71 @@ public class AppointmentService : IAppointmentService
     private async Task<AppointmentDto> AddSync(Customer customer, AppointmentStatus status, DateTime startTime,
         DateTime endTime, string description)
     {
-        var appointmentStatus = GetAppointmentStatus(status);
         var appointment = new Appointment
         {
             Customer = customer,
-            Status = appointmentStatus.Status,
+            Status = status,
             StartTime = startTime,
             EndTime = endTime,
             Description = description
         };
         appointment = await _appointmentRepository.Add(appointment);
 
-        var gcEvent = await _googleCalendarService.AddEvent(
-            "RANDEVU",
-            $"{customer.Name} {customer.Surname}\n{customer.Email}\n{customer.PhoneNumber}",
-            appointment.StartTime
-            , appointment.EndTime,
-            appointmentStatus.ColorId
-        );
+        var gcEvent = await _googleCalendarService.AddEvent(CreateGcEvent(appointment));
         appointment.GoogleEventId = gcEvent.Id;
         await _appointmentRepository.Update(appointment);
 
         return _mapper.Map<AppointmentDto>(appointment);
     }
-    
-    public async Task<AppointmentDto> Update(SubmissionUpdateDto submissionUpdateDto)
+
+    public async Task<AppointmentDto> Update(SubmissionUpdateDto dto)
     {
-        throw new NotImplementedException();
+        CheckPastTime(dto.StartTime, dto.EndTime);
+        await CheckOverlap(dto.StartTime, dto.EndTime, dto.Id);
+
+        var appointment = await _appointmentRepository.GetById(dto.Id);
+
+        if (appointment.Customer != null)
+        {
+            appointment.Customer.Name = dto.Name;
+            appointment.Customer.Surname = dto.Surname;
+            appointment.Customer.PhoneNumber = dto.PhoneNumber;
+            appointment.Customer.Email = dto.Email;
+            appointment.Customer.Address = dto.Address;
+        }
+        appointment.StartTime = dto.StartTime;
+        appointment.EndTime = dto.EndTime;
+        appointment.Description = dto.Description;
+        await _appointmentRepository.Update(appointment);
+
+        if (appointment.GoogleEventId != null)
+        {
+            var gcEvent = CreateGcEvent(appointment);
+            gcEvent.Id = appointment.GoogleEventId;
+            await _googleCalendarService.UpdateEvent(gcEvent);
+        }
+        
+        return _mapper.Map<AppointmentDto>(appointment);
     }
 
-    private async Task CheckOverlap(DateTime starTime, DateTime endTime)
+    private GoogleCalendarEventDto CreateGcEvent(Appointment appointment)
     {
-        if (await _appointmentRepository.IsOverlapping(starTime, endTime))
+        var customer = appointment.Customer;
+        return new GoogleCalendarEventDto
+        {
+            Summary = "RANDEVU",
+            Description = $"{customer?.Name} {customer?.Surname}\n{customer?.PhoneNumber}\n{customer?.Email}",
+            ColorId = GetAppointmentStatus(appointment.Status).ColorId,
+            StartTime = appointment.StartTime,
+            EndTime = appointment.EndTime,
+        };
+    }
+
+    private async Task CheckOverlap(DateTime starTime, DateTime endTime, int id = 0)
+    {
+        var overlap = await _appointmentRepository.Overlap(starTime, endTime);
+        if (overlap == null) return;
+        if (id == 0 || id != overlap.Id)
         {
             throw new ArgumentException("Bu tarih aralığı dolu!");
         }

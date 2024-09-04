@@ -51,16 +51,18 @@ public class AppointmentRepository : Repository<Appointment>, IAppointmentReposi
             ).ToListAsync();
     }
 
-    public async Task<bool> IsOverlapping(DateTime startTime, DateTime endTime)
+    public async Task<Appointment?> Overlap(DateTime startTime, DateTime endTime)
     {
-        return await Contains(a =>
-            ValidStatuses.Contains(a.Status) &&
-            (
-                (startTime >= a.StartTime && startTime < a.EndTime) || // başlangıç mevcut randevunun içinde 
-                (endTime > a.StartTime && endTime <= a.EndTime) || // bitiş mevcut randevunun içinde
-                (startTime <= a.StartTime && endTime >= a.EndTime) // yeni randevu mevcut randevuyu kapsıyor
+        return await _dbSet
+            .Where(a =>
+                ValidStatuses.Contains(a.Status) &&
+                (
+                    (startTime >= a.StartTime && startTime < a.EndTime) || // başlangıç mevcut randevunun içinde 
+                    (endTime > a.StartTime && endTime <= a.EndTime) || // bitiş mevcut randevunun içinde
+                    (startTime <= a.StartTime && endTime >= a.EndTime) // yeni randevu mevcut randevuyu kapsıyor
+                )
             )
-        );
+            .FirstOrDefaultAsync();
     }
 
     public new async Task<Appointment> GetById(int id)
